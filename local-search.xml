@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>Redis学习——持久化技术</title>
+    <link href="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/"/>
+    <url>/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Redis学习——持久化技术"><a href="#Redis学习——持久化技术" class="headerlink" title="Redis学习——持久化技术"></a>Redis学习——持久化技术</h1><p>简要介绍Redis的两种持久化技术——AOF和RDB快照</p><h2 id="RDB快照"><a href="#RDB快照" class="headerlink" title="RDB快照"></a>RDB快照</h2><p><strong>概述：</strong> Redis DataBase通过创建内存快照的方式，将redis数据以二进制格式保存到磁盘中，形成一个时间点的备份</p><p><strong>实现机制：</strong></p><ul><li>在指定的时间间隔内检查是否满足触发条件，如果满足，则执行快照操作</li><li>快照操作会将数据存储到一个RDB文件中（默认名为<code>dump.rdb</code>），存储的内存是某个时间点的数据状态</li><li>触发方式：<ul><li>定时保存：通过配置文件中的save参数，指定触发条件（如“在多少s内有多少次写操作”）</li><li>手动触发：使用<code>save</code>或者是<code>bgsave</code>命令<ul><li><code>save</code>会阻塞主线程进行保存</li><li><code>bgsave</code>在创建异步子进程执行保存操作，主线程可以继续处理客户端请求</li></ul></li></ul></li><li>相关文件：<ul><li>默认保存文件：<code>dump.rdb</code></li><li>可以通过配置文件<code>redis.conf</code>修改保存文件名及路径</li></ul></li><li>优点：<ul><li>文件体积小，适合用于全量备份</li><li>恢复速度快，适合灾难恢复</li></ul></li><li>缺点：<ul><li>不能保存实时数据（数据可能因系统故障丢失）</li><li>生成快照时可能占用较多资源（如CPU和内存）</li></ul></li></ul><p><strong>写时复制技术(Copy-On-Write, COW)：</strong></p><p>在执行bgsave的过程中，redis仍然可以继续执行命令，也就是数据能够被修改。<br>如果redis没有执行修改数据的操作，那bgsave执行的子进程和父进程用的是同一个物理内存</p><img src="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/image-20241212001020185.png" class=""><p>如果redis执行了修改数据的操作，子进程就会从原来的使用的内存数据复制一份出来继续进行rdb快照，因此，rdb快照保存的是<strong>原来的数据</strong>。在执行bgsave的过程中，redis修改的数据并不在bgsave保存的范围内，只能等待下一次bgsave。</p><img src="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/image-20241212001306225.png" class=""><h2 id="AOF持久化"><a href="#AOF持久化" class="headerlink" title="AOF持久化"></a>AOF持久化</h2><p><strong>概述：</strong> Append Only File是通过记录每次写操作的日志，将这些操作按顺序写入日志文件，确保数据可以完整恢复</p><p><strong>实现机制：</strong></p><ul><li>Redis将每次<strong>写操作记录</strong>到AOF文件中（默认名为<code>appendonly.aof</code>）<ul><li>注意：是命令执行成功后才写入文件中</li></ul></li><li>AOF文件采用追加的方式，确保写操作是顺序的</li><li>日志格式是Redis的协议格式，便于解析和重放</li><li>AOF文件会定期通过重写来压缩日志文件，避免日志文件过大<ul><li>原理是根据某个键值对的最新状态，用一条命令去记录这个键值对</li><li>重写的时候先写入临时文件，成功后再覆盖原文件（防止失败污染原文件）</li><li>在后台进行重写，同样使用了COW技术，并将在重写期间执行的命令追加到<strong>AOF缓冲区</strong>(写入旧aof文件的)和<strong>AOF重写缓冲区</strong>(等会追加到重写aof文件的)，等待后台重写完毕，会通知主线程，然后主线程将AOF重写缓冲区中的所有内容追加到新的AOF文件中，保证新旧AOF文件所保存的数据库状态一致，然后新AOF覆盖旧AOF</li></ul></li><li>配置参数决定写入磁盘的同步策略：<ul><li>always：每次写入操作立即同步（立即执行fsync函数），性能最低但数据最安全</li><li>everysec：每秒同步一次默认值，性能与安全性的折中（创建一个异步任务来执行fsync函数）</li><li>no：完全依赖操作系统决定何时同步，性能最高但数据可能丢失（永不执行fsync函数）</li></ul></li></ul><p><strong>相关文件：</strong></p><ul><li>默认保存文件：<code>ppendonly.aof</code></li><li>可通过配置文件<code>redis.conf</code>修改保存文件名及路径</li></ul><p><strong>优点：</strong></p><ul><li>数据恢复更安全，可以记录每个写操作，最大限度减少数据丢失</li><li>追加写操作性能较好</li></ul><p><strong>缺点：</strong></p><ul><li>文件体积较大</li><li>恢复速度比RDB满</li><li>初始状态可能会占用更多的存储资源</li></ul><h2 id="RDB和AOF混合持久化"><a href="#RDB和AOF混合持久化" class="headerlink" title="RDB和AOF混合持久化"></a>RDB和AOF混合持久化</h2><p>在配置文件中开启：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs conf">aof-use-rdb-preamble yes<br></code></pre></td></tr></table></figure><p>混合持久化工作在<strong>AOF日志重写过程</strong></p><p>在AOF重写日志时，fork出来的重写子线程会先将主线程共享的内存数据以RDB方式写入AOF文件，然后主线程处理的操作命令会被记录在重写缓冲区，以AOF方式写入到AOF文件，完成后主线程将含有RDB格式和AOF格式文件替换旧的AOF文件。</p><h2 id="大Key对AOF日志的影响"><a href="#大Key对AOF日志的影响" class="headerlink" title="大Key对AOF日志的影响"></a>大Key对AOF日志的影响</h2><h3 id="对AOF日志的影响"><a href="#对AOF日志的影响" class="headerlink" title="对AOF日志的影响"></a>对AOF日志的影响</h3><p>只有always策略可能会阻塞主线程，所以如果写入的是一个大Key，阻塞的时间会比较久</p><h3 id="对AOF重写和RDB的影响"><a href="#对AOF重写和RDB的影响" class="headerlink" title="对AOF重写和RDB的影响"></a>对AOF重写和RDB的影响</h3><p>如果大Key可能会很快触发AOF重写机制</p><p>然后执行AOF重写机制和RDB快照都需要fork主线程，这时候fork出来的也变可能会很大，因此会很耗时阻塞主线程</p><p>同时，如果发生了写时复制，需要复制物理内存，这个过程也会耗时阻塞主线程</p><p><strong>建议：</strong></p><ul><li>如果redis只是当作缓存，可以关闭AOF和AOF重写以及RDB，不关心数据安全性问题，可以提升性能</li><li>linux的hugepage机制也会影响redis性能，hugepage支持2MB&#x2F;1GB等大小的内存，在发生COW后，redis也需要拷贝相应hugepage大小的内存</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>redis</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>O(1)和CFS调度算法简介</title>
     <link href="/2024/12/12/O1%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B/"/>
     <url>/2024/12/12/O1%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B/</url>

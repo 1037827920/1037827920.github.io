@@ -19,26 +19,24 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="简要介绍linux中的O(1)调度算法和CFS调度算法的雏形（发展及设计思想）">
+    <meta name="description" content="简要介绍Redis的两种持久化技术——AOF和RDB快照">
 <meta property="og:type" content="article">
-<meta property="og:title" content="O(1)和CFS调度算法简介">
-<meta property="og:url" content="http://example.com/2024/12/12/O1%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:title" content="Redis学习——持久化技术">
+<meta property="og:url" content="http://example.com/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="简要介绍linux中的O(1)调度算法和CFS调度算法的雏形（发展及设计思想）">
+<meta property="og:description" content="简要介绍Redis的两种持久化技术——AOF和RDB快照">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/O(1)%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B.png">
-<meta property="article:published_time" content="2024-12-12T14:55:44.000Z">
-<meta property="article:modified_time" content="2024-12-12T14:56:45.403Z">
+<meta property="og:image" content="http://example.com/img/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF.png">
+<meta property="article:published_time" content="2024-12-12T16:37:07.000Z">
+<meta property="article:modified_time" content="2024-12-12T16:43:02.494Z">
 <meta property="article:author" content="凌云行者">
-<meta property="article:tag" content="linux">
-<meta property="article:tag" content="进程">
-<meta property="article:tag" content="调度">
+<meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/O(1)%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B.png">
+<meta name="twitter:image" content="http://example.com/img/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF.png">
   
   
   
-  <title>O(1)和CFS调度算法简介 - 凌云行者的博客</title>
+  <title>Redis学习——持久化技术 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -229,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="O(1)和CFS调度算法简介"></span>
+            <span id="subtitle" data-typed-text="Redis学习——持久化技术"></span>
           
         </div>
 
@@ -240,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-12 22:55" pubdate>
-          2024年12月12日, 10:55 晚上
+        <time datetime="2024-12-13 00:37" pubdate>
+          2024年12月13日, 12:37 凌晨
         </time>
       </span>
     
@@ -253,7 +251,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          2k 字
+          1.4k 字
         
       </span>
     
@@ -301,96 +299,101 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">O(1)和CFS调度算法简介</h1>
+            <h1 id="seo-header">Redis学习——持久化技术</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="O-1-和CFS调度算法简介"><a href="#O-1-和CFS调度算法简介" class="headerlink" title="O(1)和CFS调度算法简介"></a>O(1)和CFS调度算法简介</h1><p>简要介绍linux中的O(1)调度算法和CFS调度算法的雏形（发展及设计思想）</p>
-<h2 id="O-1-调度算法"><a href="#O-1-调度算法" class="headerlink" title="O(1)调度算法"></a>O(1)调度算法</h2><p><strong>概述：</strong> 是linux kernel 2.6引入的一种调度算法，无论系统中有多少进程，调度器总能在恒定时间内完成操作，即时间复杂度为O(1)</p>
-<p><strong>什么是调度？</strong></p>
-<p>假设这样一个场景，只有一个CPU，然后有两个进程需要执行，可以让它们交替执行。为了实现切换，我们提供一个API函数，这些进程执行一会就主动调用一下这个API函数，实现进程的切换执行，这是一种主动配合式的调度</p>
-<p><strong>进程切换的本质：</strong></p>
-<p>把当前进程的上下文（也就是CPU的一堆寄存器值）保存到该进程的PCB（进程控制块），然后把另一个进程的上下文放到CPU寄存器中开始执行。</p>
-<p><strong>中断抢占式调度：</strong></p>
-<p>有些进程在CPU执行过程中可能死锁，这样另一个进程就永远没有执行的机会了。可以利用<strong>时钟中断</strong>（一旦有中断事件到CPU，CPU就得去执行中断处理程序），在时钟中断的中断处理程序加入调度入口，就能抢到CPU的执行权。可以让每个进程都执行一个时间片（比如100ms），然后每隔一个时间片就会有一个中断事件到来，切换进程的执行。</p>
-<p><strong>就绪队列：</strong></p>
-<p>准备被CPU执行的进程，会被存储在一个队列中，这个队列就叫就绪队列</p>
-<p><strong>等待队列：</strong></p>
-<p>当有进程等待锁、IO等待或者sleep的时候，让CPU时间白白浪费了，调度程序需要介入，将其移动到等待队列，等它没有上述情况后再移动到就绪队列</p>
-<p><strong>优先级：</strong></p>
-<p>当进程数逐渐多起来，这时候进程执行一次后，等下次执行可能需要等长时间，这是不合理（比如键盘输入等1、2s才响应）。需要给每个进程设置优先级，从0-139（这里假设数字越高优先级越大，实际上并不是这样，后面有结介绍）。这样调度就需要先遍历就绪队列，这样复杂度就是O(N)了。</p>
-<p>可以按照优先级拆分成不同的队列，0-139一共140个队列，调度可以先从高优先级队列查起，可以通过一个位图(10001000….)，1表示该队列有等待调度的进程，0则无。</p>
-<p><strong>active队列和expired队列：</strong></p>
-<p>为了防止低优先级进程starvation（也就是一直没有被调度），多添加一个队列expired队列。调度器从active队列中选择最高优先级的进程运行，运行完时间片的进程被移动到expired队列，当active进程中所有进程都被移动到expired队列，直接交换两个队列（active和expired定义为指针，交换队列直接交换指针即可</p>
-<p><strong>时间片机制：</strong></p>
-<p>到上面这一步，好像跟一开始没啥区别了（也就是进程执行完一次，下一次执行需要经过很长时间，如果进程数量多的话）。故引入时间片机制，优先级越高的进程时间片越长（根据权重划分），需要设定一个最小值，不然进程数多的话有的进程时间片太小，这样调度切换多了，实际CPU执行时间就少了。</p>
-<p>这样就是O(1)调度算法的一个雏形了</p>
+                <h1 id="Redis学习——持久化技术"><a href="#Redis学习——持久化技术" class="headerlink" title="Redis学习——持久化技术"></a>Redis学习——持久化技术</h1><p>简要介绍Redis的两种持久化技术——AOF和RDB快照</p>
+<h2 id="RDB快照"><a href="#RDB快照" class="headerlink" title="RDB快照"></a>RDB快照</h2><p><strong>概述：</strong> Redis DataBase通过创建内存快照的方式，将redis数据以二进制格式保存到磁盘中，形成一个时间点的备份</p>
+<p><strong>实现机制：</strong></p>
+<ul>
+<li>在指定的时间间隔内检查是否满足触发条件，如果满足，则执行快照操作</li>
+<li>快照操作会将数据存储到一个RDB文件中（默认名为<code>dump.rdb</code>），存储的内存是某个时间点的数据状态</li>
+<li>触发方式：<ul>
+<li>定时保存：通过配置文件中的save参数，指定触发条件（如“在多少s内有多少次写操作”）</li>
+<li>手动触发：使用<code>save</code>或者是<code>bgsave</code>命令<ul>
+<li><code>save</code>会阻塞主线程进行保存</li>
+<li><code>bgsave</code>在创建异步子进程执行保存操作，主线程可以继续处理客户端请求</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>相关文件：<ul>
+<li>默认保存文件：<code>dump.rdb</code></li>
+<li>可以通过配置文件<code>redis.conf</code>修改保存文件名及路径</li>
+</ul>
+</li>
+<li>优点：<ul>
+<li>文件体积小，适合用于全量备份</li>
+<li>恢复速度快，适合灾难恢复</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>不能保存实时数据（数据可能因系统故障丢失）</li>
+<li>生成快照时可能占用较多资源（如CPU和内存）</li>
+</ul>
+</li>
+</ul>
+<p><strong>写时复制技术(Copy-On-Write, COW)：</strong></p>
+<p>在执行bgsave的过程中，redis仍然可以继续执行命令，也就是数据能够被修改。<br>如果redis没有执行修改数据的操作，那bgsave执行的子进程和父进程用的是同一个物理内存</p>
+<img src="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/image-20241212001020185.png" srcset="/img/loading.gif" lazyload class="">
+
+<p>如果redis执行了修改数据的操作，子进程就会从原来的使用的内存数据复制一份出来继续进行rdb快照，因此，rdb快照保存的是<strong>原来的数据</strong>。在执行bgsave的过程中，redis修改的数据并不在bgsave保存的范围内，只能等待下一次bgsave。</p>
+<img src="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/image-20241212001306225.png" srcset="/img/loading.gif" lazyload class="">
+
+<h2 id="AOF持久化"><a href="#AOF持久化" class="headerlink" title="AOF持久化"></a>AOF持久化</h2><p><strong>概述：</strong> Append Only File是通过记录每次写操作的日志，将这些操作按顺序写入日志文件，确保数据可以完整恢复</p>
+<p><strong>实现机制：</strong></p>
+<ul>
+<li>Redis将每次<strong>写操作记录</strong>到AOF文件中（默认名为<code>appendonly.aof</code>）<ul>
+<li>注意：是命令执行成功后才写入文件中</li>
+</ul>
+</li>
+<li>AOF文件采用追加的方式，确保写操作是顺序的</li>
+<li>日志格式是Redis的协议格式，便于解析和重放</li>
+<li>AOF文件会定期通过重写来压缩日志文件，避免日志文件过大<ul>
+<li>原理是根据某个键值对的最新状态，用一条命令去记录这个键值对</li>
+<li>重写的时候先写入临时文件，成功后再覆盖原文件（防止失败污染原文件）</li>
+<li>在后台进行重写，同样使用了COW技术，并将在重写期间执行的命令追加到<strong>AOF缓冲区</strong>(写入旧aof文件的)和<strong>AOF重写缓冲区</strong>(等会追加到重写aof文件的)，等待后台重写完毕，会通知主线程，然后主线程将AOF重写缓冲区中的所有内容追加到新的AOF文件中，保证新旧AOF文件所保存的数据库状态一致，然后新AOF覆盖旧AOF</li>
+</ul>
+</li>
+<li>配置参数决定写入磁盘的同步策略：<ul>
+<li>always：每次写入操作立即同步（立即执行fsync函数），性能最低但数据最安全</li>
+<li>everysec：每秒同步一次默认值，性能与安全性的折中（创建一个异步任务来执行fsync函数）</li>
+<li>no：完全依赖操作系统决定何时同步，性能最高但数据可能丢失（永不执行fsync函数）</li>
+</ul>
+</li>
+</ul>
+<p><strong>相关文件：</strong></p>
+<ul>
+<li>默认保存文件：<code>ppendonly.aof</code></li>
+<li>可通过配置文件<code>redis.conf</code>修改保存文件名及路径</li>
+</ul>
 <p><strong>优点：</strong></p>
 <ul>
-<li>时间复杂度为O(1)</li>
-<li>优先级机制</li>
+<li>数据恢复更安全，可以记录每个写操作，最大限度减少数据丢失</li>
+<li>追加写操作性能较好</li>
 </ul>
 <p><strong>缺点：</strong></p>
 <ul>
-<li>不够公平</li>
+<li>文件体积较大</li>
+<li>恢复速度比RDB满</li>
+<li>初始状态可能会占用更多的存储资源</li>
 </ul>
-<h2 id="完全公平调度算法"><a href="#完全公平调度算法" class="headerlink" title="完全公平调度算法"></a>完全公平调度算法</h2><p><strong>概述：</strong> CFS(Completely Fair Scheduler)是Linux内核2.6.23引入的调度算法，旨在更加公平的调度</p>
-<p><strong>虚拟运行时间(vruntime)：</strong></p>
-<p>为了让优先级较小的进程能“追赶”到公平的水平，引入vruntime的概念，也就是低优先级的vruntime增长的更快，高优先级的进程vruntime增长较慢，可以把vruntime作为衡量任务实际消耗CPU时间的账本，所以为了公平调度，每次选择vruntime最小的进程运行（让它吃个饱</p>
-<p>举个例子，假设有三个任务A,B，权重分别为2,1，三个任务刚进入系统，vruntime都是0，调度器先选择优先级高的A执行，运行10ms后，A的vruntime增加5（因为优先级高的进程vruntime增长慢），然后调度选择vrumtime目前最小的B运行10ms后，B的vruntime增加10（低优先级进程vruntime增长快），第三次调度器仍选择vruntime最小的A执行。</p>
-<p>把CPU比作很多个蛋糕，任务的优先级比作拿到蛋糕的能力（A拿蛋糕速度快吃得也快，B拿蛋糕速度慢）。调度器通过监控每个任务拿的蛋糕数量（vruntime），优先让蛋糕少的人去拿，确保大家都能吃到蛋糕，同时让能力强的人吃得多一些。</p>
-<p><strong>红黑树：</strong></p>
-<p>那要怎么去取vruntime最小的进程效率最高呢？答案是红黑树，因为它是一棵<strong>近似平衡的二叉搜索树</strong>，也就是这颗树最左节点是vruntime最小的进程，也就是需要调度的进程</p>
-<p><strong>AVL vs. 红黑树：</strong></p>
-<p>红黑树的近似平衡规则：</p>
-<ul>
-<li>每个节点是红色或黑色（颜色用于控制树的平衡调整）</li>
-<li>根节点始终是黑色的（确保树的整体平衡从根节点开始）</li>
-<li>每个叶子节点（nil节点）是黑色（nil节点是所有空子树的占位符）</li>
-<li>红色节点的子节点必须是黑色的</li>
-<li>从任一节点到其叶子节点的每条路径必须包含相同数量的黑色节点（黑高）</li>
-</ul>
-<p>示例：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs css">   (<span class="hljs-number">10</span>B)<br>  /    \<br>(<span class="hljs-number">5</span>R)   (<span class="hljs-number">15</span>R)<br></code></pre></td></tr></table></figure>
+<h2 id="RDB和AOF混合持久化"><a href="#RDB和AOF混合持久化" class="headerlink" title="RDB和AOF混合持久化"></a>RDB和AOF混合持久化</h2><p>在配置文件中开启：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs conf">aof-use-rdb-preamble yes<br></code></pre></td></tr></table></figure>
 
-<p>插入2：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs css">       (<span class="hljs-number">10</span>B)<br>      /    \<br>   (<span class="hljs-number">5</span>R)    (<span class="hljs-number">15</span>R)<br>  /<br>(<span class="hljs-number">2</span>R)<br></code></pre></td></tr></table></figure>
-
-<p>将5改为黑色，右旋（以5为轴：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs css">    (<span class="hljs-number">5</span>B)<br>   /    \<br>(<span class="hljs-number">2</span>R)   (<span class="hljs-number">10</span>B)<br>          \<br>          (<span class="hljs-number">15</span>R)<br></code></pre></td></tr></table></figure>
-
-<p>而AVL树是严格平衡的，也就是节点的左右子树高度差不超过1，而CFS更看重<strong>实时响应性</strong>，AVL树需要更加频繁地调整，且红黑树的实现较简单，旋转次数更少，<strong>较低的调度延迟</strong>。</p>
-<p><strong>优点：</strong></p>
+<p>混合持久化工作在<strong>AOF日志重写过程</strong></p>
+<p>在AOF重写日志时，fork出来的重写子线程会先将主线程共享的内存数据以RDB方式写入AOF文件，然后主线程处理的操作命令会被记录在重写缓冲区，以AOF方式写入到AOF文件，完成后主线程将含有RDB格式和AOF格式文件替换旧的AOF文件。</p>
+<h2 id="大Key对AOF日志的影响"><a href="#大Key对AOF日志的影响" class="headerlink" title="大Key对AOF日志的影响"></a>大Key对AOF日志的影响</h2><h3 id="对AOF日志的影响"><a href="#对AOF日志的影响" class="headerlink" title="对AOF日志的影响"></a>对AOF日志的影响</h3><p>只有always策略可能会阻塞主线程，所以如果写入的是一个大Key，阻塞的时间会比较久</p>
+<h3 id="对AOF重写和RDB的影响"><a href="#对AOF重写和RDB的影响" class="headerlink" title="对AOF重写和RDB的影响"></a>对AOF重写和RDB的影响</h3><p>如果大Key可能会很快触发AOF重写机制</p>
+<p>然后执行AOF重写机制和RDB快照都需要fork主线程，这时候fork出来的也变可能会很大，因此会很耗时阻塞主线程</p>
+<p>同时，如果发生了写时复制，需要复制物理内存，这个过程也会耗时阻塞主线程</p>
+<p><strong>建议：</strong></p>
 <ul>
-<li>公平性</li>
-<li>高效，红黑树操作时间复杂度是O(logN)</li>
-<li>CFS支持调度公平性程序（如通过<code>sched_latenct</code>和<code>sched_min_granularity</code>参数）</li>
+<li>如果redis只是当作缓存，可以关闭AOF和AOF重写以及RDB，不关心数据安全性问题，可以提升性能</li>
+<li>linux的hugepage机制也会影响redis性能，hugepage支持2MB&#x2F;1GB等大小的内存，在发生COW后，redis也需要拷贝相应hugepage大小的内存</li>
 </ul>
-<p><strong>缺点：</strong></p>
-<ul>
-<li>较高复杂度相比O(1)调度算法</li>
-<li>对实时任务支持较弱</li>
-</ul>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p><strong>二者的对比：</strong></p>
-<p>O(1)调度算法更适合实时系统和对复杂性要求较高的场景，CFS调度是现代通用linux系统的默认调度器，它在公平性和灵活性上显著优于O(1)调度</p>
-<p><strong>调度的是线程：</strong></p>
-<p>在现代linux内核中，参与调度的实体是线程而不是进程，linux将线程视为轻量级线程(LWP)。</p>
-<p>相比于进程：</p>
-<ul>
-<li>线程的上下文切换开销更小，因为线程共享进程资源，不需要切换整个地址空间等信息</li>
-<li>符合现代应用程序的并发需求，现代程序常常通过多线程模型来实现高性能并发</li>
-<li>更好地支持多核架构，不同线程可以同时运行在多个CPU核心上，而且线程粒度更细</li>
-</ul>
-<p><strong>实时优先级和普通优先级：</strong></p>
-<ul>
-<li>0-99：实时优先级，用于实时任务，更高数字表示更高优先级</li>
-<li>100-139：普通优先级，更低数字表示更高的优先级</li>
-</ul>
-<p><strong>nice值：</strong></p>
-<p>进程通过一个nice值（对其他进程的友好度，nice越大越友好，越谦让，优先级越低）映射到优先级，nice越大优先级越低</p>
-<p><strong>进程优先级是分动态和静态的</strong></p>
-<p><strong>在多核模式下，为了防止加锁带来的性能损失，每个CPU核都有自己的调度队列</strong></p>
 
                 
               </div>
@@ -424,11 +427,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/linux/" class="print-no-link">#linux</a>
-      
-        <a href="/tags/%E8%BF%9B%E7%A8%8B/" class="print-no-link">#进程</a>
-      
-        <a href="/tags/%E8%B0%83%E5%BA%A6/" class="print-no-link">#调度</a>
+        <a href="/tags/redis/" class="print-no-link">#redis</a>
       
     </div>
   
@@ -440,8 +439,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>O(1)和CFS调度算法简介</div>
-      <div>http://example.com/2024/12/12/O1和CFS调度算法简介/</div>
+      <div>Redis学习——持久化技术</div>
+      <div>http://example.com/2024/12/13/Redis学习——持久化技术/</div>
     </div>
     <div class="license-meta">
       
@@ -453,7 +452,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年12月12日</div>
+          <div>2024年12月13日</div>
         </div>
       
       
@@ -497,18 +496,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/" title="Redis学习——持久化技术">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redis学习——持久化技术</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/12/11/ubuntu22%E5%AE%89%E8%A3%85docker%E5%B9%B6%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F/" title="ubuntu22安装docker并配置镜像">
-                        <span class="hidden-mobile">ubuntu22安装docker并配置镜像</span>
+                      <a href="/2024/12/12/O1%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B/" title="O(1)和CFS调度算法简介">
+                        <span class="hidden-mobile">O(1)和CFS调度算法简介</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
