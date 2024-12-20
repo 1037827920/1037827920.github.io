@@ -252,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          346 字
+          340 字
         
       </span>
     
@@ -306,16 +306,18 @@
               <div class="markdown-body">
                 
                 <p>本文将介绍JMeter的简单使用方法（windows11平台），用来测试web应用的性能，也可以作为后端接口的测试。</p>
-<p><strong>JMeter下载地址：</strong> <a target="_blank" rel="noopener" href="https://jmeter.apache.org/download_jmeter.cgi">Apache JMeter - Download Apache JMeter</a></p>
-<p>选择二进制包下载后解压，双击&#x2F;bin&#x2F;jmeter.bat</p>
-<h1 id="语言设置"><a href="#语言设置" class="headerlink" title="语言设置"></a>语言设置</h1><p>可以在Options&#x2F;Choose Language将语言设置为中文</p>
+<p><strong>JMeter下载地址：</strong> <a
+target="_blank" rel="noopener" href="https://jmeter.apache.org/download_jmeter.cgi">Apache JMeter -
+Download Apache JMeter</a></p>
+<p>选择二进制包下载后解压，双击/bin/jmeter.bat</p>
+<h1 id="语言设置">语言设置</h1>
+<p>可以在Options/Choose Language将语言设置为中文</p>
 <img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117163738309.png" srcset="/img/loading.gif" lazyload class="">
-
-<h1 id="创建线程组"><a href="#创建线程组" class="headerlink" title="创建线程组"></a>创建线程组</h1><p>右键Test Plan，按下图操作</p>
+<h1 id="创建线程组">创建线程组</h1>
+<p>右键Test Plan，按下图操作</p>
 <img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117163835921.png" srcset="/img/loading.gif" lazyload class="">
-
-<h1 id="设置线程组"><a href="#设置线程组" class="headerlink" title="设置线程组"></a>设置线程组</h1><img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117163925672.png" srcset="/img/loading.gif" lazyload class="">
-
+<h1 id="设置线程组">设置线程组</h1>
+<img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117163925672.png" srcset="/img/loading.gif" lazyload class="">
 <ul>
 <li>名称：线程组名称</li>
 <li>注释（可选设置）</li>
@@ -323,26 +325,27 @@
 <li>Ramp-Up时间：在设定的时间内启动上面设置的线程数</li>
 <li>循环次数：即一个线程发送设定的请求，可以勾选永远，这样线程就会一直发送API请求</li>
 </ul>
-<h1 id="添加HTTP请求"><a href="#添加HTTP请求" class="headerlink" title="添加HTTP请求"></a>添加HTTP请求</h1><p>右键线程组，按下图操作</p>
+<h1 id="添加http请求">添加HTTP请求</h1>
+<p>右键线程组，按下图操作</p>
 <img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117164146898.png" srcset="/img/loading.gif" lazyload class="">
-
-<h1 id="设置HTTP请求"><a href="#设置HTTP请求" class="headerlink" title="设置HTTP请求"></a>设置HTTP请求</h1><img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117164232440.png" srcset="/img/loading.gif" lazyload class="">
+<h1 id="设置http请求">设置HTTP请求</h1>
+<img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117164232440.png" srcset="/img/loading.gif" lazyload class="">
 <ul>
 <li>名称：接口名称</li>
 <li>注释（可选）</li>
-<li>协议：http&#x2F;https</li>
+<li>协议：http/https</li>
 <li>服务器名称或IP：服务器域名或IP地址</li>
 <li>端口号：web程序监听的端口号</li>
-<li>请求方法：GET&#x2F;POST&#x2F;….</li>
+<li>请求方法：GET/POST/....</li>
 <li>路径：API接口路径</li>
 </ul>
-<h1 id="添加HTTP请求头"><a href="#添加HTTP请求头" class="headerlink" title="添加HTTP请求头"></a>添加HTTP请求头</h1><p>右键线程组，按下图操作</p>
+<h1 id="添加http请求头">添加HTTP请求头</h1>
+<p>右键线程组，按下图操作</p>
 <img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117164430297.png" srcset="/img/loading.gif" lazyload class="">
-
 <p>然后设置接口的HTTP请求头 ，如果有的话</p>
-<h1 id="添加监听器"><a href="#添加监听器" class="headerlink" title="添加监听器"></a>添加监听器</h1><p>查看结果树：可以查看请求响应是否成功，也可以看到响应内存</p>
+<h1 id="添加监听器">添加监听器</h1>
+<p>查看结果树：可以查看请求响应是否成功，也可以看到响应内存</p>
 <img src="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/image-20241117164613252.png" srcset="/img/loading.gif" lazyload class="">
-
 <p>聚合报告：可以查看API响应时间以及吞吐量</p>
 
                 
@@ -516,6 +519,12 @@
 
 
   
+
+
+  
+  
+
+
 
 
 
@@ -734,6 +743,49 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script defer src="/js/leancloud.js" ></script>
 

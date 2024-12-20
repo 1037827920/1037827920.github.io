@@ -306,45 +306,55 @@
             
               <div class="markdown-body">
                 
-                <h1 id="glfw"><a href="#glfw" class="headerlink" title="glfw"></a>glfw</h1><p><strong>概述：</strong> 用于OpenGL开发中创建窗口、上下文和处理输入等操作。提供跨平台支持，简化了底层的操作系统调用</p>
+                <h1 id="glfw">glfw</h1>
+<p><strong>概述：</strong>
+用于OpenGL开发中创建窗口、上下文和处理输入等操作。提供跨平台支持，简化了底层的操作系统调用</p>
 <p><strong>作用：</strong></p>
 <ul>
-<li>窗口和上下文管理：<ul>
+<li>窗口和上下文管理：
+<ul>
 <li>创建窗口：GLFW提供API创建OpenGL窗口，并设置窗口大小、标题、位置等，窗口是渲染图像的主要界面</li>
 <li>OpenGL上下文：每个窗口都有独立的OpenGL上下文，用于管理OpenGL的状态和资源。GLFW自动为窗口创建上下文，简化开发流程</li>
 <li>双缓冲：GFLW支持双缓冲，用于减少图形闪烁问题，在双缓冲模式下，渲染的图像会在后台缓冲区绘制，完成后交换到前台缓冲区，实现平滑显示</li>
-</ul>
-</li>
-<li>输入处理：<ul>
+</ul></li>
+<li>输入处理：
+<ul>
 <li>键盘输入：GLFW提供API监听键盘事件，包括按键按下、释放等，开发者可以查询某个按键的状态，或使用回调函数处理键盘输入</li>
 <li>鼠标输入：GLFW还提供鼠标位置、滚轮和按键事件的处理。</li>
-<li>手柄&#x2F;控制器支持：GLFW支持游戏手柄，适用于需要控制器输入的应用</li>
-</ul>
-</li>
-<li>事件管理：<ul>
+<li>手柄/控制器支持：GLFW支持游戏手柄，适用于需要控制器输入的应用</li>
+</ul></li>
+<li>事件管理：
+<ul>
 <li>窗口事件：GLFW可以监听窗口的事件，包括窗口大小改变、窗口关闭等事件。开发者可以注册相应的回调函数，方便实现窗口重绘或调整界面元素</li>
 <li>刷新帧：GLFW提供了帧刷新功能，让开发者在双缓冲模式下完成每帧的渲染后，将图像从后台缓冲区切换到前台</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h1 id="glad"><a href="#glad" class="headerlink" title="glad"></a>glad</h1><p><strong>概述：</strong> 是一个用于管理OpenGL函数指针的库，由于OpenGL是一个跨平台的图形API，不同平台上的OpenGL实现可能会有所不同，因此需要一个工具来加载和管理这些函数指针。</p>
+<h1 id="glad">glad</h1>
+<p><strong>概述：</strong>
+是一个用于管理OpenGL函数指针的库，由于OpenGL是一个跨平台的图形API，不同平台上的OpenGL实现可能会有所不同，因此需要一个工具来加载和管理这些函数指针。</p>
 <p><strong>作用：</strong></p>
 <ul>
 <li>加载OpenGL函数指针：OpenGL函数在运行时由驱动程序提供，GLAD负责加载这些函数指针，使得程序可以调用OpenGL函数</li>
 <li>跨平台支持：glad支持多种平台和opengl版本，简化了跨平台开发的复杂性</li>
 </ul>
-<h1 id="创建窗口进行渲染的基本流程"><a href="#创建窗口进行渲染的基本流程" class="headerlink" title="创建窗口进行渲染的基本流程"></a>创建窗口进行渲染的基本流程</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>怎么在vscode上使用cmake构建项目，具体可以看这篇<a target="_blank" rel="noopener" href="https://1037827920.github.io/2024/10/31/Windows%E4%B8%8A%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8CMake%E6%9E%84%E5%BB%BA%E9%A1%B9%E7%9B%AE/">Windows上如何使用CMake构建项目 - 凌云行者的博客</a></p>
-<p><strong>目的：</strong>  利用glfw和glad进行窗口的创建，然后循环渲染。</p>
+<h1 id="创建窗口进行渲染的基本流程">创建窗口进行渲染的基本流程</h1>
+<h2 id="简介">简介</h2>
+<p>怎么在vscode上使用cmake构建项目，具体可以看这篇<a
+target="_blank" rel="noopener" href="https://1037827920.github.io/2024/10/31/Windows上如何使用CMake构建项目/">Windows上如何使用CMake构建项目
+- 凌云行者的博客</a></p>
+<p><strong>目的：</strong>
+利用glfw和glad进行窗口的创建，然后循环渲染。</p>
 <p><strong>环境：</strong></p>
 <ul>
 <li>编译工具链：使用msys2安装的mingw-gcc</li>
 <li>依赖项：glfw3:x64-mingw-static，glad:x64-mingw-static（通过vcpkg安装）</li>
 </ul>
-<h2 id="main-cpp"><a href="#main-cpp" class="headerlink" title="main.cpp"></a>main.cpp</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;glad/glad.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;GLFW/glfw3.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-keyword">using</span> std::cout;<br><span class="hljs-keyword">using</span> std::endl;<br><br><span class="hljs-comment">// 屏幕宽度</span><br><span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> SCR_WIDTH = <span class="hljs-number">800</span>;<br><span class="hljs-comment">// 屏幕高度</span><br><span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> SCR_HEIGHT = <span class="hljs-number">600</span>;<br><br><span class="hljs-comment">// 窗口大小改变的回调函数</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">framebuffer_size_callback</span><span class="hljs-params">(GLFWwindow* window, <span class="hljs-type">int</span> width, <span class="hljs-type">int</span> height)</span> </span>&#123;<br>    <span class="hljs-comment">// 确保视口与新窗口尺寸匹配，注意在视网膜显示器上，宽度和高度会显著大于指定值</span><br>    <span class="hljs-built_in">glViewport</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, width, height);<br>&#125;<br><br><span class="hljs-comment">// 处理输入</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">process_input</span><span class="hljs-params">(GLFWwindow* window)</span> </span>&#123;<br>    <span class="hljs-comment">// 按下ESC键时进入if块</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">glfwGetKey</span>(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)<br>        <span class="hljs-comment">// 关闭窗口</span><br>        <span class="hljs-built_in">glfwSetWindowShouldClose</span>(window, <span class="hljs-literal">true</span>);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 初始化glfw</span><br>    <span class="hljs-built_in">glfwInit</span>();<br>    <span class="hljs-comment">// 设置opengl版本</span><br>    <span class="hljs-built_in">glfwWindowHint</span>(GLFW_CONTEXT_VERSION_MAJOR, <span class="hljs-number">3</span>);<br>    <span class="hljs-built_in">glfwWindowHint</span>(GLFW_CONTEXT_VERSION_MINOR, <span class="hljs-number">3</span>);<br>    <span class="hljs-comment">// 使用核心模式：确保不使用任何被弃用的功能</span><br>    <span class="hljs-built_in">glfwWindowHint</span>(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);<br>	<br>    <span class="hljs-comment">// 创建glfw窗口</span><br>    GLFWwindow* window = <span class="hljs-built_in">glfwCreateWindow</span>(SCR_WIDTH, SCR_HEIGHT, <span class="hljs-string">&quot;I am window title&quot;</span>, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);<br>    <span class="hljs-keyword">if</span> (window == <span class="hljs-literal">NULL</span>) &#123;<br>        cout &lt;&lt; <span class="hljs-string">&quot;Failed to create glfw window&quot;</span> &lt;&lt; endl;<br>        <span class="hljs-comment">// 终止GLFW</span><br>        <span class="hljs-built_in">glfwTerminate</span>();<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>    &#125;<br>    <span class="hljs-comment">// 设置当前窗口的上下文</span><br>    <span class="hljs-built_in">glfwMakeContextCurrent</span>(window);<br>    <span class="hljs-comment">// 设置窗口大小改变的回调函数</span><br>    <span class="hljs-built_in">glfwSetFramebufferSizeCallback</span>(window, framebuffer_size_callback);<br>    <br>    <span class="hljs-comment">// 加载opengl函数指针</span><br>    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">gladLoadGLLoader</span>((GLADloadproc)glfwGetProcAddress)) &#123;<br>        cout &lt;&lt; <span class="hljs-string">&quot;Failed to initialize GLAD&quot;</span> &lt;&lt; endl;<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>    &#125;<br>    <br>    <span class="hljs-comment">// 循环渲染</span><br>    <span class="hljs-keyword">while</span> (!<span class="hljs-built_in">glfwWindowShouldClose</span>(window)) &#123; <span class="hljs-comment">// 检查是否应该关闭窗口</span><br>        <span class="hljs-comment">// 处理输入</span><br>        <span class="hljs-built_in">process_input</span>(window);<br>        <br>        <span class="hljs-comment">// 清空屏幕所用的颜色</span><br>        <span class="hljs-built_in">glClearColor</span>(<span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>);<br>        <span class="hljs-comment">// 清空颜色缓冲，主要目的是为每一帧的渲染准备一个干净的画布</span><br>        <span class="hljs-built_in">glClear</span>(GL_COLOR_BUFFER_BIT);<br>        <br>        <span class="hljs-comment">// 交换缓冲区</span><br>        <span class="hljs-built_in">glfwSwapBuffers</span>(window);<br>        <span class="hljs-comment">// 处理所有待处理事件，去poll所有事件，看看哪个没处理的</span><br>        <span class="hljs-built_in">glfwPollEvents</span>();<br>    &#125;<br>    <br>    <span class="hljs-comment">// 终止GLFW，清理GLFW分配的资源</span><br>    <span class="hljs-built_in">glfwTerminate</span>();<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<h2 id="CMakeLists-txt"><a href="#CMakeLists-txt" class="headerlink" title="CMakeLists.txt"></a>CMakeLists.txt</h2><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cmake"><span class="hljs-comment"># 设置CMake的最低版本要求</span><br><span class="hljs-keyword">cmake_minimum_required</span>(VERSION <span class="hljs-number">3.10</span>)<br><span class="hljs-comment"># 设置项目名称</span><br><span class="hljs-keyword">project</span>(HelloWorld)<br><br><span class="hljs-comment"># vcpkg集成, 这里要换成你自己的vcpkg工具链文件和共享库路径</span><br><span class="hljs-keyword">set</span>(VCPKG_ROOT D:/software6/vcpkg/)<br><span class="hljs-keyword">set</span>(CMAKE_TOOLCHAIN_FILE <span class="hljs-variable">$&#123;VCPKG_ROOT&#125;</span>/scripts/buildsystems/vcpkg.cmake)<br><span class="hljs-keyword">set</span>(CMAKE_PREFIX_PATH <span class="hljs-variable">$&#123;VCPKG_ROOT&#125;</span>/installed/x64-mingw-static/share)<br><br><span class="hljs-comment"># 查找所需的包</span><br><span class="hljs-keyword">find_package</span>(glad CONFIG REQUIRED)<br><span class="hljs-keyword">find_package</span>(glfw3 CONFIG REQUIRED)<br><br><span class="hljs-comment"># 添加可执行文件</span><br><span class="hljs-keyword">add_executable</span>(HelloWorld main.cpp)<br><br><span class="hljs-comment"># 链接所需的库</span><br><span class="hljs-keyword">target_link_libraries</span>(HelloWorld PRIVATE glad::glad glfw)<br></code></pre></td></tr></table></figure>
-
-<h2 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h2><img src="/2024/10/31/OpenGL%E5%85%A5%E9%97%A8001%E2%80%94%E2%80%94%E4%BD%BF%E7%94%A8glad%E5%92%8Cglfw%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AA%97%E5%8F%A3/image-20241101115319592.png" srcset="/img/loading.gif" lazyload class="">
+<h2 id="main.cpp">main.cpp</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;glad/glad.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;GLFW/glfw3.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-keyword">using</span> std::cout;<br><span class="hljs-keyword">using</span> std::endl;<br><br><span class="hljs-comment">// 屏幕宽度</span><br><span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> SCR_WIDTH = <span class="hljs-number">800</span>;<br><span class="hljs-comment">// 屏幕高度</span><br><span class="hljs-type">const</span> <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> SCR_HEIGHT = <span class="hljs-number">600</span>;<br><br><span class="hljs-comment">// 窗口大小改变的回调函数</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">framebuffer_size_callback</span><span class="hljs-params">(GLFWwindow* window, <span class="hljs-type">int</span> width, <span class="hljs-type">int</span> height)</span> </span>&#123;<br>    <span class="hljs-comment">// 确保视口与新窗口尺寸匹配，注意在视网膜显示器上，宽度和高度会显著大于指定值</span><br>    <span class="hljs-built_in">glViewport</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, width, height);<br>&#125;<br><br><span class="hljs-comment">// 处理输入</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">process_input</span><span class="hljs-params">(GLFWwindow* window)</span> </span>&#123;<br>    <span class="hljs-comment">// 按下ESC键时进入if块</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">glfwGetKey</span>(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)<br>        <span class="hljs-comment">// 关闭窗口</span><br>        <span class="hljs-built_in">glfwSetWindowShouldClose</span>(window, <span class="hljs-literal">true</span>);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 初始化glfw</span><br>    <span class="hljs-built_in">glfwInit</span>();<br>    <span class="hljs-comment">// 设置opengl版本</span><br>    <span class="hljs-built_in">glfwWindowHint</span>(GLFW_CONTEXT_VERSION_MAJOR, <span class="hljs-number">3</span>);<br>    <span class="hljs-built_in">glfwWindowHint</span>(GLFW_CONTEXT_VERSION_MINOR, <span class="hljs-number">3</span>);<br>    <span class="hljs-comment">// 使用核心模式：确保不使用任何被弃用的功能</span><br>    <span class="hljs-built_in">glfwWindowHint</span>(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);<br>	<br>    <span class="hljs-comment">// 创建glfw窗口</span><br>    GLFWwindow* window = <span class="hljs-built_in">glfwCreateWindow</span>(SCR_WIDTH, SCR_HEIGHT, <span class="hljs-string">&quot;I am window title&quot;</span>, <span class="hljs-literal">NULL</span>, <span class="hljs-literal">NULL</span>);<br>    <span class="hljs-keyword">if</span> (window == <span class="hljs-literal">NULL</span>) &#123;<br>        cout &lt;&lt; <span class="hljs-string">&quot;Failed to create glfw window&quot;</span> &lt;&lt; endl;<br>        <span class="hljs-comment">// 终止GLFW</span><br>        <span class="hljs-built_in">glfwTerminate</span>();<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>    &#125;<br>    <span class="hljs-comment">// 设置当前窗口的上下文</span><br>    <span class="hljs-built_in">glfwMakeContextCurrent</span>(window);<br>    <span class="hljs-comment">// 设置窗口大小改变的回调函数</span><br>    <span class="hljs-built_in">glfwSetFramebufferSizeCallback</span>(window, framebuffer_size_callback);<br>    <br>    <span class="hljs-comment">// 加载opengl函数指针</span><br>    <span class="hljs-keyword">if</span> (!<span class="hljs-built_in">gladLoadGLLoader</span>((GLADloadproc)glfwGetProcAddress)) &#123;<br>        cout &lt;&lt; <span class="hljs-string">&quot;Failed to initialize GLAD&quot;</span> &lt;&lt; endl;<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>    &#125;<br>    <br>    <span class="hljs-comment">// 循环渲染</span><br>    <span class="hljs-keyword">while</span> (!<span class="hljs-built_in">glfwWindowShouldClose</span>(window)) &#123; <span class="hljs-comment">// 检查是否应该关闭窗口</span><br>        <span class="hljs-comment">// 处理输入</span><br>        <span class="hljs-built_in">process_input</span>(window);<br>        <br>        <span class="hljs-comment">// 清空屏幕所用的颜色</span><br>        <span class="hljs-built_in">glClearColor</span>(<span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>);<br>        <span class="hljs-comment">// 清空颜色缓冲，主要目的是为每一帧的渲染准备一个干净的画布</span><br>        <span class="hljs-built_in">glClear</span>(GL_COLOR_BUFFER_BIT);<br>        <br>        <span class="hljs-comment">// 交换缓冲区</span><br>        <span class="hljs-built_in">glfwSwapBuffers</span>(window);<br>        <span class="hljs-comment">// 处理所有待处理事件，去poll所有事件，看看哪个没处理的</span><br>        <span class="hljs-built_in">glfwPollEvents</span>();<br>    &#125;<br>    <br>    <span class="hljs-comment">// 终止GLFW，清理GLFW分配的资源</span><br>    <span class="hljs-built_in">glfwTerminate</span>();<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="cmakelists.txt">CMakeLists.txt</h2>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cmake"><span class="hljs-comment"># 设置CMake的最低版本要求</span><br><span class="hljs-keyword">cmake_minimum_required</span>(VERSION <span class="hljs-number">3.10</span>)<br><span class="hljs-comment"># 设置项目名称</span><br><span class="hljs-keyword">project</span>(HelloWorld)<br><br><span class="hljs-comment"># vcpkg集成, 这里要换成你自己的vcpkg工具链文件和共享库路径</span><br><span class="hljs-keyword">set</span>(VCPKG_ROOT D:/software6/vcpkg/)<br><span class="hljs-keyword">set</span>(CMAKE_TOOLCHAIN_FILE <span class="hljs-variable">$&#123;VCPKG_ROOT&#125;</span>/scripts/buildsystems/vcpkg.cmake)<br><span class="hljs-keyword">set</span>(CMAKE_PREFIX_PATH <span class="hljs-variable">$&#123;VCPKG_ROOT&#125;</span>/installed/x64-mingw-static/share)<br><br><span class="hljs-comment"># 查找所需的包</span><br><span class="hljs-keyword">find_package</span>(glad CONFIG REQUIRED)<br><span class="hljs-keyword">find_package</span>(glfw3 CONFIG REQUIRED)<br><br><span class="hljs-comment"># 添加可执行文件</span><br><span class="hljs-keyword">add_executable</span>(HelloWorld main.cpp)<br><br><span class="hljs-comment"># 链接所需的库</span><br><span class="hljs-keyword">target_link_libraries</span>(HelloWorld PRIVATE glad::glad glfw)<br></code></pre></td></tr></table></figure>
+<h2 id="最终效果">最终效果</h2>
+<img src="/2024/10/31/OpenGL%E5%85%A5%E9%97%A8001%E2%80%94%E2%80%94%E4%BD%BF%E7%94%A8glad%E5%92%8Cglfw%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%AA%97%E5%8F%A3/image-20241101115319592.png" srcset="/img/loading.gif" lazyload class="">
 
                 
               </div>
@@ -519,6 +529,12 @@
 
 
   
+
+
+  
+  
+
+
 
 
 
@@ -737,6 +753,49 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script defer src="/js/leancloud.js" ></script>
 

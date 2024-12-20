@@ -305,83 +305,90 @@
             
               <div class="markdown-body">
                 
-                <h1 id="OpenGL阴影映射技术介绍"><a href="#OpenGL阴影映射技术介绍" class="headerlink" title="OpenGL阴影映射技术介绍"></a>OpenGL阴影映射技术介绍</h1><h2 id="SM"><a href="#SM" class="headerlink" title="SM"></a>SM</h2><p><strong>概述：</strong> Shadow Mapping，最基本的阴影算法之一，通过使用光源的视角渲染场景的深度信息来生成阴影，其核心思想时将光源的深度信息存储在一个深度贴图中，在进行渲染时，利用该深度信息来判断每个片段是否在阴影中</p>
+                <h1 id="opengl阴影映射技术介绍">OpenGL阴影映射技术介绍</h1>
+<h2 id="sm">SM</h2>
+<p><strong>概述：</strong> Shadow
+Mapping，最基本的阴影算法之一，通过使用光源的视角渲染场景的深度信息来生成阴影，其核心思想时将光源的深度信息存储在一个深度贴图中，在进行渲染时，利用该深度信息来判断每个片段是否在阴影中</p>
 <p><strong>步骤：</strong></p>
-<ol>
-<li>生成深度贴图：对场景进行一次光源视角的渲染，生成一个深度贴图，该贴图存储了光源照射到场景中的每个像素的深度值<ul>
+<ol type="1">
+<li>生成深度贴图：对场景进行一次光源视角的渲染，生成一个深度贴图，该贴图存储了光源照射到场景中的每个像素的深度值
+<ul>
 <li>在光源的视角中，进行正交或透视投影渲染</li>
 <li>将深度值存储在深度贴图中</li>
-</ul>
-</li>
+</ul></li>
 <li>使用深度贴图进行阴影测试：在场景的主渲染阶段，首先将每个片段（像素）的世界坐标转换到光源的视角空间，然后在光源的深度贴图查询该位置的深度值，如果当前片段的深度值大于深度贴图中的值，说明该片段在阴影中</li>
 </ol>
 <p><strong>算法实现：</strong></p>
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs glsl"><span class="hljs-type">float</span> SM(<span class="hljs-type">vec4</span> fragPosLightSpace,<span class="hljs-type">vec3</span> normal,<span class="hljs-type">vec3</span> lightDir,<span class="hljs-type">sampler2D</span> shadowMap)&#123;<br>    <span class="hljs-comment">// 转换为标准齐次坐标 z[-1, 1]</span><br>    <span class="hljs-type">vec3</span> projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;<br>    <span class="hljs-comment">// xyz: [-1, 1] -&gt; [0, 1]</span><br>    projCoords=projCoords*<span class="hljs-number">.5</span>+<span class="hljs-number">.5</span>;<br>    <span class="hljs-comment">// 只要投影向量的z坐标大于1.0或小于0.0，就把shadow设置为1.0(即超出了光源视锥体的最远处，这样最远处也不会处在阴影中，导致采样过多不真实)</span><br>    <span class="hljs-keyword">if</span>(projCoords.z&gt;<span class="hljs-number">1.</span>||projCoords.z&lt;<span class="hljs-number">0.</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    <br>    <span class="hljs-comment">// 从光源视角看到的深度值（从阴影贴图获取</span><br>    <span class="hljs-type">float</span> closestDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy).r;<br>    <span class="hljs-comment">// 从摄像机视角看到的深度值</span><br>    <span class="hljs-type">float</span> currentDepth=projCoords.z;<br>    <span class="hljs-comment">// 偏移量，解决阴影失真的问题, 根据表面朝向光线的角度更改偏移量</span><br>    <span class="hljs-type">float</span> bias=<span class="hljs-built_in">max</span>(<span class="hljs-number">.05</span>*(<span class="hljs-number">1.</span>-<span class="hljs-built_in">dot</span>(normal,lightDir)),<span class="hljs-number">.005</span>);<br>    <span class="hljs-comment">/// 常规做法：如果currentDepth大于closetDepth，说明当前fragment被某个物体遮挡住了，在阴影之中</span><br>    <span class="hljs-type">float</span> shadow=currentDepth-bias&gt;closestDepth?<span class="hljs-number">1.</span>:<span class="hljs-number">0.</span>;<br>    <br>    <span class="hljs-keyword">return</span> shadow;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p><strong>效果图：</strong></p>
-<img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201160122292.png" srcset="/img/loading.gif" lazyload class="">
-
-<h2 id="PCF"><a href="#PCF" class="headerlink" title="PCF"></a>PCF</h2><p><strong>概述：</strong> Percentage Closer Filter是对阴影贴图的一种后处理技术，用于减少阴影的锯齿状边缘，通过对阴影贴图中的多个样本进行采样，计算它们的平均值，从而实现阴影的模糊过渡</p>
+<p><strong>效果图：</strong> <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201160122292.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="pcf">PCF</h2>
+<p><strong>概述：</strong> Percentage Closer
+Filter是对阴影贴图的一种后处理技术，用于减少阴影的锯齿状边缘，通过对阴影贴图中的多个样本进行采样，计算它们的平均值，从而实现阴影的模糊过渡</p>
 <p><strong>步骤：</strong></p>
-<ol>
+<ol type="1">
 <li>多次采样：在阴影测试阶段，针对每个片段，不仅仅检查单个像素的深度值，而是对一个小范围内的小像素进行采样（例如3×3或5×5的采样区域）</li>
 <li>计算平均值：对采样的范围进行阴影测试，如果当前片段大于从深度贴图采样的值，认为其在阴影中，累加到shadow变量中，最后对shadow变量取平均值</li>
 </ol>
 <p><strong>算法实现：</strong></p>
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs glsl"><span class="hljs-type">float</span> PCF(<span class="hljs-type">vec4</span> fragPosLightSpace,<span class="hljs-type">vec3</span> normal,<span class="hljs-type">vec3</span> lightDir,<span class="hljs-type">sampler2D</span> shadowMap)&#123;<br>    <span class="hljs-comment">// 转换为标准齐次坐标 z[-1, 1]</span><br>    <span class="hljs-type">vec3</span> projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;<br>    <span class="hljs-comment">// xyz: [-1, 1] -&gt; [0, 1]</span><br>    projCoords=projCoords*<span class="hljs-number">.5</span>+<span class="hljs-number">.5</span>;<br>    <span class="hljs-comment">// 只要投影向量的z坐标大于1.0或小于0.0，就把shadow设置为1.0(即超出了光源视锥体的最远处，这样最远处也不会处在阴影中，导致采样过多不真实)</span><br>    <span class="hljs-keyword">if</span>(projCoords.z&gt;<span class="hljs-number">1.</span>||projCoords.z&lt;<span class="hljs-number">0.</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    <br>    <span class="hljs-comment">// 从光源视角看到的深度值（从阴影贴图获取</span><br>    <span class="hljs-type">float</span> closestDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy).r;<br>    <span class="hljs-comment">// 从摄像机视角看到的深度值</span><br>    <span class="hljs-type">float</span> currentDepth=projCoords.z;<br>    <span class="hljs-comment">// 偏移量，解决阴影失真的问题, 根据表面朝向光线的角度更改偏移量</span><br>    <span class="hljs-type">float</span> bias=<span class="hljs-built_in">max</span>(<span class="hljs-number">.05</span>*(<span class="hljs-number">1.</span>-<span class="hljs-built_in">dot</span>(normal,lightDir)),<span class="hljs-number">.005</span>);<br>    <span class="hljs-comment">/// PCF:</span><br>    <span class="hljs-type">float</span> shadow=<span class="hljs-number">0.</span>;<br>    <span class="hljs-comment">// 计算每个纹素的大小</span><br>    <span class="hljs-type">vec2</span> texelSize=<span class="hljs-number">1.</span>/<span class="hljs-built_in">textureSize</span>(shadowMap,<span class="hljs-number">0</span>);<br>    <span class="hljs-comment">// 遍历3x3的邻域</span><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> x=-PCF_RADIUS;x&lt;=PCF_RADIUS;++x)<br>    &#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> y=-PCF_RADIUS;y&lt;=PCF_RADIUS;++y)<br>        &#123;<br>            <span class="hljs-comment">// 从阴影贴图中采样深度值</span><br>            <span class="hljs-type">float</span> pcfDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy+<span class="hljs-type">vec2</span>(x,y)*texelSize).r;<br>            <span class="hljs-comment">// 如果当前片段的深度值大于采样的深度值，则在阴影中</span><br>            shadow+=currentDepth-bias&gt;pcfDepth?<span class="hljs-number">1.</span>:<span class="hljs-number">0.</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// 计算平均阴影值</span><br>    <span class="hljs-type">float</span> total=<span class="hljs-number">2</span>*PCF_RADIUS+<span class="hljs-number">1</span>;<br>    shadow/=(total*total);<br>    <br>    <span class="hljs-keyword">return</span> shadow;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p><strong>特点：</strong> PCF的优点是相对简单，但可能会导致较为模糊的阴影，且在高分辨率阴影贴图上会更有效。</p>
-<p><strong>效果图：</strong></p>
-<img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201161755195.png" srcset="/img/loading.gif" lazyload class="">
-
-<h2 id="PCSS"><a href="#PCSS" class="headerlink" title="PCSS"></a>PCSS</h2><p><strong>概述：</strong> Percentage Closer Soft Shadows是一种基于PCF的扩展，旨在生成更自然的软阴影效果。PCSS通过在阴影贴图的采样过程中引入光源半径的概念，来根据片段距离光源的远近来调整阴影的柔和成都</p>
+<p><strong>特点：</strong>
+PCF的优点是相对简单，但可能会导致较为模糊的阴影，且在高分辨率阴影贴图上会更有效。</p>
+<p><strong>效果图：</strong> <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201161755195.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="pcss">PCSS</h2>
+<p><strong>概述：</strong> Percentage Closer Soft
+Shadows是一种基于PCF的扩展，旨在生成更自然的软阴影效果。PCSS通过在阴影贴图的采样过程中引入光源半径的概念，来根据片段距离光源的远近来调整阴影的柔和成都</p>
 <p><strong>步骤：</strong></p>
-<ol>
+<ol type="1">
 <li>计算光源的大小：由于距离光源较远的区域阴影边缘应该更加模糊，PCSS根据光源的大小（即阴影的投射区域）来动态调整阴影的软化程度</li>
 <li>应用阴影半径：对于每个片段，计算该片段距离光源的距离，并基于该距离来调整PCF的采样区域大小。距离较远的片段采用较大的采样区域，从而产生更软的阴影</li>
 </ol>
 <p><strong>算法实现：</strong></p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">float</span> <span class="hljs-title">PCSS</span><span class="hljs-params">(vec4 fragPosLightSpace,vec3 normal,vec3 lightDir,sampler2D shadowMap)</span></span>&#123;<br>    <span class="hljs-comment">// 转换为标准齐次坐标 z[-1, 1]</span><br>    vec3 projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;<br>    <span class="hljs-comment">// xyz: [-1, 1] -&gt; [0, 1]</span><br>    projCoords=projCoords*<span class="hljs-number">.5</span><span class="hljs-number">+.5</span>;<br>    <span class="hljs-comment">// 只要投影向量的z坐标大于1.0或小于0.0，就把shadow设置为1.0(即超出了光源视锥体的最远处，这样最远处也不会处在阴影中，导致采样过多不真实)</span><br>    <span class="hljs-keyword">if</span>(projCoords.z&gt;<span class="hljs-number">1.</span>||projCoords.z&lt;<span class="hljs-number">0.</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    <br>    <span class="hljs-comment">// 从光源视角看到的深度值（从阴影贴图获取</span><br>    <span class="hljs-type">float</span> closestDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy).r;<br>    <span class="hljs-comment">// 从摄像机视角看到的深度值</span><br>    <span class="hljs-type">float</span> currentDepth=projCoords.z;<br>    <span class="hljs-comment">// 偏移量，解决阴影失真的问题, 根据表面朝向光线的角度更改偏移量</span><br>    <span class="hljs-type">float</span> bias=<span class="hljs-built_in">max</span>(<span class="hljs-number">.05</span>*(<span class="hljs-number">1.</span>-<span class="hljs-built_in">dot</span>(normal,lightDir)),<span class="hljs-number">.005</span>);<br>    <span class="hljs-comment">/// PCSS:</span><br>    <span class="hljs-comment">// 计算平均遮挡物体的深度值</span><br>    <span class="hljs-type">float</span> avgDepth=<span class="hljs-built_in">findBlocker</span>(projCoords.xy,currentDepth,shadowMap,bias);<br>    <span class="hljs-comment">// 如果没有遮挡物体，则直接返回0.0(不在阴影中)</span><br>    <span class="hljs-keyword">if</span>(avgDepth==<span class="hljs-number">-1.</span>)&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    &#125;<br>    <span class="hljs-comment">// 半影大小</span><br>    <span class="hljs-type">float</span> penumbra=(currentDepth-avgDepth)/avgDepth*lightWidth;<br>    <span class="hljs-comment">// 采样半径</span><br>    <span class="hljs-type">float</span> filterRadius=penumbra*NEAR_PLANE/currentDepth;<br>    <span class="hljs-comment">// PCF</span><br>    filterRadius*=PCFSampleRadius;<br>    <span class="hljs-type">float</span> shadow=<span class="hljs-number">0.</span>;<br>    <span class="hljs-comment">// 计算每个纹素的大小</span><br>    vec2 texelSize=<span class="hljs-number">1.</span>/<span class="hljs-built_in">textureSize</span>(shadowMap,<span class="hljs-number">0</span>);<br>    <span class="hljs-comment">// 遍历邻域</span><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> x=-PCF_RADIUS;x&lt;=PCF_RADIUS;++x)<br>    &#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> y=-PCF_RADIUS;y&lt;=PCF_RADIUS;++y)<br>        &#123;<br>            <span class="hljs-comment">// 从阴影贴图中采样深度值</span><br>            <span class="hljs-type">float</span> shadowMapDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy+filterRadius*<span class="hljs-built_in">vec2</span>(x,y)*texelSize).r;<br>            <span class="hljs-comment">// 如果当前片段的深度值大于采样的深度值，则在阴影中</span><br>            shadow+=currentDepth-bias&gt;shadowMapDepth?<span class="hljs-number">1.</span>:<span class="hljs-number">0.</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// 计算平均阴影值</span><br>    <span class="hljs-type">float</span> total=<span class="hljs-number">2</span>*PCF_RADIUS<span class="hljs-number">+1</span>;<br>    shadow/=(total*total);<br>    <br>    <span class="hljs-keyword">return</span> shadow;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p><strong>特点：</strong> PCSS能够产生更加平滑和逼真的阴影效果，但相对于普通的PCF，计算开销较大。</p>
-<p><strong>效果图：</strong></p>
-<img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201204040348.png" srcset="/img/loading.gif" lazyload class="">
-
-<h2 id="VSM"><a href="#VSM" class="headerlink" title="VSM"></a>VSM</h2><p><strong>概述：</strong> Variance Shadow Mapping 是一种通过利用方差来改进传统阴影贴图的方法，与传统的阴影贴图不同，VSM使用每个光源的深度值的均值和方差来创建阴影，这样可以在计算中处理阴影的模糊化，同时避免了对深度贴图的多次采样</p>
+<p><strong>特点：</strong>
+PCSS能够产生更加平滑和逼真的阴影效果，但相对于普通的PCF，计算开销较大。</p>
+<p><strong>效果图：</strong> <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201204040348.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="vsm">VSM</h2>
+<p><strong>概述：</strong> Variance Shadow Mapping
+是一种通过利用方差来改进传统阴影贴图的方法，与传统的阴影贴图不同，VSM使用每个光源的深度值的均值和方差来创建阴影，这样可以在计算中处理阴影的模糊化，同时避免了对深度贴图的多次采样</p>
 <p><strong>步骤：</strong></p>
-<ol>
-<li>存储深度和方差：在深度贴图中，不仅存储每个像素的深度值，还存储该深度值的方差，这样，光源照射到场景中的区域可以通过方差值来表示阴影的软化程度<ul>
+<ol type="1">
+<li>存储深度和方差：在深度贴图中，不仅存储每个像素的深度值，还存储该深度值的方差，这样，光源照射到场景中的区域可以通过方差值来表示阴影的软化程度
+<ul>
 <li>第一通道存储深度值(z)</li>
-<li>第二通道存储深度值的方差($\delta^2$)</li>
-</ul>
-</li>
+<li>第二通道存储深度值的方差(<span
+class="math inline">\(\delta^2\)</span>)</li>
+</ul></li>
 <li>深度比较：在片段着色器中，使用一个不等式来判断一个片段是否被阴影遮挡，由于存储了方差，阴影边缘会变得更平滑</li>
 </ol>
 <p><strong>算法实现：</strong></p>
 <ul>
 <li>需要两个纹理来存储对应点周围区域内的方差和均值</li>
-<li>两趟pass可以把每个点的复杂度从$(2R+1)^2$降到$(4R+2)$</li>
+<li>两趟pass可以把每个点的复杂度从<span
+class="math inline">\((2R+1)^2\)</span>降到<span
+class="math inline">\((4R+2)\)</span></li>
 </ul>
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs glsl"><span class="hljs-type">float</span> VSM(<span class="hljs-type">vec4</span> fragPosLightSpace,<span class="hljs-type">vec3</span> normal,<span class="hljs-type">vec3</span> lightDir,<span class="hljs-type">sampler2D</span> d_d2_filter)&#123;<br>    <span class="hljs-type">vec3</span> projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;<br>    <span class="hljs-comment">// [-1, 1] =&gt; [0, 1]</span><br>    projCoords=projCoords*<span class="hljs-number">.5</span>+<span class="hljs-number">.5</span>;<br>    <span class="hljs-keyword">if</span>(projCoords.z&gt;<span class="hljs-number">1.</span>||projCoords.z&lt;<span class="hljs-number">0.</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    <br>    depth=projCoords.z;<br>    <br>    <span class="hljs-comment">// 从模糊后的纹理中获得深度值均值和方差</span><br>    d_d2=<span class="hljs-built_in">texture</span>(d_d2_filter,projCoords.xy).rg;<br>    <span class="hljs-type">float</span> var=d_d2.y-d_d2.x*d_d2.x;<span class="hljs-comment">// E(X-EX)^2 = EX^2-E^2X</span><br>    <br>    <span class="hljs-comment">// 偏移量，解决阴影失真的问题, 根据表面朝向光线的角度更改偏移量</span><br>    <span class="hljs-type">float</span> bias=<span class="hljs-built_in">max</span>(<span class="hljs-number">.05</span>*(<span class="hljs-number">1.</span>-<span class="hljs-built_in">dot</span>(normal,lightDir)),<span class="hljs-number">.005</span>);<br>    <span class="hljs-comment">// float bias=.005;</span><br>    <span class="hljs-type">float</span> visibility;<br>    <span class="hljs-keyword">if</span>(depth-bias&lt;d_d2.x)&#123;<br>        visibility=<span class="hljs-number">1.</span>;<span class="hljs-comment">// 没有阴影</span><br>    &#125;<br>    <span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-comment">// 使用切比雪夫不等式计算阴影</span><br>        <span class="hljs-type">float</span> t_minus_mu=depth-d_d2.x;<br>        visibility=var/(var+t_minus_mu*t_minus_mu);<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1.</span>-visibility;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p><strong>特点：</strong> VSM能提供相对较好的阴影效果，且具有较低的计算开销，但可能会面临一些噪声问题，特别是在低对比度区域</p>
-<p><strong>效果图：</strong></p>
-<img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160611579.png" srcset="/img/loading.gif" lazyload class="">
-
+<p><strong>特点：</strong>
+VSM能提供相对较好的阴影效果，且具有较低的计算开销，但可能会面临一些噪声问题，特别是在低对比度区域</p>
+<p><strong>效果图：</strong> <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160611579.png" srcset="/img/loading.gif" lazyload class=""></p>
 <p><strong>与PCSS对比：</strong></p>
-<p>PCSS：</p>
-<img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160757509.png" srcset="/img/loading.gif" lazyload class="">
-
-<p>VSM:</p>
-<img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160922226.png" srcset="/img/loading.gif" lazyload class="">
-
-<h2 id="CSM"><a href="#CSM" class="headerlink" title="CSM"></a>CSM</h2><p><strong>概述：</strong> Cascaded shadow map(联级阴影贴图)</p>
+<p>PCSS： <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160757509.png" srcset="/img/loading.gif" lazyload class=""></p>
+<p>VSM: <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160922226.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="csm">CSM</h2>
+<p><strong>概述：</strong> Cascaded shadow map(联级阴影贴图)</p>
 <p>（待补充）</p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p><strong>参考：</strong></p>
+<h2 id="其他">其他</h2>
+<p><strong>参考：</strong></p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://learnopengl-cn.github.io/05%20Advanced%20Lighting/03%20Shadows/01%20Shadow%20Mapping/">阴影映射 - LearnOpenGL CN</a></li>
-<li><a target="_blank" rel="noopener" href="https://banbao991.github.io/2021/06/18/CG/Algorithm/SM-PCF-PCSS-VSM/#%E9%98%B4%E5%BD%B1%E7%AE%97%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0">阴影算法的实现(SM、PCF、PCSS、VSM) | Banbao</a></li>
-<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_56399931/article/details/123593345">算法复现：OpenGL-ShadowMap&#x2F;PCSS&#x2F;CSM_opengl csm-CSDN博客</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://learnopengl-cn.github.io/05%20Advanced%20Lighting/03%20Shadows/01%20Shadow%20Mapping/">阴影映射
+- LearnOpenGL CN</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://banbao991.github.io/2021/06/18/CG/Algorithm/SM-PCF-PCSS-VSM/#阴影算法的实现">阴影算法的实现(SM、PCF、PCSS、VSM)
+| Banbao</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://blog.csdn.net/m0_56399931/article/details/123593345">算法复现：OpenGL-ShadowMap/PCSS/CSM_opengl
+csm-CSDN博客</a></li>
 </ul>
 
                 
@@ -555,6 +562,12 @@
 
 
   
+
+
+  
+  
+
+
 
 
 
@@ -773,6 +786,49 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script defer src="/js/leancloud.js" ></script>
 

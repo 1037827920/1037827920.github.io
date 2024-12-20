@@ -306,37 +306,41 @@
               <div class="markdown-body">
                 
                 <p>使用rust实现一个异步运行时是async-std的单线程Web服务器。</p>
-<p><strong>仓库地址：</strong> <a target="_blank" rel="noopener" href="https://github.com/1037827920/web-server">1037827920&#x2F;web-server: 使用rust编写的简单web服务器 (github.com)</a></p>
+<p><strong>仓库地址：</strong> <a
+target="_blank" rel="noopener" href="https://github.com/1037827920/web-server">1037827920/web-server:
+使用rust编写的简单web服务器 (github.com)</a></p>
 <p>在之前的单线程版本的Web服务器代码上进行修改，具体代码在给的仓库地址中。</p>
-<h2 id="实现异步代码"><a href="#实现异步代码" class="headerlink" title="实现异步代码"></a>实现异步代码</h2><p><strong>首先将handle_connection修改为async实现：</strong></p>
+<h2 id="实现异步代码">实现异步代码</h2>
+<p><strong>首先将handle_connection修改为async实现：</strong></p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">async</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">handle_connection</span>(<span class="hljs-keyword">mut</span> stream: TcpStream) &#123;&#125;<br></code></pre></td></tr></table></figure>
-
-<p>该修改会将函数的返回值从()变成Future&lt;Output &#x3D; ()&gt;，因此直接运行将不再有任何效果，只用通过.await或执行器的poll。</p>
+<p>该修改会将函数的返回值从()变成Future&lt;Output =
+()&gt;，因此直接运行将不再有任何效果，只用通过.await或执行器的poll。</p>
 <p><strong>使用async-std作为异步运行时：</strong></p>
-<p>async-std运行时允许使用属性#[async_std::main]将我们的fn main函数变成async fn main，这样就可以在main函数中直接调用其他async函数，否则你得用block_on方法来让main去阻塞等待异步函数的完成，但是这种简单粗暴的阻塞等待方式并不灵活</p>
+<p>async-std运行时允许使用属性#[async_std::main]将我们的fn
+main函数变成async fn
+main，这样就可以在main函数中直接调用其他async函数，否则你得用block_on方法来让main去阻塞等待异步函数的完成，但是这种简单粗暴的阻塞等待方式并不灵活</p>
 <p><strong>Cargo.toml：</strong></p>
 <figure class="highlight toml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs toml"><span class="hljs-section">[dependencies]</span><br><span class="hljs-attr">futures</span> = <span class="hljs-string">&quot;0.3&quot;</span><br><br><span class="hljs-section">[dependencies.async-std]</span><br><span class="hljs-attr">version</span> = <span class="hljs-string">&quot;1.6&quot;</span><br><span class="hljs-attr">features</span> = [<span class="hljs-string">&quot;attributes&quot;</span>]<br></code></pre></td></tr></table></figure>
-
 <p><strong>下面将main函数修改为异步的，并在其中调用前面修改的异步版本handle_connection：</strong></p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::&#123;<br>    io::&#123;prelude::*, BufReader&#125;,<br>    net::&#123;TcpListener, TcpStream&#125;,<br>    fs,<br>    time::Duration,<br>&#125;;<br><span class="hljs-keyword">extern</span> <span class="hljs-keyword">crate</span> async_std;<br><span class="hljs-keyword">use</span> async_std::task;<br><br><span class="hljs-meta">#[async_std::main]</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">listener</span> = TcpListener::<span class="hljs-title function_ invoke__">bind</span>(<span class="hljs-string">&quot;localhost:8080&quot;</span>).<span class="hljs-title function_ invoke__">unwrap</span>();<br>    <span class="hljs-keyword">for</span> <span class="hljs-variable">stream</span> <span class="hljs-keyword">in</span> listener.<span class="hljs-title function_ invoke__">incoming</span>() &#123;<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">stream</span> = stream.<span class="hljs-title function_ invoke__">unwrap</span>();<br>        <span class="hljs-comment">// 这里还是无法并发</span><br>        <span class="hljs-title function_ invoke__">handle_connection</span>(stream).<span class="hljs-keyword">await</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p><strong>实现异步版本的handle_connection：</strong></p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">/// # 函数作用</span><br><span class="hljs-comment">/// 处理连接：读取请求，回应请求</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">handle_connection</span>(<span class="hljs-keyword">mut</span> stream: TcpStream) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">buf_reader</span> = BufReader::<span class="hljs-title function_ invoke__">new</span>(&amp;<span class="hljs-keyword">mut</span> stream);<br>    <span class="hljs-comment">// 使用next而不是lines，因为我们只需要读取第一行，判断具体的request方法</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">request_line</span> = buf_reader.<span class="hljs-title function_ invoke__">lines</span>().<span class="hljs-title function_ invoke__">next</span>().<span class="hljs-title function_ invoke__">unwrap</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br><br>    <span class="hljs-comment">// 根据请求的不同，返回不同的响应</span><br>    <span class="hljs-keyword">let</span> (status_line, filename) = <span class="hljs-keyword">match</span> &amp;request_line[..] &#123;<br>        <span class="hljs-string">&quot;GET / HTTP/1.1&quot;</span> =&gt; (<span class="hljs-string">&quot;HTTP/1.1 200 OK&quot;</span>, <span class="hljs-string">&quot;hello.html&quot;</span>), <span class="hljs-comment">// 请求 / 资源</span><br>        <span class="hljs-string">&quot;GET /sleep HTTP/1.1&quot;</span> =&gt; &#123; <span class="hljs-comment">// 请求 /sleep 资源</span><br>            <span class="hljs-comment">// 没有使用std::thread::sleep进行睡眠，原因是该函数是阻塞的，它会让当前线程陷入睡眠中，导致其他任务无法继续运行</span><br>            task::<span class="hljs-title function_ invoke__">sleep</span>(Duration::<span class="hljs-title function_ invoke__">from_secs</span>(<span class="hljs-number">5</span>)).<span class="hljs-keyword">await</span>;<br>            (<span class="hljs-string">&quot;HTTP/1.1 200 OK&quot;</span>, <span class="hljs-string">&quot;hello.html&quot;</span>)<br>        &#125;<br>        _ =&gt; (<span class="hljs-string">&quot;HTTP/1.1 404 NOT FOUND&quot;</span>, <span class="hljs-string">&quot;404.html&quot;</span>),<br>    &#125;;<br><br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">contents</span> = fs::<span class="hljs-title function_ invoke__">read_to_string</span>(filename).<span class="hljs-title function_ invoke__">unwrap</span>();<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">length</span> = contents.<span class="hljs-title function_ invoke__">len</span>();<br>    <br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">response</span> = <span class="hljs-built_in">format!</span>(<span class="hljs-string">&quot;&#123;status_line&#125;\r\nContent-Length: &#123;length&#125;\r\n\r\n&#123;contents&#125;&quot;</span>);<br><br>    <span class="hljs-comment">// write_all接收&amp;[u8]类型作为参数，这里需要用as_bytes将字符串转换为字节数组</span><br>    stream.<span class="hljs-title function_ invoke__">write_all</span>(response.<span class="hljs-title function_ invoke__">as_bytes</span>()).<span class="hljs-title function_ invoke__">unwrap</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>可以看出，只是把函数变成async往往是不够的，还需要将它内部的代码也都变成异步兼容，阻塞线程绝对是不可行的</p>
 <p>但是线程web服务器还是不能进行并发处理请求，原因是listener.incoming()是阻塞的迭代器。当listener在等待连接时，执行器是无法执行其他Future的，而且只有当我们处理完已有的连接后，才能接收新的连接。</p>
-<h2 id="并发地处理连接"><a href="#并发地处理连接" class="headerlink" title="并发地处理连接"></a>并发地处理连接</h2><p>上面的解决方法是将listener.incoming()从一个阻塞的迭代器变成一个非阻塞的Stream</p>
+<h2 id="并发地处理连接">并发地处理连接</h2>
+<p>上面的解决方法是将listener.incoming()从一个阻塞的迭代器变成一个非阻塞的Stream</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::&#123;<br>    fs,<br>    time::Duration,<br>&#125;;<br><span class="hljs-keyword">extern</span> <span class="hljs-keyword">crate</span> async_std;<br><span class="hljs-keyword">use</span> async_std::&#123;<br>    net::&#123;TcpListener, TcpStream&#125;,<br>    io::&#123;prelude::*, BufReader&#125;,<br>    task,<br>&#125;;<br><span class="hljs-keyword">use</span> futures::StreamExt;<br><br><span class="hljs-meta">#[async_std::main]</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">listener</span> = TcpListener::<span class="hljs-title function_ invoke__">bind</span>(<span class="hljs-string">&quot;localhost:8080&quot;</span>).<span class="hljs-keyword">await</span>.<span class="hljs-title function_ invoke__">unwrap</span>();<br>    <br>    listener<br>        .<span class="hljs-title function_ invoke__">incoming</span>()<br>        .for_each_concurrent(<span class="hljs-literal">None</span>, |tcpstream| <span class="hljs-keyword">async</span> <span class="hljs-keyword">move</span> &#123;<br>            <span class="hljs-keyword">let</span> <span class="hljs-variable">tpcstream</span> = tcpstream.<span class="hljs-title function_ invoke__">unwrap</span>();<br>            <span class="hljs-title function_ invoke__">handle_connection</span>(tpcstream).<span class="hljs-keyword">await</span>;<br>        &#125;)<br>        .<span class="hljs-keyword">await</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>异步版本的TcpListener为listener.incoming()实现了Stream trait，这样listener.incoming()不再阻塞，且使用for_each_concurrent可以并发地处理从Stream获取的元素。</p>
+<p>异步版本的TcpListener为listener.incoming()实现了Stream
+trait，这样listener.incoming()不再阻塞，且使用for_each_concurrent可以并发地处理从Stream获取的元素。</p>
 <p>现在关键在于handle_connection不能再阻塞：</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">/// # 函数作用</span><br><span class="hljs-comment">/// 处理连接：读取请求，回应请求</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">handle_connection</span>(<span class="hljs-keyword">mut</span> stream: TcpStream) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">buf_reader</span> = BufReader::<span class="hljs-title function_ invoke__">new</span>(&amp;<span class="hljs-keyword">mut</span> stream);<br>    <span class="hljs-comment">// 使用next而不是lines，因为我们只需要读取第一行，判断具体的request方法</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">request_line</span> = buf_reader.<span class="hljs-title function_ invoke__">lines</span>().<span class="hljs-title function_ invoke__">next</span>().<span class="hljs-keyword">await</span>.<span class="hljs-title function_ invoke__">unwrap</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br><br>    <span class="hljs-comment">// 根据请求的不同，返回不同的响应</span><br>    <span class="hljs-keyword">let</span> (status_line, filename) = <span class="hljs-keyword">match</span> &amp;request_line[..] &#123;<br>        <span class="hljs-string">&quot;GET / HTTP/1.1&quot;</span> =&gt; (<span class="hljs-string">&quot;HTTP/1.1 200 OK&quot;</span>, <span class="hljs-string">&quot;hello.html&quot;</span>), <span class="hljs-comment">// 请求 / 资源</span><br>        <span class="hljs-string">&quot;GET /sleep HTTP/1.1&quot;</span> =&gt; &#123; <span class="hljs-comment">// 请求 /sleep 资源</span><br>            <span class="hljs-comment">// 没有使用std::thread::sleep进行睡眠，原因是该函数是阻塞的，它会让当前线程陷入睡眠中，导致其他任务无法继续运行</span><br>            task::<span class="hljs-title function_ invoke__">sleep</span>(Duration::<span class="hljs-title function_ invoke__">from_secs</span>(<span class="hljs-number">5</span>)).<span class="hljs-keyword">await</span>;<br>            (<span class="hljs-string">&quot;HTTP/1.1 200 OK&quot;</span>, <span class="hljs-string">&quot;hello.html&quot;</span>)<br>        &#125;<br>        _ =&gt; (<span class="hljs-string">&quot;HTTP/1.1 404 NOT FOUND&quot;</span>, <span class="hljs-string">&quot;404.html&quot;</span>),<br>    &#125;;<br><br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">contents</span> = fs::<span class="hljs-title function_ invoke__">read_to_string</span>(filename).<span class="hljs-title function_ invoke__">unwrap</span>();<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">length</span> = contents.<span class="hljs-title function_ invoke__">len</span>();<br>    <br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">response</span> = <span class="hljs-built_in">format!</span>(<span class="hljs-string">&quot;&#123;status_line&#125;\r\nContent-Length: &#123;length&#125;\r\n\r\n&#123;contents&#125;&quot;</span>);<br><br>    <span class="hljs-comment">// write_all接收&amp;[u8]类型作为参数，这里需要用as_bytes将字符串转换为字节数组</span><br>    stream.<span class="hljs-title function_ invoke__">write_all</span>(response.<span class="hljs-title function_ invoke__">as_bytes</span>()).<span class="hljs-keyword">await</span>.<span class="hljs-title function_ invoke__">unwrap</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>在将数据读写改造成异步后，现在该函数也彻底变成了异步版本，可以并发地处理连接</p>
-<h2 id="使用多线程提升性能"><a href="#使用多线程提升性能" class="headerlink" title="使用多线程提升性能"></a>使用多线程提升性能</h2><p>async并发和多线程其实并不冲突，async-std包也允许我们使用多个线程去处理，由于handle_connection实现了Send trait不会阻塞，因此使用async_std::task::spawn是非常安全的：</p>
+<h2 id="使用多线程提升性能">使用多线程提升性能</h2>
+<p>async并发和多线程其实并不冲突，async-std包也允许我们使用多个线程去处理，由于handle_connection实现了Send
+trait不会阻塞，因此使用async_std::task::spawn是非常安全的：</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> async_std::task::spawn;<br><br><span class="hljs-meta">#[async_std::main]</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">listener</span> = TcpListener::<span class="hljs-title function_ invoke__">bind</span>(<span class="hljs-string">&quot;localhost:8080&quot;</span>).<span class="hljs-keyword">await</span>.<span class="hljs-title function_ invoke__">unwarp</span>():<br>    listener<br>    	.<span class="hljs-title function_ invoke__">incoming</span>()<br>    	.for_each_concurrent(<span class="hljs-literal">None</span>, |stream| <span class="hljs-keyword">async</span> <span class="hljs-keyword">move</span> &#123;<br>            <span class="hljs-keyword">let</span> <span class="hljs-variable">stream</span> = stream.<span class="hljs-title function_ invoke__">unwrap</span>();<br>            <span class="hljs-title function_ invoke__">spawn</span>(<span class="hljs-title function_ invoke__">handle_connection</span>(stream));<br>    &#125;)<br>    .<span class="hljs-keyword">await</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>但是这里是为每个请求都单独创建了一个线程，实际上需要限制创建线程的数量，可以通过线程池来实现。具体可以看<a target="_blank" rel="noopener" href="https://1037827920.github.io/2024/10/01/%E4%BD%BF%E7%94%A8rust%E5%86%99%E4%B8%80%E4%B8%AAWeb%E6%9C%8D%E5%8A%A1%E5%99%A8%E2%80%94%E2%80%94%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%89%88%E6%9C%AC/">这篇无async的多线程版本的Web服务器</a></p>
+<p>但是这里是为每个请求都单独创建了一个线程，实际上需要限制创建线程的数量，可以通过线程池来实现。具体可以看<a
+target="_blank" rel="noopener" href="https://1037827920.github.io/2024/10/01/使用rust写一个Web服务器——单线程版本/">这篇无async的多线程版本的Web服务器</a></p>
 
                 
               </div>
@@ -509,6 +513,12 @@
 
 
   
+
+
+  
+  
+
+
 
 
 
@@ -727,6 +737,49 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script defer src="/js/leancloud.js" ></script>
 

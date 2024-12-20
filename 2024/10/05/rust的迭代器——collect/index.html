@@ -304,39 +304,35 @@
             
               <div class="markdown-body">
                 
-                <p><strong>概述：</strong> 它能够将一个迭代器转换为各种集合类型，例如向量、哈希集、哈希映射等，能够将迭代器的所有元素收集到一个集合中</p>
+                <p><strong>概述：</strong>
+它能够将一个迭代器转换为各种集合类型，例如向量、哈希集、哈希映射等，能够将迭代器的所有元素收集到一个集合中</p>
 <p><strong>常见的用法：</strong></p>
 <p>将迭代器转换为Vec：</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">Vec</span>: <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">i32</span>&gt; = (<span class="hljs-number">1</span>..<span class="hljs-number">5</span>).<span class="hljs-title function_ invoke__">collect</span>();<br></code></pre></td></tr></table></figure>
-
 <p>将迭代器转换为HashSet：</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::collections::HashSet;<br><br><span class="hljs-keyword">let</span> <span class="hljs-variable">set</span>: HashSet&lt;<span class="hljs-type">i32</span>&gt; = <span class="hljs-built_in">vec!</span>[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">2</span>].<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">collect</span>();<br></code></pre></td></tr></table></figure>
-
 <p>将迭代器转换为HashMap：</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::collections::HashMap;<br><br><span class="hljs-keyword">let</span> <span class="hljs-variable">map</span>: HashMap&lt;&amp;<span class="hljs-type">str</span>, <span class="hljs-type">i32</span>&gt; = <span class="hljs-built_in">vec!</span>[(<span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-number">1</span>), (<span class="hljs-string">&quot;b&quot;</span>, <span class="hljs-number">2</span>), (<span class="hljs-string">&quot;c&quot;</span>, <span class="hljs-number">3</span>)].<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">collect</span>();<br></code></pre></td></tr></table></figure>
-
 <p><strong>collect的类型推导：</strong></p>
 <p>collect是泛型的，通常需要通过上下文推导出类型目标，但是有时，如果没有足够的上下文，rust无法推导出目标类型，可能需要显式指定。</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">numbers</span> = (<span class="hljs-number">1</span>..<span class="hljs-number">4</span>).collect::&lt;<span class="hljs-type">Vec</span>&lt;<span class="hljs-type">i32</span>&gt;&gt;();<br></code></pre></td></tr></table></figure>
-
 <p><strong>内部工作原理：</strong></p>
-<p>collect之所以通用，是因为它依赖于FromIterator trait，该trait定义了如何从一个迭代器构建某个集合类型。Vec、HashMap、HashSet等类型都实现了FromIterator</p>
+<p>collect之所以通用，是因为它依赖于FromIterator
+trait，该trait定义了如何从一个迭代器构建某个集合类型。Vec、HashMap、HashSet等类型都实现了FromIterator</p>
 <p>FromIterator定义如下：</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">pub</span> <span class="hljs-keyword">trait</span> <span class="hljs-title class_">FromIterator</span>&lt;A&gt; &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">from_iter</span>&lt;T: <span class="hljs-built_in">IntoIterator</span>&lt;Item = A&gt;&gt;(iter: T) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-keyword">Self</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p><strong>常见的使用场景：</strong></p>
-<ol>
+<ol type="1">
 <li><p>可以使用filter_map结合collect，从一个可能包含None的迭代器中收集有效的值</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">values</span> = <span class="hljs-built_in">vec!</span>[<span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-number">1</span>), <span class="hljs-literal">None</span>, <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-number">2</span>), <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-number">3</span>)];<br><span class="hljs-keyword">let</span> <span class="hljs-variable">result</span>: <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">i32</span>&gt; = values.<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">filter_map</span>(|x| x).<span class="hljs-title function_ invoke__">collect</span>();<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;&quot;</span>, result); <span class="hljs-comment">// 输出: [1, 2, 3]</span><br></code></pre></td></tr></table></figure>
-</li>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">values</span> = <span class="hljs-built_in">vec!</span>[<span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-number">1</span>), <span class="hljs-literal">None</span>, <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-number">2</span>), <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-number">3</span>)];<br><span class="hljs-keyword">let</span> <span class="hljs-variable">result</span>: <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">i32</span>&gt; = values.<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">filter_map</span>(|x| x).<span class="hljs-title function_ invoke__">collect</span>();<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;&quot;</span>, result); <span class="hljs-comment">// 输出: [1, 2, 3]</span><br></code></pre></td></tr></table></figure></li>
 <li><p>去重和排序：将元素收集到HashMap中去重，再收集到Vec来排序</p>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::collections::HashSet;<br><br><span class="hljs-keyword">let</span> <span class="hljs-variable">vec</span> = <span class="hljs-built_in">vec!</span>[<span class="hljs-number">3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>];<br><span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">set</span>: HashSet&lt;_&gt; = vec.<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">collect</span>();<br><span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">vec</span>: <span class="hljs-type">Vec</span>&lt;_&gt; = set.<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">collect</span>();<br>vec.<span class="hljs-title function_ invoke__">sort</span>();<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;&quot;</span>, vec); <span class="hljs-comment">// 输出: [1, 2, 3, 4]</span><br></code></pre></td></tr></table></figure>
-</li>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::collections::HashSet;<br><br><span class="hljs-keyword">let</span> <span class="hljs-variable">vec</span> = <span class="hljs-built_in">vec!</span>[<span class="hljs-number">3</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>];<br><span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">set</span>: HashSet&lt;_&gt; = vec.<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">collect</span>();<br><span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">vec</span>: <span class="hljs-type">Vec</span>&lt;_&gt; = set.<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">collect</span>();<br>vec.<span class="hljs-title function_ invoke__">sort</span>();<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;&quot;</span>, vec); <span class="hljs-comment">// 输出: [1, 2, 3, 4]</span><br></code></pre></td></tr></table></figure></li>
 <li><p>将字符迭代器收集为字符串：</p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">chars</span> = <span class="hljs-built_in">vec!</span>[<span class="hljs-string">&#x27;R&#x27;</span>, <span class="hljs-string">&#x27;u&#x27;</span>, <span class="hljs-string">&#x27;s&#x27;</span>, <span class="hljs-string">&#x27;t&#x27;</span>];<br><span class="hljs-keyword">let</span> <span class="hljs-variable">s</span>: <span class="hljs-type">String</span> = chars.<span class="hljs-title function_ invoke__">into_iter</span>().<span class="hljs-title function_ invoke__">collect</span>();<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>, s); <span class="hljs-comment">// 输出: Rust</span><br></code></pre></td></tr></table></figure></li>
 </ol>
-<p><strong>性能考虑：</strong> </p>
-<p>collect通常是高效的，因为它能够预知迭代器的大小并进行优化，提前分配足够的空间，避免不必要的内存重新分配。此外，对于较大的数据集，rust还可以通过并行化迭代器（rayon crate）来进一步提升性能。</p>
+<p><strong>性能考虑：</strong></p>
+<p>collect通常是高效的，因为它能够预知迭代器的大小并进行优化，提前分配足够的空间，避免不必要的内存重新分配。此外，对于较大的数据集，rust还可以通过并行化迭代器（rayon
+crate）来进一步提升性能。</p>
 
                 
               </div>
@@ -507,6 +503,12 @@
 
 
   
+
+
+  
+  
+
+
 
 
 
@@ -725,6 +727,49 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script defer src="/js/leancloud.js" ></script>
 

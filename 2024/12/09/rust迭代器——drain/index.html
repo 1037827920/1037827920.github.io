@@ -304,9 +304,11 @@
             
               <div class="markdown-body">
                 
-                <p><strong>概述：</strong> 通常用于集合类型（如Vec、HashMap等）来移除并返回集合中的元素。就是会在遍历过程中将这些元素从集合中移除，使用drain可以避免在移除元素时进行多次分配内存和拷贝的操作，从而提高性能。</p>
+                <p><strong>概述：</strong>
+通常用于集合类型（如Vec、HashMap等）来移除并返回集合中的元素。就是会在遍历过程中将这些元素从集合中移除，使用drain可以避免在移除元素时进行多次分配内存和拷贝的操作，从而提高性能。</p>
 <p><strong>示例：</strong></p>
 <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">vec</span> = <span class="hljs-built_in">vec!</span>[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>];<br><span class="hljs-keyword">let</span> <span class="hljs-variable">drained_elements</span>: <span class="hljs-type">Vec</span>&lt;_&gt; = vec.<span class="hljs-title function_ invoke__">drain</span>(..).<span class="hljs-title function_ invoke__">collect</span>();<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;&quot;</span>, drained_elements); <span class="hljs-comment">// 输出: [1, 2, 3, 4, 5]</span><br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;&quot;</span>, vec); <span class="hljs-comment">// 输出: []</span><br></code></pre></td></tr></table></figure>
+
                 
               </div>
             
@@ -476,6 +478,12 @@
 
 
   
+
+
+  
+  
+
+
 
 
 
@@ -694,6 +702,49 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script defer src="/js/leancloud.js" ></script>
 

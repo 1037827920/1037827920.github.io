@@ -304,36 +304,29 @@
             
               <div class="markdown-body">
                 
-                <h1 id="ubuntu22安装docker并配置镜像"><a href="#ubuntu22安装docker并配置镜像" class="headerlink" title="ubuntu22安装docker并配置镜像"></a>ubuntu22安装docker并配置镜像</h1><h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><p>更新现有软件包索引：</p>
+                <h1 id="ubuntu22安装docker并配置镜像">ubuntu22安装docker并配置镜像</h1>
+<h2 id="安装docker">安装docker</h2>
+<p>更新现有软件包索引：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt update<br></code></pre></td></tr></table></figure>
-
 <p>安装必要的依赖包：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt install apt-transport-https ca-certificates curl software-properties-common<br></code></pre></td></tr></table></figure>
-
 <p>添加docker官方的GPG密钥：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | <span class="hljs-built_in">sudo</span> gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg<br></code></pre></td></tr></table></figure>
-
 <p>添加docker的apt仓库：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu <span class="hljs-subst">$(lsb_release -cs)</span> stable&quot;</span> | <span class="hljs-built_in">sudo</span> <span class="hljs-built_in">tee</span> /etc/apt/sources.list.d/docker.list &gt; /dev/null<br></code></pre></td></tr></table></figure>
-
 <p>更新软件包索引：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt update<br></code></pre></td></tr></table></figure>
-
 <p>安装docker：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> apt install docker-ce docker-ce-cli containerd.io<br></code></pre></td></tr></table></figure>
-
 <p>查看是否安装成功：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker --version<br></code></pre></td></tr></table></figure>
-
 <p>启动并自启动docker：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> systemctl start docker<br><span class="hljs-built_in">sudo</span> systemctl <span class="hljs-built_in">enable</span> docker<br></code></pre></td></tr></table></figure>
-
-<h2 id="配置镜像源"><a href="#配置镜像源" class="headerlink" title="配置镜像源"></a>配置镜像源</h2><p>修改<code>/etc/docker/daemon.json</code>文件</p>
+<h2 id="配置镜像源">配置镜像源</h2>
+<p>修改<code>/etc/docker/daemon.json</code>文件</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> vim /etc/docker/daemon.json<br></code></pre></td></tr></table></figure>
-
 <p>添加以下内容：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash">&#123;<br><span class="hljs-string">&quot;registry-mirrors&quot;</span>: [<span class="hljs-string">&quot;https://docker.registry.cyou&quot;</span>,<br><span class="hljs-string">&quot;https://docker-cf.registry.cyou&quot;</span>,<br><span class="hljs-string">&quot;https://dockercf.jsdelivr.fyi&quot;</span>,<br><span class="hljs-string">&quot;https://docker.jsdelivr.fyi&quot;</span>,<br><span class="hljs-string">&quot;https://dockertest.jsdelivr.fyi&quot;</span>,<br><span class="hljs-string">&quot;https://mirror.aliyuncs.com&quot;</span>,<br><span class="hljs-string">&quot;https://dockerproxy.com&quot;</span>,<br><span class="hljs-string">&quot;https://mirror.baidubce.com&quot;</span>,<br><span class="hljs-string">&quot;https://docker.m.daocloud.io&quot;</span>,<br><span class="hljs-string">&quot;https://docker.nju.edu.cn&quot;</span>,<br><span class="hljs-string">&quot;https://docker.mirrors.sjtug.sjtu.edu.cn&quot;</span>,<br><span class="hljs-string">&quot;https://docker.mirrors.ustc.edu.cn&quot;</span>,<br><span class="hljs-string">&quot;https://mirror.iscas.ac.cn&quot;</span>,<br><span class="hljs-string">&quot;https://docker.rainbond.cc&quot;</span>]<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <blockquote>
 <p>截至2024.12.11仍有效</p>
 </blockquote>
@@ -509,6 +502,12 @@
 
 
   
+
+
+  
+  
+
+
 
 
 
@@ -727,6 +726,49 @@
 
 
   <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
 
   <script defer src="/js/leancloud.js" ></script>
 
