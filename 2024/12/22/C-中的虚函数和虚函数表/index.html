@@ -19,24 +19,25 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="C++中的进程虚拟内存布局">
+    <meta name="description" content="C++中的虚函数和虚函数表">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++中的进程虚拟内存布局">
-<meta property="og:url" content="http://example.com/2024/12/20/C-%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/index.html">
+<meta property="og:title" content="C++中的虚函数和虚函数表">
+<meta property="og:url" content="http://example.com/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="C++中的进程虚拟内存布局">
+<meta property="og:description" content="C++中的虚函数和虚函数表">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png">
-<meta property="article:published_time" content="2024-12-20T15:44:28.000Z">
-<meta property="article:modified_time" content="2024-12-20T15:56:06.268Z">
+<meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8.png">
+<meta property="article:published_time" content="2024-12-22T06:29:15.000Z">
+<meta property="article:modified_time" content="2024-12-22T06:30:01.841Z">
 <meta property="article:author" content="凌云行者">
 <meta property="article:tag" content="C++">
+<meta property="article:tag" content="虚函数">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png">
+<meta name="twitter:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8.png">
   
   
   
-  <title>C++中的进程虚拟内存布局 - 凌云行者的博客</title>
+  <title>C++中的虚函数和虚函数表 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="C++中的进程虚拟内存布局"></span>
+            <span id="subtitle" data-typed-text="C++中的虚函数和虚函数表"></span>
           
         </div>
 
@@ -238,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-20 23:44" pubdate>
-          2024年12月20日, 11:44 晚上
+        <time datetime="2024-12-22 14:29" pubdate>
+          2024年12月22日, 2:29 下午
         </time>
       </span>
     
@@ -251,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          1.2k 字
+          638 字
         
       </span>
     
@@ -299,72 +300,33 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">C++中的进程虚拟内存布局</h1>
+            <h1 id="seo-header">C++中的虚函数和虚函数表</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="进程虚拟内存布局">进程虚拟内存布局</h1>
-<p><strong>进程虚拟内存布局：</strong></p>
+                <h1 id="虚函数和虚函数表">虚函数和虚函数表</h1>
+<p><strong>动态多态：</strong>
+在程序运行时根据对象的实际类型确定调用哪个类的成员函数</p>
+<p><strong>C++是如何实现动态多态的？</strong></p>
+<p>通过虚函数实现的，为每一个包含虚函数的对象分配一个虚函数指针，这个虚函数指针指向一个放在常量区的虚函数表。在运行时运行到某个虚函数时，根据这个虚函数指针来找到对应的虚函数表，然后根据对应的这个函数的下标值在虚函数表中找到对应的虚函数来完成调用。</p>
+<p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">A</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func1</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func2</span><span class="hljs-params">()</span></span>;<br>&#125;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">B</span>: <span class="hljs-keyword">public</span> A &#123;<br><span class="hljs-keyword">public</span>:<br>   	<span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func1</span><span class="hljs-params">()</span></span>;<br>&#125;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">C</span>: <span class="hljs-keyword">public</span> B &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func2</span><span class="hljs-params">()</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<img src="/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/image-20241221234919256.png" srcset="/img/loading.gif" lazyload class="">
+<p><strong>内存布局相关：</strong></p>
+<p>一个类多重继承了几个父类，就有几张虚函数表。一个类有几个虚函数表，一个类的对象就有几个虚函数指针。虚函数指针按照继承父类的顺序，从对象的首地址开始依次排布。</p>
 <ul>
-<li><p>.text（代码段）：存放的是程序源代码编译后的机器指令，是只读的。</p></li>
-<li><p>.rodata（只读数据段）：存放的是程序中的只读数据，一般是程序里面的只读变量和字符串常量。</p></li>
-<li><p>.data（数据段）：存放的是已经初始化了的全局静态变量和局部静态变量</p></li>
-<li><p>.bss：存放的是未初始化的全局静态变量和局部静态变量</p></li>
-<li><p>堆：一般由程序员分配释放，若程序员不释放，存放一些new创建出来的对象</p></li>
-<li><p>栈：由编译器自动分配释放，存放函数的参数值，局部变量的值等</p></li>
-<li><p>内核空间：是OS内存管理的一部分，用于存储和运行操作系统内核的代码和数据</p></li>
+<li>单继承中：父类的虚函数在子类虚函数前面，按照声明顺序排序，共同形成一张表，如果子类有和父类相同的虚函数，会对父类的虚函数进行覆盖。</li>
+<li>多继承中：子类和第一个继承的父类形成一张表，剩下的父类单独形成一个虚函数表，同样的，如果子类有和父类相同的虚函数，会对父类的虚函数进行覆盖。</li>
 </ul>
-<img src="/2024/12/20/C-%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/image-20241220160957674.png" srcset="/img/loading.gif" lazyload class="">
-<p><strong>生命周期：</strong></p>
+<p><strong>析构函数为什么要是虚函数？</strong></p>
+<p>由于基类的多态性，基类指针可以指向派生类对象，如果删除该基类指针，就会调用该指针指向的派生类析构函数，然后派生类析构函数又自动调用积累的析构函数，这样整个派生类对象就会被完全释放。</p>
+<p>如果析构函数不被声明为虚函数，删除基类指针时只会调用基类的析构函数而不会调用派生类析构函数。</p>
+<p><strong>构造函数可以是虚函数吗？</strong></p>
+<p>不可以</p>
 <ul>
-<li>代码段：在程序加载到内存时被分配，并在程序结束时释放</li>
-<li>数据段：与程序生命周期相同</li>
-<li>堆：堆上的内存需要在运行时手动分配和释放，如果不手动释放，堆上内存在程序结束时，由系统释放</li>
-<li>栈：离开它的作用域后由系统释放</li>
-</ul>
-<p><strong>栈和堆的区别：</strong></p>
-<ul>
-<li>内存分配方式不同：
-<ul>
-<li>栈：栈上的内存是自动分配和释放的，通常用于存储函数调用过程中的局部变量、调用参数和使用的寄存器状态等信息。</li>
-<li>堆：堆上的内存是动态分配的，程序在运行时可以根据需要分配和释放内存。在C++中可以通过new/new[]分配堆内存，使用delete/delete[]释放堆内存。在C中可以使用malloc、calloc和realloc函数分配堆内存，使用free函数释放堆内存</li>
-</ul></li>
-<li>生命周期不同：
-<ul>
-<li>栈：栈上的内存生命周期与函数调用相关。局部变量在函数被调用时自动分配内存，函数返回时自动释放内存</li>
-<li>堆：堆上内存的生命周期取决于程序员手动分配和释放。分配的内存在程序运行过程中移植存在，直到被显式释放或程序结束</li>
-</ul></li>
-<li>内存管理不同：
-<ul>
-<li>栈：栈上的内存由操作系统和编译器自动管理</li>
-<li>堆：堆上的内存需要程序员手动管理。可能导致错误，如内存泄露、野指针、重复释放等</li>
-</ul></li>
-<li>内存大小不同：
-<ul>
-<li>栈：栈的大小相对较小，适用于存储较小的数据结构和对象。分配和释放栈内存的操作非常快速，但栈空间有限，可能导致栈溢出错误</li>
-<li>堆：堆的大小通常比栈大得多，因此可以用于存储较大的数据结构和对象。然而，分配和释放堆内存的操作相对较慢，可能导致程序性能下降</li>
-</ul></li>
-</ul>
-<p><strong>可执行文件和进程虚拟内存布局：</strong></p>
-<p>可执行文件中存在
-.text、.rodata和.data，不存在.bss、堆和栈。因为.bss上的内存是在可执行文件中存储未初始化的全局变量和静态变量的内存区域，为了节省空间，在程序加载到内存时，.bss段中的变量会被自动初始化为0或空指针，所以不占用任何空间。而栈和堆是在程序运行时分配的。</p>
-<p><strong>为什么要把程序的指令和数据分开？</strong></p>
-<ul>
-<li>出于保护只读区域的原因：数据区域堆进程来说是可读写的，而指令是只读的</li>
-<li>对于现代CPU来说：现代CPU的缓存一般都设计成指令缓存和数据缓存，指令和数据分开有利于提高程序的局部性，有助于提高CPU缓存命中率</li>
-<li>从共享的角度：程序中运行多个程序时，使用的指令是一样的，内存只用保存一份，将指令和数据分开，可以使指令共享，节省资源。</li>
-</ul>
-<p><strong>栈何时会溢出？(栈的大小是可以修改的)</strong></p>
-<ul>
-<li>递归调用层数过深</li>
-<li>局部变量占用过多空间：一个函数中声明了过多的局部变量，或者某个局部变量占用的内存空间过大时，会导致栈空间快速耗尽</li>
-<li>大量函数调用嵌套：如果程序中存在大量的函数调用嵌套，而栈空间不足以容纳所有的函数调用信息，也会导致栈溢出。</li>
-</ul>
-<p><strong>栈和堆分别存放着什么？</strong></p>
-<ul>
-<li>栈：函数返回地址、调用参数、局部变量以及使用的寄存器状态等信息</li>
-<li>堆：程序运行时使用new，malloc等动态分配的内存</li>
+<li>如果构造函数是虚函数，就需要通过虚函数表中对应的虚函数指针来调用，可是对象如果还没有实例化，也就没有内存空间，就没有虚函数指针了。</li>
+<li>构造函数是自动调用的，不用通过父类的指针或者引用去调用，不需要将其设置为虚函数</li>
 </ul>
 
                 
@@ -401,6 +363,8 @@
       
         <a href="/tags/C/" class="print-no-link">#C++</a>
       
+        <a href="/tags/%E8%99%9A%E5%87%BD%E6%95%B0/" class="print-no-link">#虚函数</a>
+      
     </div>
   
 </div>
@@ -411,8 +375,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>C++中的进程虚拟内存布局</div>
-      <div>http://example.com/2024/12/20/C-中的进程虚拟内存布局/</div>
+      <div>C++中的虚函数和虚函数表</div>
+      <div>http://example.com/2024/12/22/C-中的虚函数和虚函数表/</div>
     </div>
     <div class="license-meta">
       
@@ -424,7 +388,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年12月20日</div>
+          <div>2024年12月22日</div>
         </div>
       
       
@@ -468,18 +432,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/" title="C++中的虚函数和虚函数表">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">C++中的虚函数和虚函数表</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/12/20/C-%E4%B8%AD%E7%9A%84new%E5%92%8Cmalloc/" title="C++中的new和malloc">
-                        <span class="hidden-mobile">C++中的new和malloc</span>
+                      <a href="/2024/12/20/C-%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" title="C++中的进程虚拟内存布局">
+                        <span class="hidden-mobile">C++中的进程虚拟内存布局</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

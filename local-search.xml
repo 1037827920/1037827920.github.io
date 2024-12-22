@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>C++中的虚函数和虚函数表</title>
+    <link href="/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/"/>
+    <url>/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/</url>
+    
+    <content type="html"><![CDATA[<h1 id="虚函数和虚函数表">虚函数和虚函数表</h1><p><strong>动态多态：</strong>在程序运行时根据对象的实际类型确定调用哪个类的成员函数</p><p><strong>C++是如何实现动态多态的？</strong></p><p>通过虚函数实现的，为每一个包含虚函数的对象分配一个虚函数指针，这个虚函数指针指向一个放在常量区的虚函数表。在运行时运行到某个虚函数时，根据这个虚函数指针来找到对应的虚函数表，然后根据对应的这个函数的下标值在虚函数表中找到对应的虚函数来完成调用。</p><p>示例：</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">A</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func1</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func2</span><span class="hljs-params">()</span></span>;<br>&#125;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">B</span>: <span class="hljs-keyword">public</span> A &#123;<br><span class="hljs-keyword">public</span>:<br>   <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func1</span><span class="hljs-params">()</span></span>;<br>&#125;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">C</span>: <span class="hljs-keyword">public</span> B &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func2</span><span class="hljs-params">()</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure><img src="/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/image-20241221234919256.png" class=""><p><strong>内存布局相关：</strong></p><p>一个类多重继承了几个父类，就有几张虚函数表。一个类有几个虚函数表，一个类的对象就有几个虚函数指针。虚函数指针按照继承父类的顺序，从对象的首地址开始依次排布。</p><ul><li>单继承中：父类的虚函数在子类虚函数前面，按照声明顺序排序，共同形成一张表，如果子类有和父类相同的虚函数，会对父类的虚函数进行覆盖。</li><li>多继承中：子类和第一个继承的父类形成一张表，剩下的父类单独形成一个虚函数表，同样的，如果子类有和父类相同的虚函数，会对父类的虚函数进行覆盖。</li></ul><p><strong>析构函数为什么要是虚函数？</strong></p><p>由于基类的多态性，基类指针可以指向派生类对象，如果删除该基类指针，就会调用该指针指向的派生类析构函数，然后派生类析构函数又自动调用积累的析构函数，这样整个派生类对象就会被完全释放。</p><p>如果析构函数不被声明为虚函数，删除基类指针时只会调用基类的析构函数而不会调用派生类析构函数。</p><p><strong>构造函数可以是虚函数吗？</strong></p><p>不可以</p><ul><li>如果构造函数是虚函数，就需要通过虚函数表中对应的虚函数指针来调用，可是对象如果还没有实例化，也就没有内存空间，就没有虚函数指针了。</li><li>构造函数是自动调用的，不用通过父类的指针或者引用去调用，不需要将其设置为虚函数</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>虚函数</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>C++中的进程虚拟内存布局</title>
     <link href="/2024/12/20/C-%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/"/>
     <url>/2024/12/20/C-%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/</url>
