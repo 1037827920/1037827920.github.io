@@ -19,25 +19,25 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="C++中的虚函数和虚函数表">
+    <meta name="description" content="C++中的模板元编程">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++中的虚函数和虚函数表">
-<meta property="og:url" content="http://example.com/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/index.html">
+<meta property="og:title" content="C++中的模板元编程">
+<meta property="og:url" content="http://example.com/2024/12/23/C-%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="C++中的虚函数和虚函数表">
+<meta property="og:description" content="C++中的模板元编程">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8.png">
-<meta property="article:published_time" content="2024-12-22T06:29:15.000Z">
-<meta property="article:modified_time" content="2024-12-23T13:48:09.321Z">
+<meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B.png">
+<meta property="article:published_time" content="2024-12-23T13:51:19.000Z">
+<meta property="article:modified_time" content="2024-12-23T13:52:09.352Z">
 <meta property="article:author" content="凌云行者">
 <meta property="article:tag" content="C++">
-<meta property="article:tag" content="虚函数">
+<meta property="article:tag" content="模板元编程">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8.png">
+<meta name="twitter:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B.png">
   
   
   
-  <title>C++中的虚函数和虚函数表 - 凌云行者的博客</title>
+  <title>C++中的模板元编程 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -228,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="C++中的虚函数和虚函数表"></span>
+            <span id="subtitle" data-typed-text="C++中的模板元编程"></span>
           
         </div>
 
@@ -239,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-22 14:29" pubdate>
-          2024年12月22日, 2:29 下午
+        <time datetime="2024-12-23 21:51" pubdate>
+          2024年12月23日, 9:51 晚上
         </time>
       </span>
     
@@ -252,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          977 字
+          359 字
         
       </span>
     
@@ -300,61 +300,24 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">C++中的虚函数和虚函数表</h1>
+            <h1 id="seo-header">C++中的模板元编程</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="虚函数和虚函数表">虚函数和虚函数表</h1>
-<p><strong>动态多态：</strong>
-在程序运行时根据对象的实际类型确定调用哪个类的成员函数</p>
-<p><strong>C++是如何实现动态多态的？</strong></p>
-<p>通过虚函数实现的，为每一个包含虚函数的对象分配一个虚函数指针，这个虚函数指针指向一个放在常量区的虚函数表。在运行时运行到某个虚函数时，根据这个虚函数指针来找到对应的虚函数表，然后根据对应的这个函数的下标值在虚函数表中找到对应的虚函数来完成调用。</p>
+                <h1 id="模板元编程">模板元编程</h1>
+<p><strong>模板特化：</strong>
+指的是对某个特定类型或特定类型组合提供模板的定制实现。</p>
 <p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">A</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func1</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func2</span><span class="hljs-params">()</span></span>;<br>&#125;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">B</span>: <span class="hljs-keyword">public</span> A &#123;<br><span class="hljs-keyword">public</span>:<br>   	<span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func1</span><span class="hljs-params">()</span></span>;<br>&#125;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">C</span>: <span class="hljs-keyword">public</span> B &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">func2</span><span class="hljs-params">()</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-<img src="/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/image-20241221234919256.png" srcset="/img/loading.gif" lazyload class="">
-<p><strong>内存布局相关：</strong></p>
-<p>一个类多重继承了几个父类，就有几张虚函数表。一个类有几个虚函数表，一个类的对象就有几个虚函数指针。虚函数指针按照继承父类的顺序，从对象的首地址开始依次排布。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func</span><span class="hljs-params">(T t)</span> </span>&#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;Generic template: &quot;</span> &lt;&lt; t &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-comment">// 完全特化模板</span><br><span class="hljs-keyword">template</span> &lt;&gt;<br><span class="hljs-type">void</span> <span class="hljs-built_in">func</span>&lt;<span class="hljs-type">int</span>&gt;(<span class="hljs-type">int</span> t) &#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;Specialized template for int: &quot;</span> &lt;&lt; t &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-built_in">func</span>(<span class="hljs-number">10</span>); <span class="hljs-comment">// 使用特化模板</span><br>    <span class="hljs-built_in">func</span>(<span class="hljs-number">3.14</span>); <span class="hljs-comment">// 使用通用模板</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>模板偏特化：</strong>
+通常用于处理模板参数中的某些类型特征（比如说指针类型、数组类型等）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostrea&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func</span><span class="hljs-params">(T t)</span> </span>&#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;Generic template: &quot;</span> &lt;&lt; t &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-comment">// 偏特化</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func</span><span class="hljs-params">(T* t)</span> </span>&#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;Template specialized for pointer type: &quot;</span> &lt;&lt; *t &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-type">int</span> a = <span class="hljs-number">10</span>;<br>    <span class="hljs-type">int</span>* p = &amp;a;<br>    <br>    <span class="hljs-built_in">func</span>(a); <span class="hljs-comment">// 使用通用模板</span><br>    <span class="hljs-built_in">func</span>(p); <span class="hljs-comment">// 使用偏特化模板</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>函数重载与模板特化/偏特化的区别：</strong></p>
 <ul>
-<li>单继承中：父类的虚函数在子类虚函数前面，按照声明顺序排序，共同形成一张表，如果子类有和父类相同的虚函数，会对父类的虚函数进行覆盖。</li>
-<li>多继承中：子类和第一个继承的父类形成一张表，剩下的父类单独形成一个虚函数表，同样的，如果子类有和父类相同的虚函数，会对父类的虚函数进行覆盖。</li>
+<li>函数重载：指的是为同一个函数名提供多个不同参数列表的实现。编译器根据传入参数的类型来选择合适的重载版本。函数重载是基于函数参数的类型和数量来选择执行哪个函数，而不涉及模板概念</li>
+<li>模板特化/偏特化：是针对模板的类型参数进行定制，根据传入的类型来选择对应的模板实例化。</li>
 </ul>
-<p><strong>析构函数为什么要是虚函数？</strong></p>
-<p>由于基类的多态性，基类指针可以指向派生类对象，如果删除该基类指针，就会调用该指针指向的派生类析构函数，然后派生类析构函数又自动调用积累的析构函数，这样整个派生类对象就会被完全释放。</p>
-<p>如果析构函数不被声明为虚函数，删除基类指针时只会调用基类的析构函数而不会调用派生类析构函数。</p>
-<p><strong>构造函数可以是虚函数吗？</strong></p>
-<p>不可以</p>
-<ul>
-<li>如果构造函数是虚函数，就需要通过虚函数表中对应的虚函数指针来调用，可是对象如果还没有实例化，也就没有内存空间，就没有虚函数指针了。</li>
-<li>构造函数是自动调用的，不用通过父类的指针或者引用去调用，不需要将其设置为虚函数</li>
-</ul>
-<p><strong>虚函数和普通函数之间的区别：</strong></p>
-<p>主要体现在多态的支持和调用方式上，虚函数是实现运行时多态（动态绑定）的核心机制</p>
-<ul>
-<li>绑定方式：
-<ul>
-<li>虚函数：采用动态绑定，调用哪个函数由对象的实际类型决定。</li>
-<li>普通函数：采用静态绑定，函数的调用在编译时就已经确定，不依赖于运行时的对象类型。</li>
-</ul></li>
-<li>性能差异：
-<ul>
-<li>虚函数：调用比普通函数蛮，因为它需要通过虚表进行动态查找</li>
-<li>普通函数：直接调用，不需要通过虚表，因此速度较快</li>
-</ul></li>
-<li>内存开销：
-<ul>
-<li>虚函数：需要为每个对象增加一个虚函数表指针，该指针指向虚函数表，这个虚表包含了该类的虚函数的地址。增加了内存开销</li>
-<li>普通函数：没有虚表，没有额外内存开销</li>
-</ul></li>
-</ul>
-<p><strong>计算这个类的大小：</strong></p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">base1</span> &#123;<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-type">int</span> a;<br>    <span class="hljs-type">char</span> c;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">fun1</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">fun2</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    std::cout &lt;&lt; (<span class="hljs-built_in">sizeof</span>(base1));<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-<ul>
-<li>int a通常占4个字节</li>
-<li>char c通常占1个字节，但是有3个填充字节为了对齐虚表指针</li>
-<li>虚表指针在64位系统中为8字节，在32位系统中为4字节</li>
-</ul>
-<p>所以32位系统为12字节，64位系统为16字节</p>
 
                 
               </div>
@@ -390,7 +353,7 @@
       
         <a href="/tags/C/" class="print-no-link">#C++</a>
       
-        <a href="/tags/%E8%99%9A%E5%87%BD%E6%95%B0/" class="print-no-link">#虚函数</a>
+        <a href="/tags/%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B/" class="print-no-link">#模板元编程</a>
       
     </div>
   
@@ -402,8 +365,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>C++中的虚函数和虚函数表</div>
-      <div>http://example.com/2024/12/22/C-中的虚函数和虚函数表/</div>
+      <div>C++中的模板元编程</div>
+      <div>http://example.com/2024/12/23/C-中的模板元编程/</div>
     </div>
     <div class="license-meta">
       
@@ -415,7 +378,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年12月22日</div>
+          <div>2024年12月23日</div>
         </div>
       
       
@@ -459,18 +422,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/12/23/C-%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B/" title="C++中的模板元编程">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">C++中的模板元编程</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/12/20/C-%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" title="C++中的进程虚拟内存布局">
-                        <span class="hidden-mobile">C++中的进程虚拟内存布局</span>
+                      <a href="/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/" title="C++中的虚函数和虚函数表">
+                        <span class="hidden-mobile">C++中的虚函数和虚函数表</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

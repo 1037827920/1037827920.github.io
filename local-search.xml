@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>C++中的模板元编程</title>
+    <link href="/2024/12/23/C-%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B/"/>
+    <url>/2024/12/23/C-%E4%B8%AD%E7%9A%84%E6%A8%A1%E6%9D%BF%E5%85%83%E7%BC%96%E7%A8%8B/</url>
+    
+    <content type="html"><![CDATA[<h1 id="模板元编程">模板元编程</h1><p><strong>模板特化：</strong>指的是对某个特定类型或特定类型组合提供模板的定制实现。</p><p>示例：</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func</span><span class="hljs-params">(T t)</span> </span>&#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;Generic template: &quot;</span> &lt;&lt; t &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-comment">// 完全特化模板</span><br><span class="hljs-keyword">template</span> &lt;&gt;<br><span class="hljs-type">void</span> <span class="hljs-built_in">func</span>&lt;<span class="hljs-type">int</span>&gt;(<span class="hljs-type">int</span> t) &#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;Specialized template for int: &quot;</span> &lt;&lt; t &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-built_in">func</span>(<span class="hljs-number">10</span>); <span class="hljs-comment">// 使用特化模板</span><br>    <span class="hljs-built_in">func</span>(<span class="hljs-number">3.14</span>); <span class="hljs-comment">// 使用通用模板</span><br>&#125;<br></code></pre></td></tr></table></figure><p><strong>模板偏特化：</strong>通常用于处理模板参数中的某些类型特征（比如说指针类型、数组类型等）</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostrea&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func</span><span class="hljs-params">(T t)</span> </span>&#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;Generic template: &quot;</span> &lt;&lt; t &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-comment">// 偏特化</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">func</span><span class="hljs-params">(T* t)</span> </span>&#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;Template specialized for pointer type: &quot;</span> &lt;&lt; *t &lt;&lt; endl;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-type">int</span> a = <span class="hljs-number">10</span>;<br>    <span class="hljs-type">int</span>* p = &amp;a;<br>    <br>    <span class="hljs-built_in">func</span>(a); <span class="hljs-comment">// 使用通用模板</span><br>    <span class="hljs-built_in">func</span>(p); <span class="hljs-comment">// 使用偏特化模板</span><br>&#125;<br></code></pre></td></tr></table></figure><p><strong>函数重载与模板特化/偏特化的区别：</strong></p><ul><li>函数重载：指的是为同一个函数名提供多个不同参数列表的实现。编译器根据传入参数的类型来选择合适的重载版本。函数重载是基于函数参数的类型和数量来选择执行哪个函数，而不涉及模板概念</li><li>模板特化/偏特化：是针对模板的类型参数进行定制，根据传入的类型来选择对应的模板实例化。</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>模板元编程</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>C++中的虚函数和虚函数表</title>
     <link href="/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/"/>
     <url>/2024/12/22/C-%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8/</url>
