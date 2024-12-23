@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E8%99%9A%E5%87%BD%E6%95%B0%E8%A1%A8.png">
 <meta property="article:published_time" content="2024-12-22T06:29:15.000Z">
-<meta property="article:modified_time" content="2024-12-22T06:30:01.841Z">
+<meta property="article:modified_time" content="2024-12-23T13:48:09.321Z">
 <meta property="article:author" content="凌云行者">
 <meta property="article:tag" content="C++">
 <meta property="article:tag" content="虚函数">
@@ -252,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          638 字
+          977 字
         
       </span>
     
@@ -328,6 +328,33 @@
 <li>如果构造函数是虚函数，就需要通过虚函数表中对应的虚函数指针来调用，可是对象如果还没有实例化，也就没有内存空间，就没有虚函数指针了。</li>
 <li>构造函数是自动调用的，不用通过父类的指针或者引用去调用，不需要将其设置为虚函数</li>
 </ul>
+<p><strong>虚函数和普通函数之间的区别：</strong></p>
+<p>主要体现在多态的支持和调用方式上，虚函数是实现运行时多态（动态绑定）的核心机制</p>
+<ul>
+<li>绑定方式：
+<ul>
+<li>虚函数：采用动态绑定，调用哪个函数由对象的实际类型决定。</li>
+<li>普通函数：采用静态绑定，函数的调用在编译时就已经确定，不依赖于运行时的对象类型。</li>
+</ul></li>
+<li>性能差异：
+<ul>
+<li>虚函数：调用比普通函数蛮，因为它需要通过虚表进行动态查找</li>
+<li>普通函数：直接调用，不需要通过虚表，因此速度较快</li>
+</ul></li>
+<li>内存开销：
+<ul>
+<li>虚函数：需要为每个对象增加一个虚函数表指针，该指针指向虚函数表，这个虚表包含了该类的虚函数的地址。增加了内存开销</li>
+<li>普通函数：没有虚表，没有额外内存开销</li>
+</ul></li>
+</ul>
+<p><strong>计算这个类的大小：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">base1</span> &#123;<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-type">int</span> a;<br>    <span class="hljs-type">char</span> c;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">fun1</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">fun2</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    std::cout &lt;&lt; (<span class="hljs-built_in">sizeof</span>(base1));<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<ul>
+<li>int a通常占4个字节</li>
+<li>char c通常占1个字节，但是有3个填充字节为了对齐虚表指针</li>
+<li>虚表指针在64位系统中为8字节，在32位系统中为4字节</li>
+</ul>
+<p>所以32位系统为12字节，64位系统为16字节</p>
 
                 
               </div>
