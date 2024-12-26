@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>C++中的类型转换</title>
+    <link href="/2024/12/26/C-%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/"/>
+    <url>/2024/12/26/C-%E4%B8%AD%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/</url>
+    
+    <content type="html"><![CDATA[<h1 id="类型转换">类型转换</h1><p><strong>概述：</strong> 将一个类型显式地转换为另一个类型的过程</p><p><strong>C风格的强制转换：</strong></p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">double</span> pi = <span class="hljs-number">3.14</span>;<br><span class="hljs-type">int</span> iPi = (<span class="hljs-type">int</span>)pi;<br></code></pre></td></tr></table></figure><ul><li>不安全性：可能会导致一些隐式转换被执行，转换失败没有明显的错误提示</li><li>不推荐</li></ul><p><strong>static_cast（静态转换）：</strong></p><p>在编译时进行类型检查，比C风格强制转换更安全</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">double</span> pi = <span class="hljs-number">3.14</span>;<br>ubt iPi = <span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">int</span>&gt;(pi);<br></code></pre></td></tr></table></figure><p>适用于：</p><ul><li>基础类型之间的转换</li><li>对象之间的转换，前提是二者之间存在继承关系</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Base</span> &#123;&#125;;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Derived</span> : <span class="hljs-keyword">public</span> Base &#123;&#125;;<br><br>Base* base_ptr = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Derived</span>();<br><span class="hljs-comment">// 基类指针转换为派生类指针</span><br>Derived* derivedPtr = <span class="hljs-keyword">static_cast</span>&lt;Derived*&gt; base;<br></code></pre></td></tr></table></figure><p>不能用于：</p><ul><li>指针/引用类型不相关，即不在继承体系中</li><li>跨不同类型的复杂转换（如将void* 转换为非void* 类型）</li></ul><p><strong>dynamic_cast（动态转换）：</strong></p><p>用于安全的运行时类型识别(RTTI)，尤其是在多态层次中</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Base</span> &#123;<br>    <span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>&#125;;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Derived</span> : <span class="hljs-keyword">public</span> Base &#123;&#125;;<br><br>Base* basePtr = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Derived</span>();<br>Derived* derivedPtr = <span class="hljs-built_in">dynamic_cast</span>&lt;Derived*&gt;(basePtr);<br><br><span class="hljs-keyword">if</span> (derived_ptr) &#123;<br>    <span class="hljs-comment">// 转换成功</span><br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// 转换失败</span><br>&#125;<br></code></pre></td></tr></table></figure><p><strong>const_cast（常量转换）：</strong></p><p>用于添加或移除常量性。可以使用它来去掉对象的const或volatile限定符，或者将const指针转换为非const指针，他不会改变对象本身</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">const</span> <span class="hljs-type">int</span> x = <span class="hljs-number">10</span>;<br><span class="hljs-type">int</span>* y = <span class="hljs-built_in">const_cast</span>&lt;<span class="hljs-type">int</span>*&gt;(&amp;x); <span class="hljs-comment">// 将const int* 转换为int*</span><br></code></pre></td></tr></table></figure><p><strong>reinterpret_cast（重解释转换）：</strong></p><p>是C++中的最强转换，直接将对象的内存表示解释为另一种类型。它通常用于指针之间的转换（包括将任意类型的指针转换为void*或其他类型的指针）</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">int</span> x = <span class="hljs-number">42</span>;<br><span class="hljs-type">char</span>* p = <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">char</span>*&gt;(&amp;x);<br></code></pre></td></tr></table></figure><ul><li>无视类型的实际内容，跳过了类型的安全检查</li><li>不安全性</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>类型转换</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>数据库系统期末复习笔记</title>
     <link href="/2024/12/26/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <url>/2024/12/26/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
