@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>ACPI_PM_Timer</title>
+    <link href="/2024/12/29/ACPI-PM-Timer/"/>
+    <url>/2024/12/29/ACPI-PM-Timer/</url>
+    
+    <content type="html"><![CDATA[<h1 id="acpi-pm-timer">ACPI PM Timer</h1><p><strong>概述：</strong> ACPI PM Timer是一个非常简单的计时器，它以3.579545 MHz运行，在计数器溢出时生成系统控制中断（SCI）。它精度较低，建议使用其他定时器，如HPET或APIC定时器。</p><h2 id="检测acpi-pm-timer">检测ACPI PM Timer</h2><p><strong>关键概念：</strong></p><ul><li>RSDP(Root System DescriptionPointer)：是一个指向ACPI系统表（如RSDT或XSDT）的指针。它位于系统内存的一个固定位置，操作系统会在启动时查找这个指针，以便访问ACPI表。RSDP在大多数情况下存储在系统的低地址区域（如BIOS固件中）</li><li>RSDT(Root System DescirptionTable)：是一个包含指向其他ACPI表的指针的ACPI表，它提供了系统固件中定义的所有ACPI结构的入口。</li><li>XSDT(Extended System DescriptionTable)：是RSDT的扩展，用于支持64位系统。于RSDT使用32指针不同，XSDT使用64位指针，可以支持更多的表</li><li>FADT(Fixed ACPI DescriptionTable)：是ACPI表之一，包含固定的ACPI信息，如电源管理、配置等内容，它描述了系统硬件的一些基本信息，并提供了与电源管理和系统管理相关的接口。</li></ul><p><strong>如何查找：</strong></p><p>通过RSDP指针以获取RSDT或XSDT，然后找到FADT。一旦找到了FADT，需要检查PMTimerLength字段是否为4，如果不是，则必须假定该计时器不可用。然后，如果ACPI的版本为2或更高，并且X_PMTimerBlock通用地址结构可用（检测地址不为0），则使用它，否则，将PMTimerBlock用作IO端口。</p><h2 id="位和32位模式">24位和32位模式</h2><p>ACPI PMTimer支持24位和32位计数器。如果FADA标志的第8位被设置，则计数器位32位。</p><h2 id="读取counter值">读取counter值</h2><p><strong>使用的是X_PMTimerBlock：</strong></p><ul><li>检查地址在哪个空间地址中<ul><li>如果是MMIO（内存映射I/O）：将地址映射到虚拟内存中，并从中读取无符号32位整数counter值</li><li>如果是IO（端口I/O）：从I/O端口读取无符号32位整数counter值</li></ul></li></ul><p><strong>使用的是PM_Timer：</strong></p><ul><li>直接从I/O端口读取无符号32位整数counter值</li></ul><h2 id="counter值">counter值</h2><table><thead><tr><th>位</th><th>描述</th></tr></thead><tbody><tr><td>0:23</td><td>计数器的24位</td></tr><tr><td>24:31</td><td>如果计数器是32位的，则为计数器的高8位。如果计数器是24位的，则为0.</td></tr></tbody></table><h2 id="中断请求">中断请求</h2><p>ACPI PM Timer在计数器溢出时会触发一个系统控制中断（SCI）。</p><h2 id="参考">参考</h2><ul><li><a href="https://wiki.osdev.org/ACPI_Timer">ACPI Timer - OSDevWiki</a></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>OS硬件设备</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>操作系统</tag>
+      
+      <tag>硬件设备</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Rust入门学习笔记</title>
     <link href="/2024/12/29/Rust%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <url>/2024/12/29/Rust%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
