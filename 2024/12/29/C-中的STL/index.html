@@ -19,25 +19,25 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="C++中的concept">
+    <meta name="description" content="C++中的STL">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++中的concept">
-<meta property="og:url" content="http://example.com/2024/12/28/C-%E4%B8%AD%E7%9A%84concept/index.html">
+<meta property="og:title" content="C++中的STL">
+<meta property="og:url" content="http://example.com/2024/12/29/C-%E4%B8%AD%E7%9A%84STL/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="C++中的concept">
+<meta property="og:description" content="C++中的STL">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84concept.png">
-<meta property="article:published_time" content="2024-12-28T12:15:59.000Z">
-<meta property="article:modified_time" content="2024-12-28T12:16:28.086Z">
+<meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84STL.png">
+<meta property="article:published_time" content="2024-12-29T03:33:11.000Z">
+<meta property="article:modified_time" content="2024-12-29T03:33:41.442Z">
 <meta property="article:author" content="凌云行者">
 <meta property="article:tag" content="C++">
-<meta property="article:tag" content="concept">
+<meta property="article:tag" content="STL">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84concept.png">
+<meta name="twitter:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84STL.png">
   
   
   
-  <title>C++中的concept - 凌云行者的博客</title>
+  <title>C++中的STL - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -228,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="C++中的concept"></span>
+            <span id="subtitle" data-typed-text="C++中的STL"></span>
           
         </div>
 
@@ -239,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-28 20:15" pubdate>
-          2024年12月28日, 8:15 晚上
+        <time datetime="2024-12-29 11:33" pubdate>
+          2024年12月29日, 11:33 中午
         </time>
       </span>
     
@@ -252,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          545 字
+          1.2k 字
         
       </span>
     
@@ -300,37 +300,93 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">C++中的concept</h1>
+            <h1 id="seo-header">C++中的STL</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="concept">concept</h1>
-<p><strong>概述：</strong>
-是C++20引入的新机制，旨在提供一种类型约束机制，使得模板的使用更加直观、可读且类型安全</p>
-<p><strong>示例：</strong></p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;concepts&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><br><span class="hljs-comment">// 定义concept</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">concept</span> Incrementable = <span class="hljs-built_in">requires</span>(T x) &#123;<br>    &#123; ++x &#125; -&gt; std::same_as&lt;T&amp;&gt;;  <span class="hljs-comment">// 确保类型 T 支持自增操作并返回 T&amp;</span><br>    &#123; x++ &#125; -&gt; std::same_as&lt;T&gt;;   <span class="hljs-comment">// 确保类型 T 支持后置自增操作并返回 T</span><br>&#125;;<br><br><span class="hljs-comment">// 使用定义的concept来约束模板参数</span><br><span class="hljs-keyword">template</span> &lt;Incrementable T&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">increment</span><span class="hljs-params">(T&amp; x)</span> </span>&#123;<br>    ++x;<br>    std::cout &lt;&lt; x &lt;&lt; std::endl;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-type">int</span> a = <span class="hljs-number">5</span>;<br>    <span class="hljs-built_in">increment</span>(a); <span class="hljs-comment">// 有效，支持int自增操作</span><br><br>    <span class="hljs-comment">// std::string b = &quot;hello&quot;;</span><br>    <span class="hljs-comment">// increment(b); // 编译错误，不支持自增操作</span><br>&#125;<br></code></pre></td></tr></table></figure>
-<p><strong>常见的内建concept：</strong></p>
+                <h1 id="stl">STL</h1>
+<h2 id="vector">vector</h2>
+<p><strong>特点：</strong></p>
 <ul>
-<li>std::integral：表示整数类型（如int，long等）</li>
-<li>std::floating_point：表示浮点类型（如float、double等）</li>
-<li>std::same_as：检查两个类型是否相同</li>
-<li>std::convertible_to：检查一个类型是否可以转换为另一个类型</li>
-<li>std::invocable：检查类型是否可以被调用（如函数对象）</li>
-<li>std::signed_integral：表示带符号整数类型</li>
-<li>std::unsigned_integral：表示无符号整数类型</li>
+<li>底层结构：由动态数组实现，特点是存储空间连续</li>
+<li>访问遍历：支持随机访问，可使用下标访问，访问时间复杂度为O(1)</li>
+<li>插入/删除：尾部插入/删除效率较高；中间和头部插入/删除效率较低，因为存储空间是连续的，插入后需要改变元素顺序</li>
+<li>空间效率：底层实现时，会事先预留一些额外空间，
+以减少重新分配的次数</li>
+<li>使用场景：需要随机访问且频繁在尾部进行操作的场景；如果频繁增删元素则不适用该容器</li>
 </ul>
-<p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">template</span> &lt;std::integral T&gt;<br><span class="hljs-function">T <span class="hljs-title">add</span><span class="hljs-params">(T a, T b)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> a + b;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    std::cout &lt;&lt; <span class="hljs-built_in">add</span>(<span class="hljs-number">5</span>, <span class="hljs-number">10</span>) &lt;&lt; std::endl; <span class="hljs-comment">// 有效，int是integral类型</span><br>    <span class="hljs-comment">// std::cout &lt;&lt; add(5.5, 10.5) &lt;&lt; std::endl; // 编译错误，double不是integral类型</span><br>&#125;<br></code></pre></td></tr></table></figure>
-<p><strong>概念的组合：</strong></p>
-<p>concept还可以通过逻辑运算符组合，创建更复杂的类型约束：</p>
+<p><strong>实现原理：</strong></p>
+<p>std::vector内部维护一个动态数组，当容量不足以容纳新元素时，std::vector会分配更大的内存空间，并将现有元素复制到新的存储空间。新容量通常是旧容量的两倍，以减少频繁的内存分配和拷贝操作</p>
+<h2 id="deque">deque</h2>
+<p><strong>特点：</strong></p>
 <ul>
-<li>&amp;&amp;：要求类型同时满足多个条件</li>
-<li>||：要求类型满足至少一个条件</li>
-<li>!：要求类型不满足这个条件</li>
+<li>底层结构：由双向队列实现，特点是存储空间连续</li>
+<li>访问遍历：支持随机访问，其性能比vector要低</li>
+<li>插入/删除：尾部和头部插入/删除效率较高；中间插入/删除时间效率较低，但比vector高效一些</li>
+<li>空间效率：底层实现时比vector的结构更复杂，也会事先预留一些额外空间，
+以减少重新分配的次数</li>
+<li>使用场景：需要随机访问且频繁在头部和尾部进行操作的场景；如果频繁在中部增删元素则不适用该容器</li>
 </ul>
-<p>示例：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">concept</span> Addable = <span class="hljs-built_in">requires</span>(T a, T b) &#123;<br>    &#123; a + b &#125; -&gt; std::same_as&lt;T&gt;; <span class="hljs-comment">// 必须支持加法运算</span><br>&#125;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">concept</span> Incrementable = <span class="hljs-built_in">requires</span>(T x) &#123;<br>    &#123; ++x &#125; -&gt; std::same_as&lt;T&amp;&gt;;  <span class="hljs-comment">// 确保类型 T 支持自增操作并返回 T&amp;</span><br>    &#123; x++ &#125; -&gt; std::same_as&lt;T&gt;;   <span class="hljs-comment">// 确保类型 T 支持后置自增操作并返回 T</span><br>&#125;;<br><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">concept</span> IncrementableAddable = Incrementable&lt;T&gt; &amp;&amp; Addable&lt;T&gt;;<br><br><span class="hljs-keyword">template</span> &lt;IncrementableAddable T&gt;<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">incrementAndAdd</span><span class="hljs-params">(T&amp; x, T y)</span> </span>&#123;<br>    ++x;<br>    x = x + ;y;<br>    std::cout &lt;&lt; x &lt;&lt; std::endl;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-type">int</span> a = <span class="hljs-number">5</span>;<br>    <span class="hljs-built_in">incrementAndAdd</span>(a, <span class="hljs-number">10</span>); <span class="hljs-comment">// 有效</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>实现原理：</strong></p>
+<p>std::queue是一个双端队列，支持在两端快速插入和删除。内部使用分段存储结构，，而不是一个连续的大块内存。这使得在两端的插入和删除更加高效。使用一个指针管理这些块，并在需要时动态调整指针数组的大小</p>
+<h2 id="list">list</h2>
+<p><strong>特点：</strong></p>
+<ul>
+<li>底层结构：由双向链表实现，特点是存储空间不连续</li>
+<li>访问遍历：不支持随机访问，只能通过迭代器进行访问</li>
+<li>插入/删除：任意位置插入/删除效率都很高</li>
+<li>空间效率：每个元素都需要分配额外的空间</li>
+<li>使用场景：需要在任意位置频繁插入/删除操作的场景</li>
+</ul>
+<p><strong>实现原理：</strong></p>
+<p>std::list是一个双向链表，包含节点，每个节点包含一个数据元素和两个指针，分别指向前一个和后一个节点。每次插入或删除节点时，都会进行动态内存分配和释放</p>
+<h2 id="set">set</h2>
+<p><strong>特点：</strong></p>
+<ul>
+<li>底层结构：由红黑树实现，是一种平衡二叉搜索树，存储空间不连续</li>
+<li>访问遍历：不支持随机访问，只能通过迭代器进行访问</li>
+<li>插入/删除：查询/插入/删除效率为O(log N)复杂度</li>
+<li>排序方式：默认使用less仿函数，即&lt;运算符进行排序；也可以自定义排序规则仿函数</li>
+<li>使用场景：需要有序集合且元素不重复的场景</li>
+</ul>
+<h2 id="multiset">multiset</h2>
+<p><strong>特点：</strong></p>
+<ul>
+<li>底层结构：由红黑树实现，是一种平衡二叉搜索树，存储空间不连续</li>
+<li>访问遍历：不支持随机访问，只能通过迭代器访问</li>
+<li>插入/删除：查询/插入/删除效率为O(log N)复杂度</li>
+<li>排序方式：默认使用less仿函数，即&lt;运算符进行排序；也可以自定义排序规则仿函数</li>
+<li>使用场景：需要有序集合且元素<strong>重复</strong>的场景</li>
+</ul>
+<h2 id="map">map</h2>
+<p><strong>特点：</strong></p>
+<ul>
+<li>底层结构：由红黑树实现，是一种平衡二叉搜索树，存储空间不连续</li>
+<li>访问遍历：不支持随机访问，只能通过迭代器进行访问</li>
+<li>插入/删除：查询/插入/删除效率为O(log N)复杂度</li>
+<li>排序方式：默认使用less仿函数，即&lt;运算符进行排序‘；也可以自定义排序规则的仿函数</li>
+<li>使用场景：需要有序键值对且键值不重复的场景</li>
+</ul>
+<h2 id="multimap">multimap</h2>
+<p><strong>特点：</strong></p>
+<ul>
+<li>底层结构：由红黑树实现，是一种平衡二叉搜索树，存储空间不连续</li>
+<li>访问遍历：不支持随机访问，只能通过迭代器进行访问</li>
+<li>插入/删除：查询/插入/删除效率为O(log N)复杂度</li>
+<li>排序方式：默认使用less仿函数，即&lt;运算符进行排序‘；也可以自定义排序规则的仿函数</li>
+<li>使用场景：需要有序键值对且键值<strong>重复</strong>的场景</li>
+</ul>
+<h2 id="emplace_back和push_back">emplace_back和push_back</h2>
+<p><strong>概述：</strong> 二者的功能都是向容器尾部添加新元素</p>
+<p><strong>区别：</strong></p>
+<ul>
+<li>push_back：先创建临时对象，然后再拷贝复制到对应的内存，再删除临时对象，效率较低</li>
+<li>emplace_back：直接在内存处创建对象，效率较高</li>
+</ul>
+<blockquote>
+<p>在代码中能用emplace_back就用emplace_back</p>
+</blockquote>
 
                 
               </div>
@@ -366,7 +422,7 @@
       
         <a href="/tags/C/" class="print-no-link">#C++</a>
       
-        <a href="/tags/concept/" class="print-no-link">#concept</a>
+        <a href="/tags/STL/" class="print-no-link">#STL</a>
       
     </div>
   
@@ -378,8 +434,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>C++中的concept</div>
-      <div>http://example.com/2024/12/28/C-中的concept/</div>
+      <div>C++中的STL</div>
+      <div>http://example.com/2024/12/29/C-中的STL/</div>
     </div>
     <div class="license-meta">
       
@@ -391,7 +447,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年12月28日</div>
+          <div>2024年12月29日</div>
         </div>
       
       
@@ -435,18 +491,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/12/29/C-%E4%B8%AD%E7%9A%84STL/" title="C++中的STL">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">C++中的STL</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/12/28/C-%E4%B8%AD%E7%9A%84%E5%AE%8C%E7%BE%8E%E8%BD%AC%E5%8F%91/" title="C++中的完美转发">
-                        <span class="hidden-mobile">C++中的完美转发</span>
+                      <a href="/2024/12/28/C-%E4%B8%AD%E7%9A%84concept/" title="C++中的concept">
+                        <span class="hidden-mobile">C++中的concept</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

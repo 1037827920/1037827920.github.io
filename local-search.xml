@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>C++中的STL</title>
+    <link href="/2024/12/29/C-%E4%B8%AD%E7%9A%84STL/"/>
+    <url>/2024/12/29/C-%E4%B8%AD%E7%9A%84STL/</url>
+    
+    <content type="html"><![CDATA[<h1 id="stl">STL</h1><h2 id="vector">vector</h2><p><strong>特点：</strong></p><ul><li>底层结构：由动态数组实现，特点是存储空间连续</li><li>访问遍历：支持随机访问，可使用下标访问，访问时间复杂度为O(1)</li><li>插入/删除：尾部插入/删除效率较高；中间和头部插入/删除效率较低，因为存储空间是连续的，插入后需要改变元素顺序</li><li>空间效率：底层实现时，会事先预留一些额外空间，以减少重新分配的次数</li><li>使用场景：需要随机访问且频繁在尾部进行操作的场景；如果频繁增删元素则不适用该容器</li></ul><p><strong>实现原理：</strong></p><p>std::vector内部维护一个动态数组，当容量不足以容纳新元素时，std::vector会分配更大的内存空间，并将现有元素复制到新的存储空间。新容量通常是旧容量的两倍，以减少频繁的内存分配和拷贝操作</p><h2 id="deque">deque</h2><p><strong>特点：</strong></p><ul><li>底层结构：由双向队列实现，特点是存储空间连续</li><li>访问遍历：支持随机访问，其性能比vector要低</li><li>插入/删除：尾部和头部插入/删除效率较高；中间插入/删除时间效率较低，但比vector高效一些</li><li>空间效率：底层实现时比vector的结构更复杂，也会事先预留一些额外空间，以减少重新分配的次数</li><li>使用场景：需要随机访问且频繁在头部和尾部进行操作的场景；如果频繁在中部增删元素则不适用该容器</li></ul><p><strong>实现原理：</strong></p><p>std::queue是一个双端队列，支持在两端快速插入和删除。内部使用分段存储结构，，而不是一个连续的大块内存。这使得在两端的插入和删除更加高效。使用一个指针管理这些块，并在需要时动态调整指针数组的大小</p><h2 id="list">list</h2><p><strong>特点：</strong></p><ul><li>底层结构：由双向链表实现，特点是存储空间不连续</li><li>访问遍历：不支持随机访问，只能通过迭代器进行访问</li><li>插入/删除：任意位置插入/删除效率都很高</li><li>空间效率：每个元素都需要分配额外的空间</li><li>使用场景：需要在任意位置频繁插入/删除操作的场景</li></ul><p><strong>实现原理：</strong></p><p>std::list是一个双向链表，包含节点，每个节点包含一个数据元素和两个指针，分别指向前一个和后一个节点。每次插入或删除节点时，都会进行动态内存分配和释放</p><h2 id="set">set</h2><p><strong>特点：</strong></p><ul><li>底层结构：由红黑树实现，是一种平衡二叉搜索树，存储空间不连续</li><li>访问遍历：不支持随机访问，只能通过迭代器进行访问</li><li>插入/删除：查询/插入/删除效率为O(log N)复杂度</li><li>排序方式：默认使用less仿函数，即&lt;运算符进行排序；也可以自定义排序规则仿函数</li><li>使用场景：需要有序集合且元素不重复的场景</li></ul><h2 id="multiset">multiset</h2><p><strong>特点：</strong></p><ul><li>底层结构：由红黑树实现，是一种平衡二叉搜索树，存储空间不连续</li><li>访问遍历：不支持随机访问，只能通过迭代器访问</li><li>插入/删除：查询/插入/删除效率为O(log N)复杂度</li><li>排序方式：默认使用less仿函数，即&lt;运算符进行排序；也可以自定义排序规则仿函数</li><li>使用场景：需要有序集合且元素<strong>重复</strong>的场景</li></ul><h2 id="map">map</h2><p><strong>特点：</strong></p><ul><li>底层结构：由红黑树实现，是一种平衡二叉搜索树，存储空间不连续</li><li>访问遍历：不支持随机访问，只能通过迭代器进行访问</li><li>插入/删除：查询/插入/删除效率为O(log N)复杂度</li><li>排序方式：默认使用less仿函数，即&lt;运算符进行排序‘；也可以自定义排序规则的仿函数</li><li>使用场景：需要有序键值对且键值不重复的场景</li></ul><h2 id="multimap">multimap</h2><p><strong>特点：</strong></p><ul><li>底层结构：由红黑树实现，是一种平衡二叉搜索树，存储空间不连续</li><li>访问遍历：不支持随机访问，只能通过迭代器进行访问</li><li>插入/删除：查询/插入/删除效率为O(log N)复杂度</li><li>排序方式：默认使用less仿函数，即&lt;运算符进行排序‘；也可以自定义排序规则的仿函数</li><li>使用场景：需要有序键值对且键值<strong>重复</strong>的场景</li></ul><h2 id="emplace_back和push_back">emplace_back和push_back</h2><p><strong>概述：</strong> 二者的功能都是向容器尾部添加新元素</p><p><strong>区别：</strong></p><ul><li>push_back：先创建临时对象，然后再拷贝复制到对应的内存，再删除临时对象，效率较低</li><li>emplace_back：直接在内存处创建对象，效率较高</li></ul><blockquote><p>在代码中能用emplace_back就用emplace_back</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>STL</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>C++中的concept</title>
     <link href="/2024/12/28/C-%E4%B8%AD%E7%9A%84concept/"/>
     <url>/2024/12/28/C-%E4%B8%AD%E7%9A%84concept/</url>
