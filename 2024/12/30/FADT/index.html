@@ -19,25 +19,21 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="简要介绍ACPI PM Timer">
+    <meta name="description" content="FADT 概述： FADT(Fixed ACPI Description Table)表是ACPI编程接口中使用一种的数据结构，该表包含与电源管理相关的固定寄存器块的信息。 查找FADT 通过RSDP指针以获取RSDT或XSDT，然后找到FADT，FADT是RSDT或XSDT的一个条目、FADT结构体 123456789101112131415161718192021222324252627282">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ACPI_PM_Timer">
-<meta property="og:url" content="http://example.com/2024/12/29/ACPI-PM-Timer/index.html">
+<meta property="og:title" content="FADT">
+<meta property="og:url" content="http://example.com/2024/12/30/FADT/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="简要介绍ACPI PM Timer">
+<meta property="og:description" content="FADT 概述： FADT(Fixed ACPI Description Table)表是ACPI编程接口中使用一种的数据结构，该表包含与电源管理相关的固定寄存器块的信息。 查找FADT 通过RSDP指针以获取RSDT或XSDT，然后找到FADT，FADT是RSDT或XSDT的一个条目、FADT结构体 123456789101112131415161718192021222324252627282">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/ACPI%20PM%20Timer.png">
-<meta property="article:published_time" content="2024-12-29T15:45:00.000Z">
-<meta property="article:modified_time" content="2024-12-29T15:46:12.713Z">
+<meta property="article:published_time" content="2024-12-30T03:37:32.000Z">
+<meta property="article:modified_time" content="2024-12-30T04:11:27.191Z">
 <meta property="article:author" content="凌云行者">
-<meta property="article:tag" content="操作系统">
-<meta property="article:tag" content="硬件设备">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/ACPI%20PM%20Timer.png">
   
   
   
-  <title>ACPI_PM_Timer - 凌云行者的博客</title>
+  <title>FADT - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -222,13 +218,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="ACPI_PM_Timer"></span>
+            <span id="subtitle" data-typed-text="FADT"></span>
           
         </div>
 
@@ -239,8 +235,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-29 23:45" pubdate>
-          2024年12月29日, 11:45 晚上
+        <time datetime="2024-12-30 11:37" pubdate>
+          2024年12月30日, 11:37 中午
         </time>
       </span>
     
@@ -252,7 +248,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          561 字
+          1k 字
         
       </span>
     
@@ -300,70 +296,177 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">ACPI_PM_Timer</h1>
+            <h1 id="seo-header">FADT</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="acpi-pm-timer">ACPI PM Timer</h1>
-<p><strong>概述：</strong> ACPI PM Timer是一个非常简单的计时器，它以
-3.579545 MHz
-运行，在计数器溢出时生成系统控制中断（SCI）。它精度较低，建议使用其他定时器，如HPET或APIC定时器。</p>
-<h2 id="检测acpi-pm-timer">检测ACPI PM Timer</h2>
-<p><strong>关键概念：</strong></p>
-<ul>
-<li>RSDP(Root System Description
-Pointer)：是一个指向ACPI系统表（如RSDT或XSDT）的指针。它位于系统内存的一个固定位置，操作系统会在启动时查找这个指针，以便访问ACPI表。RSDP在大多数情况下存储在系统的低地址区域（如BIOS固件中）</li>
-<li>RSDT(Root System Descirption
-Table)：是一个包含指向其他ACPI表的指针的ACPI表，它提供了系统固件中定义的所有ACPI结构的入口。</li>
-<li>XSDT(Extended System Description
-Table)：是RSDT的扩展，用于支持64位系统。于RSDT使用32指针不同，XSDT使用64位指针，可以支持更多的表</li>
-<li>FADT(Fixed ACPI Description
-Table)：是ACPI表之一，包含固定的ACPI信息，如电源管理、配置等内容，它描述了系统硬件的一些基本信息，并提供了与电源管理和系统管理相关的接口。</li>
-</ul>
-<p><strong>如何查找：</strong></p>
-<p>通过RSDP指针以获取RSDT或XSDT，然后找到FADT。一旦找到了FADT，需要检查PMTimerLength字段是否为4，如果不是，则必须假定该计时器不可用。然后，如果ACPI的版本为2或更高，并且X_PMTimerBlock通用地址结构可用（检测地址不为0），则使用它，否则，将PMTimerBlock用作IO端口。</p>
-<h2 id="位和32位模式">24位和32位模式</h2>
-<p>ACPI PM
-Timer支持24位和32位计数器。如果FADA标志的第8位被设置，则计数器位32位。</p>
-<h2 id="读取counter值">读取counter值</h2>
-<p><strong>使用的是X_PMTimerBlock：</strong></p>
-<ul>
-<li>检查地址在哪个空间地址中
-<ul>
-<li>如果是MMIO（内存映射I/O）：将地址映射到虚拟内存中，并从中读取无符号32位整数counter值</li>
-<li>如果是IO（端口I/O）：从I/O端口读取无符号32位整数counter值</li>
-</ul></li>
-</ul>
-<p><strong>使用的是PM_Timer：</strong></p>
-<ul>
-<li>直接从I/O端口读取无符号32位整数counter值</li>
-</ul>
-<h2 id="counter值">counter值</h2>
+                <h1 id="fadt">FADT</h1>
+<p><strong>概述：</strong> FADT(Fixed ACPI Description
+Table)表是ACPI编程接口中使用一种的数据结构，该表包含与电源管理相关的固定寄存器块的信息。</p>
+<h2 id="查找fadt">查找FADT</h2>
+<p>通过RSDP指针以获取RSDT或XSDT，然后找到FADT，FADT是RSDT或XSDT的一个条目、FADT结构体</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">FADT</span> &#123;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ACPISDTHeader</span> <span class="hljs-title">h</span>;</span> <span class="hljs-comment">// ACPI 标准描述表头部</span><br>    <span class="hljs-type">uint32_t</span> FirmwareCtrl; <span class="hljs-comment">// 固件控制寄存器地址</span><br>    <span class="hljs-type">uint32_t</span> Dsdt; <span class="hljs-comment">// DSDT 表地址</span><br><br>    <span class="hljs-comment">// ACPI 1.0 中使用的字段；现在不再使用，仅用于兼容性</span><br>    <span class="hljs-type">uint8_t</span> Reserved;<br><br>    <span class="hljs-type">uint8_t</span> PreferredPowerManagementProfile; <span class="hljs-comment">// 首选电源管理配置</span><br>    <span class="hljs-type">uint16_t</span> SCI_Interrupt; <span class="hljs-comment">// SCI 中断</span><br>    <span class="hljs-type">uint32_t</span> SMI_CommandPort; <span class="hljs-comment">// SMI 命令端口</span><br>    <span class="hljs-type">uint8_t</span> AcpiEnable; <span class="hljs-comment">// ACPI 启用</span><br>    <span class="hljs-type">uint8_t</span> AcpiDisable; <span class="hljs-comment">// ACPI 禁用</span><br>    <span class="hljs-type">uint8_t</span> S4BIOS_REQ; <span class="hljs-comment">// S4BIOS 请求</span><br>    <span class="hljs-type">uint8_t</span> PSTATE_Control; <span class="hljs-comment">// PSTATE 控制</span><br>    <span class="hljs-type">uint32_t</span> PM1aEventBlock; <span class="hljs-comment">// PM1a 事件块地址</span><br>    <span class="hljs-type">uint32_t</span> PM1bEventBlock; <span class="hljs-comment">// PM1b 事件块地址</span><br>    <span class="hljs-type">uint32_t</span> PM1aControlBlock; <span class="hljs-comment">// PM1a 控制块地址</span><br>    <span class="hljs-type">uint32_t</span> PM1bControlBlock; <span class="hljs-comment">// PM1b 控制块地址</span><br>    <span class="hljs-type">uint32_t</span> PM2ControlBlock; <span class="hljs-comment">// PM2 控制块地址</span><br>    <span class="hljs-type">uint32_t</span> PMTimerBlock; <span class="hljs-comment">// 定时器块地址</span><br>    <span class="hljs-type">uint32_t</span> GPE0Block; <span class="hljs-comment">// GPE0 块地址</span><br>    <span class="hljs-type">uint32_t</span> GPE1Block; <span class="hljs-comment">// GPE1 块地址</span><br>    <span class="hljs-type">uint8_t</span> PM1EventLength; <span class="hljs-comment">// PM1 事件长度</span><br>    <span class="hljs-type">uint8_t</span> PM1ControlLength; <span class="hljs-comment">// PM1 控制长度</span><br>    <span class="hljs-type">uint8_t</span> PM2ControlLength; <span class="hljs-comment">// PM2 控制长度</span><br>    <span class="hljs-type">uint8_t</span> PMTimerLength; <span class="hljs-comment">// 定时器长度</span><br>    <span class="hljs-type">uint8_t</span> GPE0Length; <span class="hljs-comment">// GPE0 长度</span><br>    <span class="hljs-type">uint8_t</span> GPE1Length; <span class="hljs-comment">// GPE1 长度</span><br>    <span class="hljs-type">uint8_t</span> GPE1Base; <span class="hljs-comment">// GPE1 基址</span><br>    <span class="hljs-type">uint8_t</span> CStateControl; <span class="hljs-comment">// C 状态控制</span><br>    <span class="hljs-type">uint16_t</span> WorstC2Latency; <span class="hljs-comment">// 最差的 C2 延迟</span><br>    <span class="hljs-type">uint16_t</span> WorstC3Latency; <span class="hljs-comment">// 最差的 C3 延迟</span><br>    <span class="hljs-type">uint16_t</span> FlushSize; <span class="hljs-comment">// 刷新大小</span><br>    <span class="hljs-type">uint16_t</span> FlushStride; <span class="hljs-comment">// 刷新步进</span><br>    <span class="hljs-type">uint8_t</span> DutyOffset; <span class="hljs-comment">// 任务偏移</span><br>    <span class="hljs-type">uint8_t</span> DutyWidth; <span class="hljs-comment">// 任务宽度</span><br>    <span class="hljs-type">uint8_t</span> DayAlarm; <span class="hljs-comment">// 日闹钟</span><br>    <span class="hljs-type">uint8_t</span> MonthAlarm; <span class="hljs-comment">// 月闹钟</span><br>    <span class="hljs-type">uint8_t</span> Century; <span class="hljs-comment">// 世纪</span><br><br>    <span class="hljs-comment">// ACPI 1.0 中保留；自 ACPI 2.0+ 开始使用</span><br>    <span class="hljs-type">uint16_t</span> BootArchitectureFlags; <span class="hljs-comment">// 启动架构标志</span><br><br>    <span class="hljs-type">uint8_t</span> Reserved2;<br>    <span class="hljs-type">uint32_t</span> Flags; <span class="hljs-comment">// 标志位</span><br><br>    <span class="hljs-comment">// 12 字节结构；详情请参阅下文</span><br>    GenericAddressStructure ResetReg; <span class="hljs-comment">// 复位寄存器</span><br><br>    <span class="hljs-type">uint8_t</span> ResetValue; <span class="hljs-comment">// 复位值</span><br>    <span class="hljs-type">uint8_t</span> Reserved3[<span class="hljs-number">3</span>];<br><br>    <span class="hljs-comment">// 64 位指针 - 在 ACPI 2.0+ 中可用</span><br>    <span class="hljs-type">uint64_t</span> X_FirmwareControl; <span class="hljs-comment">// 扩展固件控制寄存器地址</span><br>    <span class="hljs-type">uint64_t</span> X_Dsdt; <span class="hljs-comment">// 扩展 DSDT 表地址</span><br><br>    GenericAddressStructure X_PM1aEventBlock; <span class="hljs-comment">// 扩展 PM1a 事件块地址</span><br>    GenericAddressStructure X_PM1bEventBlock; <span class="hljs-comment">// 扩展 PM1b 事件块地址</span><br>    GenericAddressStructure X_PM1aControlBlock; <span class="hljs-comment">// 扩展 PM1a 控制块地址</span><br>    GenericAddressStructure X_PM1bControlBlock; <span class="hljs-comment">// 扩展 PM1b 控制块地址</span><br>    GenericAddressStructure X_PM2ControlBlock; <span class="hljs-comment">// 扩展 PM2 控制块地址</span><br>    GenericAddressStructure X_PMTimerBlock; <span class="hljs-comment">// 扩展定时器块地址</span><br>    GenericAddressStructure X_GPE0Block; <span class="hljs-comment">// 扩展 GPE0 块地址</span><br>    GenericAddressStructure X_GPE1Block; <span class="hljs-comment">// 扩展 GPE1 块地址</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p><strong>FirmwareCtrl：</strong>
+这是一个指向FACS（固件控制结构）的32位指针。自ACPI2.0版本，表格中添加了一个新字段，名为X_FirmwareControl，类型为GAS，宽度为64位。这两个字段中只有一个被使用，另一个字段包含0。根据规范，当FACS放置在第4个GB上方时，才会使用X_字段</p>
+<p><strong>Dsdt：</strong>
+这是一个指向DSDT（差异化系统描述表）的32位指针，同时还有一个名为X_Dsdt的兄弟字段。</p>
+<p><strong>PreferredPowerManagementProfile：</strong>
+该值应指向一个电源管理配置文件，例如，如果它包含2，则计算机是笔记本电脑，并且您应该在省电模式下配置电源管理</p>
+<p>值含义：</p>
 <table>
-
 <thead>
 <tr>
-<th>位</th>
-<th>描述</th>
+<th>0</th>
+<th>未指定</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>0:23</td>
-<td>计数器的24位</td>
+<td>1</td>
+<td>桌面电脑</td>
 </tr>
 <tr>
-<td>24:31</td>
-<td>如果计数器是32位的，则为计数器的高8位。如果计数器是24位的，则为0.</td>
+<td>2</td>
+<td>移动设备（笔记本电脑）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>工作站</td>
+</tr>
+<tr>
+<td>4</td>
+<td>企业服务器</td>
+</tr>
+<tr>
+<td>5</td>
+<td>SOHO服务器</td>
+</tr>
+<tr>
+<td>6</td>
+<td>设备PC</td>
+</tr>
+<tr>
+<td>7</td>
+<td>性能服务器</td>
+</tr>
+<tr>
+<td>大于7</td>
+<td>保留</td>
 </tr>
 </tbody>
 </table>
-<h2 id="中断请求">中断请求</h2>
-<p>ACPI PM Timer在计数器溢出时会触发一个系统控制中断（SCI）。</p>
+<p><strong>SCI_Interrupt：</strong></p>
+<p>ACPI使用系统控制中断(SCI)通知OS有关固定事件的信息，例如按下电源按钮，或用于特定于固件的通用事件（GPE）。</p>
+<p>FADT结构中这个字段指示了用于SCI的PIC（可编程中断控制器）或IOAPIC（输入输出高级可编程中断控制器）中断引脚。</p>
+<p>要知道它是否是PIC
+IRQ，通过MADT（多处理器描述表）检查是否存在双8259中断控制器，否则，它就是一个GSI（全局系统中断）。</p>
+<p>如果正在使用IOAPIC并且PIC存在，请首先检查中断源覆盖以获取与IRQ源相关联的GSI。</p>
+<p><strong>SMI_CommandPort：</strong></p>
+<p>这是一个I/O端口，OS在这里写入AcpiEnable或AcpiDisable，以获取或释放ACPI寄存器的所有权，在不支持SMM（系统管理模式）的系统上，该端口地址为0。</p>
+<h2 id="gnericaddress结构体">GnericAddress结构体</h2>
+<p>GAS是ACPI用来描述寄存器位置的一种结构</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">GenericAddressStructure</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-type">uint8_t</span> AddressSpace; <span class="hljs-comment">// 地址空间标识</span><br>  <span class="hljs-type">uint8_t</span> BitWidth; <span class="hljs-comment">// 位宽</span><br>  <span class="hljs-type">uint8_t</span> BitOffset; <span class="hljs-comment">// 位偏移</span><br>  <span class="hljs-type">uint8_t</span> AccessSize; <span class="hljs-comment">// 访问大小</span><br>  <span class="hljs-type">uint64_t</span> Address; <span class="hljs-comment">// 地址</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p><strong>AddressSpace：</strong> 寄存器所在的地址空间</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>地址空间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x00</td>
+<td>系统内存</td>
+</tr>
+<tr>
+<td>0x01</td>
+<td>系统I/O</td>
+</tr>
+<tr>
+<td>0x02</td>
+<td>PCI配置空间</td>
+</tr>
+<tr>
+<td>0x03</td>
+<td>嵌入式控制器</td>
+</tr>
+<tr>
+<td>0x04</td>
+<td>系统管理总线</td>
+</tr>
+<tr>
+<td>0x05</td>
+<td>系统CMOS</td>
+</tr>
+<tr>
+<td>0x06</td>
+<td>PCI设备BAR目标</td>
+</tr>
+<tr>
+<td>0x07</td>
+<td>智能平台管理基础设施</td>
+</tr>
+<tr>
+<td>0x08</td>
+<td>通用性I/O</td>
+</tr>
+<tr>
+<td>0x09</td>
+<td>通用串行总线</td>
+</tr>
+<tr>
+<td>0x0A</td>
+<td>平台沟通渠道</td>
+</tr>
+<tr>
+<td>0x0B to 0x0F</td>
+<td>保留位</td>
+</tr>
+<tr>
+<td>0x80 to 0xFF</td>
+<td>OEM定义</td>
+</tr>
+</tbody>
+</table>
+<p><strong>BitWidth：</strong> 寄存器的位宽，即寄存器中数据的位数</p>
+<p><strong>BitOffset：</strong> 指示数据在寄存器中的偏移量</p>
+<p><strong>AccessSize：</strong> 定义一次可以读/写的字节数</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>访问大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x00</td>
+<td>未定义</td>
+</tr>
+<tr>
+<td>0x01</td>
+<td>字节（8位）访问</td>
+</tr>
+<tr>
+<td>0x02</td>
+<td>16位访问</td>
+</tr>
+<tr>
+<td>0x03</td>
+<td>32位访问</td>
+</tr>
+<tr>
+<td>0x04</td>
+<td>64位访问</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Address：</strong> 寄存器的地址</p>
 <h2 id="参考">参考</h2>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://wiki.osdev.org/ACPI_Timer">ACPI Timer - OSDev
+<li><a target="_blank" rel="noopener" href="https://wiki.osdev.org/FADT#SCI_Interrupt">FADT - OSDev
 Wiki</a></li>
 </ul>
 
@@ -374,36 +477,6 @@ Wiki</a></li>
             <div>
               <div class="post-metas my-3">
   
-    <div class="post-meta mr-3 d-flex align-items-center">
-      <i class="iconfont icon-category"></i>
-      
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/OS%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87/" class="category-chain-item">OS硬件设备</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-    </div>
-  
-  
-    <div class="post-meta">
-      <i class="iconfont icon-tags"></i>
-      
-        <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="print-no-link">#操作系统</a>
-      
-        <a href="/tags/%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87/" class="print-no-link">#硬件设备</a>
-      
-    </div>
   
 </div>
 
@@ -413,8 +486,8 @@ Wiki</a></li>
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>ACPI_PM_Timer</div>
-      <div>http://example.com/2024/12/29/ACPI-PM-Timer/</div>
+      <div>FADT</div>
+      <div>http://example.com/2024/12/30/FADT/</div>
     </div>
     <div class="license-meta">
       
@@ -426,7 +499,7 @@ Wiki</a></li>
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年12月29日</div>
+          <div>2024年12月30日</div>
         </div>
       
       
@@ -470,18 +543,12 @@ Wiki</a></li>
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/12/30/FADT/" title="FADT">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">FADT</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/12/29/Rust%E5%85%A5%E9%97%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Rust入门学习笔记">
-                        <span class="hidden-mobile">Rust入门学习笔记</span>
+                      <a href="/2024/12/29/ACPI-PM-Timer/" title="ACPI_PM_Timer">
+                        <span class="hidden-mobile">ACPI_PM_Timer</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
