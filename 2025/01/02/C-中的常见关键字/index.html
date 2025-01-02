@@ -19,25 +19,25 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="简要介绍MMIO">
+    <meta name="description" content="C++中的常见关键字">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MMIO">
-<meta property="og:url" content="http://example.com/2024/12/30/MMIO/index.html">
+<meta property="og:title" content="C++中的常见关键字">
+<meta property="og:url" content="http://example.com/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="简要介绍MMIO">
+<meta property="og:description" content="C++中的常见关键字">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/MMIO.png">
-<meta property="article:published_time" content="2024-12-30T06:41:07.000Z">
-<meta property="article:modified_time" content="2024-12-30T06:41:39.716Z">
+<meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97.png">
+<meta property="article:published_time" content="2025-01-02T07:54:35.000Z">
+<meta property="article:modified_time" content="2025-01-02T07:55:25.867Z">
 <meta property="article:author" content="凌云行者">
-<meta property="article:tag" content="硬件设备">
-<meta property="article:tag" content="MMIO">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="关键字">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/MMIO.png">
+<meta name="twitter:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97.png">
   
   
   
-  <title>MMIO - 凌云行者的博客</title>
+  <title>C++中的常见关键字 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -228,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="MMIO"></span>
+            <span id="subtitle" data-typed-text="C++中的常见关键字"></span>
           
         </div>
 
@@ -239,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-30 14:41" pubdate>
-          2024年12月30日, 2:41 下午
+        <time datetime="2025-01-02 15:54" pubdate>
+          2025年01月02日, 3:54 下午
         </time>
       </span>
     
@@ -252,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          728 字
+          394 字
         
       </span>
     
@@ -300,45 +300,37 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">MMIO</h1>
+            <h1 id="seo-header">C++中的常见关键字</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="mmio">MMIO</h1>
-<p><strong>概述：</strong> Memory-Mapped I/O
-是一种用于与硬件设备交互的技术。MMIO将设备的地址空间映射到系统的内存地址空间，操作系统通过读写内存来与这些设备进行通信。</p>
-<p><strong>传统的IO：</strong>
-通过专门的IO指令（如in和out）访问设备。这些指令与CPU的内存访问指令不同，需要通过IO端口与硬件进行交互</p>
-<p><strong>工作流程：</strong></p>
-<ol type="1">
-<li>硬件地址映射：设备的寄存器和缓冲区在系统启动时会被映射到特定的内存地址区域。这个过程通常由硬件初始化程序或操作系统内核的启动代码完成</li>
-<li>设备寄存器访问：操作系统可以直接通过读写相应的内存地址来操作硬件。</li>
-</ol>
-<p><strong>MMU：</strong>
-内存管理单元，复杂将设备寄存器的物理地址映射到主内存的虚拟地址，操作系统通常会提供该机制，从而实现对设备的读写操作</p>
-<p><strong>类型：</strong></p>
+                <h1 id="常见关键字">常见关键字</h1>
+<p><strong>new和delete：</strong></p>
 <ul>
-<li>普通MMIO：这些设备的寄存器空间通常较小，可能只涉及一些特定的控制寄存器。它们在内存空间中的映射通常时直接的、线性的</li>
-<li>扩展MMIO：这些设备的寄存器空间较大，可能涉及多种控制寄存器、数据缓冲区或其他内存区域。这些地址通常会位于更高的物理地址空间，以避免与普通内存发生冲突</li>
+<li>new：分配内存，调用构造函数初始化对象</li>
+<li>delete：释放内存，释放内存前会调用析构函数</li>
 </ul>
-<p><strong>优点：</strong></p>
+<p><strong>static：</strong>
+声明静态成员函数、静态成员变量、静态局部变量、静态全局变量（内部链接）</p>
+<p><strong>const：</strong> 定义不可修改的值</p>
+<p><strong>volatile：</strong>
+告诉编译器某个变量的值可能在程序外部发生变化（如硬件寄存器、共享内存活多线程场景），因此编译器不能对该变量进行优化</p>
+<blockquote>
+<p>在多线程环境中，volatile能确保主线程修改的共享变量对其他线程立即可见，但它不保证原子性操作，也不防止竞态条件</p>
+</blockquote>
+<p><strong>inline：</strong>
+提示编译器将函数的代码直接插入调用点，而不是通过常规的函数调用机制。通常用于小函数，减少函数调用开销</p>
+<p><strong>friend：</strong>
+允许指定某个函数或类访问另一个类的私有成员</p>
+<p><strong>mutable：</strong>
+用于允许类的常量成员变量被修改，即使在常量成员函数中</p>
+<p><strong>this：</strong>
+指向当前对象的指针，只有在类的成员函数内可用</p>
+<p><strong>typeid和decltype：</strong></p>
 <ul>
-<li>高效性：MMIO通过内存总线与设备进行交互，避免了传统IO操作中频繁的IO端口访问，提高了数据交换的效率</li>
-<li>简化访问：可以像访问内存一样访问设备，无需复杂的IO操作，降低了硬件操作的复杂性</li>
-<li>灵活性：可以直接操作设备的控制寄存器</li>
-</ul>
-<p><strong>缺点：</strong></p>
-<ul>
-<li>地址冲突：设备寄存器通常会映射到特定的内存区域，避免与系统内存区域重叠</li>
-<li>性能瓶颈：过度的MMIO访问可能会导致总线带宽瓶颈，尤其是在大量设备同时访问的情况下</li>
-<li>硬件依赖性：不同硬件的MMIO地址范围和实现方式不同，操作系统需要提供特定的驱动程序来支持不同设备的访问</li>
-</ul>
-<p><strong>OS中MMIO的实现：</strong></p>
-<ul>
-<li>设备驱动程序：负责在OS中映射MMIO地址，并提供接口与硬件进行交互</li>
-<li>地址映射：OS需要使用MMU来将设备寄存器地址映射到虚拟内存地址，通过内存映射文件或直接通过mmap系统调用实现</li>
-<li>同步与缓存管理：由于MMIO涉及到硬件的直接空间，需要确保访问的同步性，避免CPU缓存与硬件之间的数据不一致</li>
+<li>typeid：是RTTI(运行时类型识别)的一部分，在多态场景中，typeid用于检查对象的实际类型。它在底层依赖虚表和类型信息存储</li>
+<li>decltype：是在编译时推导类型的工具，它不会生成任何代码，而是通过编译器的类型推断机制来确定表达式的类型</li>
 </ul>
 
                 
@@ -358,7 +350,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/OS%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87/" class="category-chain-item">OS硬件设备</a>
+  <a href="/categories/C/" class="category-chain-item">C++</a>
   
   
 
@@ -373,9 +365,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87/" class="print-no-link">#硬件设备</a>
+        <a href="/tags/C/" class="print-no-link">#C++</a>
       
-        <a href="/tags/MMIO/" class="print-no-link">#MMIO</a>
+        <a href="/tags/%E5%85%B3%E9%94%AE%E5%AD%97/" class="print-no-link">#关键字</a>
       
     </div>
   
@@ -387,8 +379,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>MMIO</div>
-      <div>http://example.com/2024/12/30/MMIO/</div>
+      <div>C++中的常见关键字</div>
+      <div>http://example.com/2025/01/02/C-中的常见关键字/</div>
     </div>
     <div class="license-meta">
       
@@ -400,7 +392,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年12月30日</div>
+          <div>2025年1月2日</div>
         </div>
       
       
@@ -444,18 +436,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/" title="C++中的常见关键字">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">C++中的常见关键字</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/12/30/FADT/" title="FADT">
-                        <span class="hidden-mobile">FADT</span>
+                      <a href="/2024/12/30/MMIO/" title="MMIO">
+                        <span class="hidden-mobile">MMIO</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

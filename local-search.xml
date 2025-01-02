@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>C++中的常见关键字</title>
+    <link href="/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/"/>
+    <url>/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/</url>
+    
+    <content type="html"><![CDATA[<h1 id="常见关键字">常见关键字</h1><p><strong>new和delete：</strong></p><ul><li>new：分配内存，调用构造函数初始化对象</li><li>delete：释放内存，释放内存前会调用析构函数</li></ul><p><strong>static：</strong>声明静态成员函数、静态成员变量、静态局部变量、静态全局变量（内部链接）</p><p><strong>const：</strong> 定义不可修改的值</p><p><strong>volatile：</strong>告诉编译器某个变量的值可能在程序外部发生变化（如硬件寄存器、共享内存活多线程场景），因此编译器不能对该变量进行优化</p><blockquote><p>在多线程环境中，volatile能确保主线程修改的共享变量对其他线程立即可见，但它不保证原子性操作，也不防止竞态条件</p></blockquote><p><strong>inline：</strong>提示编译器将函数的代码直接插入调用点，而不是通过常规的函数调用机制。通常用于小函数，减少函数调用开销</p><p><strong>friend：</strong>允许指定某个函数或类访问另一个类的私有成员</p><p><strong>mutable：</strong>用于允许类的常量成员变量被修改，即使在常量成员函数中</p><p><strong>this：</strong>指向当前对象的指针，只有在类的成员函数内可用</p><p><strong>typeid和decltype：</strong></p><ul><li>typeid：是RTTI(运行时类型识别)的一部分，在多态场景中，typeid用于检查对象的实际类型。它在底层依赖虚表和类型信息存储</li><li>decltype：是在编译时推导类型的工具，它不会生成任何代码，而是通过编译器的类型推断机制来确定表达式的类型</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>C++</tag>
+      
+      <tag>关键字</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>MMIO</title>
     <link href="/2024/12/30/MMIO/"/>
     <url>/2024/12/30/MMIO/</url>
