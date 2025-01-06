@@ -19,25 +19,24 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="C++中的常见关键字">
+    <meta name="description" content="CAM几何引擎简介">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++中的常见关键字">
-<meta property="og:url" content="http://example.com/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/index.html">
+<meta property="og:title" content="CAM几何引擎简介">
+<meta property="og:url" content="http://example.com/2025/01/06/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="C++中的常见关键字">
+<meta property="og:description" content="CAM几何引擎简介">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97.png">
-<meta property="article:published_time" content="2025-01-02T07:54:35.000Z">
-<meta property="article:modified_time" content="2025-01-02T07:55:25.867Z">
+<meta property="og:image" content="http://example.com/img/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B.png">
+<meta property="article:published_time" content="2025-01-06T14:05:00.000Z">
+<meta property="article:modified_time" content="2025-01-06T14:05:37.123Z">
 <meta property="article:author" content="凌云行者">
-<meta property="article:tag" content="C++">
-<meta property="article:tag" content="关键字">
+<meta property="article:tag" content="CAM">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/C++%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97.png">
+<meta name="twitter:image" content="http://example.com/img/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B.png">
   
   
   
-  <title>C++中的常见关键字 - 凌云行者的博客</title>
+  <title>CAM几何引擎简介 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -228,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="C++中的常见关键字"></span>
+            <span id="subtitle" data-typed-text="CAM几何引擎简介"></span>
           
         </div>
 
@@ -239,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-01-02 15:54" pubdate>
-          2025年01月02日, 3:54 下午
+        <time datetime="2025-01-06 22:05" pubdate>
+          2025年01月06日, 10:05 晚上
         </time>
       </span>
     
@@ -252,7 +251,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          394 字
+          509 字
         
       </span>
     
@@ -300,37 +299,40 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">C++中的常见关键字</h1>
+            <h1 id="seo-header">CAM几何引擎简介</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="常见关键字">常见关键字</h1>
-<p><strong>new和delete：</strong></p>
+                <p><strong>概述：</strong> Computer-Aided
+Manufacturing（计算机辅助制造）几何引擎，处理与制造过程相关的几何计算。简单来说，CAM几何引擎是一个能够生成、修改和优化几何数据，以指导制造过程的核心组件</p>
+<p><strong>功能：</strong></p>
 <ul>
-<li>new：分配内存，调用构造函数初始化对象</li>
-<li>delete：释放内存，释放内存前会调用析构函数</li>
+<li>几何建模：用于构建零件或产品的几何模型。这些几何模型通常是基于CAD系统中的设计文件（例如STL、STEP、IGES等格式），但在CAM中需要进一步转换为适合制造的格式</li>
+<li>路径规划：负责生成刀具路径或轨迹，这对于数控机床(CNC)至关重要。根据零件的几何形状和材料，计算机会生成合理的切割路径。</li>
+<li>优化与仿真：进行刀具路径的优化，如减少加工时间、提高加工质量，并进行加工过程的虚拟仿真，以预防潜在问题</li>
 </ul>
-<p><strong>static：</strong>
-声明静态成员函数、静态成员变量、静态局部变量、静态全局变量（内部链接）</p>
-<p><strong>const：</strong> 定义不可修改的值</p>
-<p><strong>volatile：</strong>
-告诉编译器某个变量的值可能在程序外部发生变化（如硬件寄存器、共享内存活多线程场景），因此编译器不能对该变量进行优化</p>
-<blockquote>
-<p>在多线程环境中，volatile能确保主线程修改的共享变量对其他线程立即可见，但它不保证原子性操作，也不防止竞态条件</p>
-</blockquote>
-<p><strong>inline：</strong>
-提示编译器将函数的代码直接插入调用点，而不是通过常规的函数调用机制。通常用于小函数，减少函数调用开销</p>
-<p><strong>friend：</strong>
-允许指定某个函数或类访问另一个类的私有成员</p>
-<p><strong>mutable：</strong>
-用于允许类的常量成员变量被修改，即使在常量成员函数中</p>
-<p><strong>this：</strong>
-指向当前对象的指针，只有在类的成员函数内可用</p>
-<p><strong>typeid和decltype：</strong></p>
+<p><strong>核心技术：</strong></p>
 <ul>
-<li>typeid：是RTTI(运行时类型识别)的一部分，在多态场景中，typeid用于检查对象的实际类型。它在底层依赖虚表和类型信息存储</li>
-<li>decltype：是在编译时推导类型的工具，它不会生成任何代码，而是通过编译器的类型推断机制来确定表达式的类型</li>
+<li>曲线和曲面建模：处理曲线（如直线、圆弧、样条曲线等）和曲面（如Bézier曲面、NURBS曲面等）</li>
+<li>几何转换：处理几何数据的转换</li>
+<li>碰撞检测与干涉检查：在生成刀具路径时，需要检测刀具与工件、夹具之间是否发生碰撞，这要求几何引擎进行空间判断</li>
+<li>离散化与插值：在数控加工中，路径通常是连续的，但机床无法直接理解连续的路径数据，因此需要将路径离散化成离散的切割点。</li>
+</ul>
+<p><strong>应用场景：</strong></p>
+<ul>
+<li>数控加工：生成控制CNC机床和刀具路径</li>
+<li>3D打印</li>
+<li>模具设计</li>
+<li>装配与机器人路径规划：计算机器人移动最优路径</li>
+</ul>
+<p><strong>常见软件：</strong> Mastercam、Fusion 360、Siemens
+NX、SolidCAM</p>
+<p><strong>挑战与发展：</strong></p>
+<ul>
+<li>复杂性：处理越来越复杂的几何模型</li>
+<li>计算效率：满足实时性要求，在有限时间内完成计算</li>
+<li>集成与互操作性：能与其他CAD、CAE、PLM等系统无缝衔接，支持跨平台协同工作</li>
 </ul>
 
                 
@@ -350,7 +352,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/C/" class="category-chain-item">C++</a>
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/" class="category-chain-item">计算机图形学</a>
   
   
 
@@ -365,9 +367,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/C/" class="print-no-link">#C++</a>
-      
-        <a href="/tags/%E5%85%B3%E9%94%AE%E5%AD%97/" class="print-no-link">#关键字</a>
+        <a href="/tags/CAM/" class="print-no-link">#CAM</a>
       
     </div>
   
@@ -379,8 +379,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>C++中的常见关键字</div>
-      <div>http://example.com/2025/01/02/C-中的常见关键字/</div>
+      <div>CAM几何引擎简介</div>
+      <div>http://example.com/2025/01/06/CAM几何引擎简介/</div>
     </div>
     <div class="license-meta">
       
@@ -392,7 +392,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年1月2日</div>
+          <div>2025年1月6日</div>
         </div>
       
       
@@ -436,18 +436,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/01/06/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B/" title="CAM几何引擎简介">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CAM几何引擎简介</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/12/30/MMIO/" title="MMIO">
-                        <span class="hidden-mobile">MMIO</span>
+                      <a href="/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/" title="C++中的常见关键字">
+                        <span class="hidden-mobile">C++中的常见关键字</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

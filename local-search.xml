@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>CAM几何引擎简介</title>
+    <link href="/2025/01/06/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B/"/>
+    <url>/2025/01/06/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B/</url>
+    
+    <content type="html"><![CDATA[<p><strong>概述：</strong> Computer-AidedManufacturing（计算机辅助制造）几何引擎，处理与制造过程相关的几何计算。简单来说，CAM几何引擎是一个能够生成、修改和优化几何数据，以指导制造过程的核心组件</p><p><strong>功能：</strong></p><ul><li>几何建模：用于构建零件或产品的几何模型。这些几何模型通常是基于CAD系统中的设计文件（例如STL、STEP、IGES等格式），但在CAM中需要进一步转换为适合制造的格式</li><li>路径规划：负责生成刀具路径或轨迹，这对于数控机床(CNC)至关重要。根据零件的几何形状和材料，计算机会生成合理的切割路径。</li><li>优化与仿真：进行刀具路径的优化，如减少加工时间、提高加工质量，并进行加工过程的虚拟仿真，以预防潜在问题</li></ul><p><strong>核心技术：</strong></p><ul><li>曲线和曲面建模：处理曲线（如直线、圆弧、样条曲线等）和曲面（如Bézier曲面、NURBS曲面等）</li><li>几何转换：处理几何数据的转换</li><li>碰撞检测与干涉检查：在生成刀具路径时，需要检测刀具与工件、夹具之间是否发生碰撞，这要求几何引擎进行空间判断</li><li>离散化与插值：在数控加工中，路径通常是连续的，但机床无法直接理解连续的路径数据，因此需要将路径离散化成离散的切割点。</li></ul><p><strong>应用场景：</strong></p><ul><li>数控加工：生成控制CNC机床和刀具路径</li><li>3D打印</li><li>模具设计</li><li>装配与机器人路径规划：计算机器人移动最优路径</li></ul><p><strong>常见软件：</strong> Mastercam、Fusion 360、SiemensNX、SolidCAM</p><p><strong>挑战与发展：</strong></p><ul><li>复杂性：处理越来越复杂的几何模型</li><li>计算效率：满足实时性要求，在有限时间内完成计算</li><li>集成与互操作性：能与其他CAD、CAE、PLM等系统无缝衔接，支持跨平台协同工作</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机图形学</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>CAM</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>C++中的常见关键字</title>
     <link href="/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/"/>
     <url>/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/</url>
