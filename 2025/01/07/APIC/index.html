@@ -19,24 +19,25 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="CAM几何引擎简介">
+    <meta name="description" content="简要介绍APIC">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CAM几何引擎简介">
-<meta property="og:url" content="http://example.com/2025/01/06/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:title" content="APIC">
+<meta property="og:url" content="http://example.com/2025/01/07/APIC/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="CAM几何引擎简介">
+<meta property="og:description" content="简要介绍APIC">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B.png">
-<meta property="article:published_time" content="2025-01-06T14:05:00.000Z">
-<meta property="article:modified_time" content="2025-01-06T14:05:37.123Z">
+<meta property="og:image" content="http://example.com/img/APIC.png">
+<meta property="article:published_time" content="2025-01-06T16:18:42.000Z">
+<meta property="article:modified_time" content="2025-01-06T16:19:15.535Z">
 <meta property="article:author" content="凌云行者">
-<meta property="article:tag" content="CAM">
+<meta property="article:tag" content="硬件设备">
+<meta property="article:tag" content="APIC">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B.png">
+<meta name="twitter:image" content="http://example.com/img/APIC.png">
   
   
   
-  <title>CAM几何引擎简介 - 凌云行者的博客</title>
+  <title>APIC - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CAM几何引擎简介"></span>
+            <span id="subtitle" data-typed-text="APIC"></span>
           
         </div>
 
@@ -238,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-01-06 22:05" pubdate>
-          2025年01月06日, 10:05 晚上
+        <time datetime="2025-01-07 00:18" pubdate>
+          2025年01月07日, 12:18 凌晨
         </time>
       </span>
     
@@ -251,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          509 字
+          1k 字
         
       </span>
     
@@ -299,40 +300,109 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CAM几何引擎简介</h1>
+            <h1 id="seo-header">APIC</h1>
             
             
               <div class="markdown-body">
                 
-                <p><strong>概述：</strong> Computer-Aided
-Manufacturing（计算机辅助制造）几何引擎，处理与制造过程相关的几何计算。简单来说，CAM几何引擎是一个能够生成、修改和优化几何数据，以指导制造过程的核心组件</p>
-<p><strong>功能：</strong></p>
+                <h1 id="apic">APIC</h1>
+<p><strong>概述：</strong>
+是一个用于管理和处理中断的硬件组件，用于提高多核或多处理器系统的中断处理效率</p>
+<p><strong>Local APIC：</strong></p>
 <ul>
-<li>几何建模：用于构建零件或产品的几何模型。这些几何模型通常是基于CAD系统中的设计文件（例如STL、STEP、IGES等格式），但在CAM中需要进一步转换为适合制造的格式</li>
-<li>路径规划：负责生成刀具路径或轨迹，这对于数控机床(CNC)至关重要。根据零件的几何形状和材料，计算机会生成合理的切割路径。</li>
-<li>优化与仿真：进行刀具路径的优化，如减少加工时间、提高加工质量，并进行加工过程的虚拟仿真，以预防潜在问题</li>
+<li>定义：是每个处理器核心独有的APIC，负责该处理核心的中断处理任务。</li>
+<li>作用：
+<ul>
+<li>接收中断：Local APIC接收来自IO APIC或其他处理器的中断请求</li>
+<li>生成中断：Local
+APIC可以生成中断信号，以通知处理器进行任务调度、上下文切换等</li>
+<li>处理中断：Local
+APIC负责管理本地中断，确保处理器按照优先级顺序响应中断请i去</li>
+</ul></li>
+<li>功能：
+<ul>
+<li>每个核心有一个Local APIC来管理该核心的中断</li>
+<li>Local APIC处理器与外部设备的IO APIC通过系统总线进行通信</li>
+<li>Local APIC支持中断优先级控制、向量分配等功能</li>
+</ul></li>
 </ul>
-<p><strong>核心技术：</strong></p>
+<p><strong>IO APIC：</strong></p>
 <ul>
-<li>曲线和曲面建模：处理曲线（如直线、圆弧、样条曲线等）和曲面（如Bézier曲面、NURBS曲面等）</li>
-<li>几何转换：处理几何数据的转换</li>
-<li>碰撞检测与干涉检查：在生成刀具路径时，需要检测刀具与工件、夹具之间是否发生碰撞，这要求几何引擎进行空间判断</li>
-<li>离散化与插值：在数控加工中，路径通常是连续的，但机床无法直接理解连续的路径数据，因此需要将路径离散化成离散的切割点。</li>
+<li>定义：是一个独立的APIC，用于管理外部设备产生的中断并将这些中断转发到相应的处理器。</li>
+<li>作用：
+<ul>
+<li>接收外部中断：IO
+APIC接收来自外部硬件设备（如网卡、磁盘、USB设备等）发送的中断信号</li>
+<li>路由中断：IO
+APIC将接收到的外部中断根据预设的路由规则（通常根据中断源和目标CPU）转发到对应的本地APIC</li>
+</ul></li>
+<li>功能：
+<ul>
+<li>IO
+APIC支持多路复用，将来自不同外设的中断信号通过不同的IRQ编号进行管理，并将它们转发到处理器核心</li>
+<li>支持中断的优先级控制，确保高优先级的中断能够及时被处理</li>
+</ul></li>
 </ul>
-<p><strong>应用场景：</strong></p>
+<h2 id="lvtlocal-vector-table">LVT(Local Vector Table)</h2>
+<p><strong>概述：</strong>
+是一个表格，包含多个条目，每个条目对应一个中断源。每个LVT条目存储了与该中断源相关的配置，包括该中断的触发方式、目标处理器等信息</p>
+<p><strong>工作原理：</strong></p>
+<p>LVT将Local
+APIC的中断源映射到特定的中断服务例程，并设置相关的中断控制属性。LVT的每个条目通常包括以下几个部分：</p>
 <ul>
-<li>数控加工：生成控制CNC机床和刀具路径</li>
-<li>3D打印</li>
-<li>模具设计</li>
-<li>装配与机器人路径规划：计算机器人移动最优路径</li>
+<li>中断向量(Vector)：表示中断的唯一标识符</li>
+<li>传递模式(Delivery Mode)：
+<ul>
+<li>固定模式(Fixed Mode)：中断传递给指定CPU</li>
+<li>最低优先级(Lowest Priority)：传递给当前优先级最低的CPU</li>
+<li>外部中断(External Interrupt)：来自外部设备的中断</li>
+<li>NMI(Non-Maskable Interrupt)：不可屏蔽中断</li>
+</ul></li>
+<li>触发方式(Trigger
+Mode)：指定该中断是上升沿触发、下降沿触发、还是电平触发</li>
+<li>屏蔽位(Mask)：如果设置为1，表示屏蔽（禁用）该中断；如果设置为0，则启用该中断</li>
+<li>目标处理器(Destination
+CPU)：如果是多处理器系统，LVT还会指定该中断由哪个CPU来处理</li>
 </ul>
-<p><strong>常见软件：</strong> Mastercam、Fusion 360、Siemens
-NX、SolidCAM</p>
-<p><strong>挑战与发展：</strong></p>
+<p><strong>主要条目：</strong></p>
 <ul>
-<li>复杂性：处理越来越复杂的几何模型</li>
-<li>计算效率：满足实时性要求，在有限时间内完成计算</li>
-<li>集成与互操作性：能与其他CAD、CAE、PLM等系统无缝衔接，支持跨平台协同工作</li>
+<li>LVT Timer(APIC_LVTT)：
+<ul>
+<li>该条目用于管理Local APIC的定时器中断</li>
+<li>它控制定时器的触发方式，通常配置为周期性中断或一次性中断，用于定期触发操作系统的调度器</li>
+</ul></li>
+<li>LVT Keyboard(APIC_LVT0)：
+<ul>
+<li>该条目用于管理键盘中断。实际上，它并不常用与现代系统，但可以用于设置其他外部中断源</li>
+</ul></li>
+<li>LVT Spurious Interrupt(APIC_LVT1)：
+<ul>
+<li>该条目用于设置处理杂散中断(spurious
+interrupts)的行为。杂散中断通常是一些错误或无效的中断源</li>
+</ul></li>
+<li>LVT Error(APIC_LVTERR)：
+<ul>
+<li>该条目用于处理APIC自身产生的错误中断。如果APIC遇到硬件错误或配置错误，就会触发该中断</li>
+</ul></li>
+<li>LVT Thermal(APIC_LVTTHMR)：
+<ul>
+<li>该条目用于处理热管理中断，例如温度监测相关的事件。这在支持热管理的系统中非常重要</li>
+</ul></li>
+<li>LVT Machine Check(APIC_LVTCMCI)：
+<ul>
+<li>该条目用于处理机器检查(Machine Check Exception,
+MCE)中断，通常用于检测硬件故障或系统错误</li>
+</ul></li>
+<li>LVT Performance Counter(APIC_LVTPC)：
+<ul>
+<li>该条目用于管理性能计数器相关的中断</li>
+</ul></li>
+</ul>
+<p><strong>LVT的操作：</strong></p>
+<ul>
+<li>写入LVT寄存器：通过<code>apic_write()</code>和<code>apic_read()</code>函数对LVT寄存器进行写入和读取操作，修改LVT条目的值</li>
+<li>屏蔽LVT条目：通过将LVT的屏蔽位设置为1来屏蔽中断。通过将其恢复为0可以启用中断</li>
+<li>配置触发方式：根据需要配置中断的触发方式</li>
 </ul>
 
                 
@@ -352,7 +422,7 @@ NX、SolidCAM</p>
     
       <span class="category-chain">
         
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/" class="category-chain-item">计算机图形学</a>
+  <a href="/categories/OS%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87/" class="category-chain-item">OS硬件设备</a>
   
   
 
@@ -367,7 +437,9 @@ NX、SolidCAM</p>
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/CAM/" class="print-no-link">#CAM</a>
+        <a href="/tags/%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87/" class="print-no-link">#硬件设备</a>
+      
+        <a href="/tags/APIC/" class="print-no-link">#APIC</a>
       
     </div>
   
@@ -379,8 +451,8 @@ NX、SolidCAM</p>
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CAM几何引擎简介</div>
-      <div>http://example.com/2025/01/06/CAM几何引擎简介/</div>
+      <div>APIC</div>
+      <div>http://example.com/2025/01/07/APIC/</div>
     </div>
     <div class="license-meta">
       
@@ -392,7 +464,7 @@ NX、SolidCAM</p>
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年1月6日</div>
+          <div>2025年1月7日</div>
         </div>
       
       
@@ -436,18 +508,12 @@ NX、SolidCAM</p>
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/01/07/APIC/" title="APIC">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">APIC</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/01/02/C-%E4%B8%AD%E7%9A%84%E5%B8%B8%E8%A7%81%E5%85%B3%E9%94%AE%E5%AD%97/" title="C++中的常见关键字">
-                        <span class="hidden-mobile">C++中的常见关键字</span>
+                      <a href="/2025/01/06/CAM%E5%87%A0%E4%BD%95%E5%BC%95%E6%93%8E%E7%AE%80%E4%BB%8B/" title="CAM几何引擎简介">
+                        <span class="hidden-mobile">CAM几何引擎简介</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
