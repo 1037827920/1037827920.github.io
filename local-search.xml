@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>为什么linux kernel喜欢这样写</title>
+    <link href="/2025/01/08/%E4%B8%BA%E4%BB%80%E4%B9%88linux-kernel%E5%96%9C%E6%AC%A2%E8%BF%99%E6%A0%B7%E5%86%99/"/>
+    <url>/2025/01/08/%E4%B8%BA%E4%BB%80%E4%B9%88linux-kernel%E5%96%9C%E6%AC%A2%E8%BF%99%E6%A0%B7%E5%86%99/</url>
+    
+    <content type="html"><![CDATA[<p>最近在看linux kernel源码的时候，发现linuxkernel喜欢在每个函数体语句块的开头先声明好函数要使用到的变量，就算该变量仅仅是用于for循环。</p><p>比如说，大部分同学写for循环可能是这j样的：</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1000</span>; i++) &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure><p>但是linux kernel就会这样写：</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">func</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>    <span class="hljs-type">int</span> i;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">1000</span>; i++) &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure><p>why？有没有同学很好奇嘞</p><p>查了一下才知道，原来C89标准还不支持在for循环内声明变量的语法，这个语法是在C99标准才加入的。</p><p>而linuxkernel为了兼容C89，能在一些不支持C89编译器上编译，所以才喜欢这样（很大的原因我觉得，毕竟linux真的兼容性超强）。</p><p>当然这里我觉得还有一些其他好处，比如说代码一致性，这样可以很方便看出每个函数都会用到哪些局部变量，更容易阅读代码。</p><p>还有吗？待补充(doge</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>linux</tag>
+      
+      <tag>kernel</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>APIC</title>
     <link href="/2025/01/07/APIC/"/>
     <url>/2025/01/07/APIC/</url>
