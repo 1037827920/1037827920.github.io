@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>内存泄漏</title>
+    <link href="/2025/02/19/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/"/>
+    <url>/2025/02/19/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/</url>
+    
+    <content type="html"><![CDATA[<h1 id="内存泄漏">内存泄漏</h1><p><strong>概述：</strong>程序在运行过程中，动态分配的内存未被及时释放，导致这些内存无法再次使用，最终导致系统内存耗尽，影响程序性能，甚至导致程序崩溃</p><p><strong>原因：</strong></p><ul><li>未释放已分配的内存：在使用malloc、new等动态分配内存后，未使用free或delete进行释放</li><li>丢失对已分配内存的引用：如果指针指向的内存被丢弃或覆盖，且没有释放该内存，导致无法访问和释放</li><li>异常导致的内存未释放：在函数执行过程中发生异常，导致提前退出，未执行释放内存的代码</li></ul><p><strong>危害：</strong></p><ul><li>性能下降</li><li>系统崩溃</li></ul><p><strong>避免内存泄漏的方法：</strong></p><ul><li>即时释放内存</li><li>使用智能指针</li><li>异常安全的内存管理，即使用RAII原则，将资源的获取和释放绑定到对象的构造和析构当中，确保异常发生时资源能够被正确释放</li><li>避免循环引用：在使用智能指针时，避免对象之间的循环引用，防止内存无法释放</li><li>定期检查和测试，使用内存分析工具如Valgrind</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>操作系统</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>操作系统</tag>
+      
+      <tag>内存泄漏</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>堆和栈</title>
     <link href="/2025/02/19/%E5%A0%86%E5%92%8C%E6%A0%88/"/>
     <url>/2025/02/19/%E5%A0%86%E5%92%8C%E6%A0%88/</url>
@@ -235,16 +262,16 @@
     
     <categories>
       
-      <category>计算机杂谈</category>
+      <category>操作系统</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>计算机组成</tag>
-      
       <tag>内存对齐</tag>
+      
+      <tag>操作系统</tag>
       
     </tags>
     
