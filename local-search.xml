@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>Linux中的SMEP&amp;SMAP</title>
+    <link href="/2025/03/06/Linux%E4%B8%AD%E7%9A%84SMEP/"/>
+    <url>/2025/03/06/Linux%E4%B8%AD%E7%9A%84SMEP/</url>
+    
+    <content type="html"><![CDATA[<h1 id="smepsmap">SMEP/SMAP</h1><p><strong>概述：</strong>是x86处理器提供的硬件安全特性，目的是防止一些常见的内核攻击</p><h2 id="smep">SMEP</h2><blockquote><p>Supervisor Mode Execution Prevention</p></blockquote><p><strong>作用：</strong>防止内核模式代码意外或恶意执行位于用户空间的代码。</p><p><strong>实现方式：</strong>通过控制寄存器CR4中设置特定位（位20）来启用的。linux内核在启动时会检测CPU是否支持SMEP，如果支持，则在早期初始化阶段启用该特定。这样，即时由于漏洞泄露导致内核错误地跳转到用户空间地址，CPU也会产生异常，阻止这种执行。</p><h2 id="smap">SMAP</h2><blockquote><p>Supervisor Mode Access Prevention</p></blockquote><p><strong>作用：</strong>它禁止内核模式代码在没有明确许可的情况下访问用户空间内存。</p><p><strong>实现方式：</strong>通过控制寄存器CR4设置特定位（位21）来启用的。由于内核有时确实需要访问用户空间（例如执行copy_to_user/copy_from_user操作），内核在需要访问用户数据时，会暂时关闭SMAP保护。具体来说，内核会使用特殊的指令（如stac 和 clac）来临时禁用 SMAP，访问完成后再恢复保护状态。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>linux</tag>
+      
+      <tag>time</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Linux时间子系统学习笔记</title>
     <link href="/2025/03/06/Linux%E6%97%B6%E9%97%B4%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <url>/2025/03/06/Linux%E6%97%B6%E9%97%B4%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
