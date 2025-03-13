@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/Linux%E6%97%B6%E9%97%B4%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
 <meta property="article:published_time" content="2025-03-06T06:28:26.000Z">
-<meta property="article:modified_time" content="2025-03-13T15:13:18.102Z">
+<meta property="article:modified_time" content="2025-03-13T16:06:57.892Z">
 <meta property="article:author" content="凌云行者">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="time">
@@ -252,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          2.3k 字
+          3.1k 字
         
       </span>
     
@@ -364,6 +364,70 @@ Timer等参考时钟进行对比</li>
 对于TSC，linux会检测多个CPU核心的TSC是否同步，以防止不同核心返回的TSC不一致</p>
 <p><strong>定期重新校准：</strong>
 linux可能会周期性地使用hpet活外部时钟（NTP）重新校准TSC</p>
+<h3 id="kvm-clock">kvm-clock</h3>
+<p><strong>概述：</strong>
+KVM提供的一个半虚拟化时钟源，其核心目的是为guest
+os提供一个高效、低开销、尽可能准确的计时机制。避免传统硬件时钟（如TSC、HPET）在虚拟化场景中可能遇到的同步、漂移或性能问题。【本质上其实也依赖于TSC吧，只是依赖的host
+os的tsc，可能误差更小】</p>
+<p><strong>工作原理：</strong></p>
+<ul>
+<li>共享内存区域：
+<ul>
+<li>Guest
+OS在初始化时会为kvm-clock分配一段共享内存，这块内存区域是由hypervisor（例如qemu/kvm）映射给guest</li>
+<li>该区域存储一个数据结构（<code>pvclock_vcpu_time_info</code>），其中包含当前的tsc值，系统时间、以及一些转换参数（如<code>tsc_to_system_mul</code>和<code>tsc_shift</code>）</li>
+<li>Guest通过读取这个共享区域，就可以直接获得当前时间，而不需要进行昂贵的系统调用或VM
+Exit</li>
+</ul></li>
+<li>主机与客机时间同步：
+<ul>
+<li>Hypervisor定期更新这块共享内存区域，确保guest看到的时间与host系统时间保持一致</li>
+<li>不仅降低了guest
+os对硬件时钟的依赖，而且可以减少虚拟化带来的时间漂移问题</li>
+</ul></li>
+<li>效率与精度：
+<ul>
+<li>由于 kvm-clock 利用共享内存而非每次调用硬件寄存器（如
+TSC），因此能够避免频繁的虚拟机退出（VM Exit），降低延迟。</li>
+<li>同时，通过对 TSC 值进行适当转换，kvm-clock
+能够提供一个相对稳定、单调递增的时钟源，即使在 CPU
+频率变动或多核环境下也能维持较高的精度。</li>
+</ul></li>
+</ul>
+<p><strong>实现细节：</strong></p>
+<ul>
+<li><p>数据结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pvclock_vcpu_time_info</span> &#123;</span><br>    u32   version;<br>    u32   pad0;<br>    u64   tsc_timestamp;<br>    u64   system_time;<br>    u32   tsc_to_system_mul;<br>    s8    tsc_shift;<br>    u8    flags;<br>    u8    pad[<span class="hljs-number">2</span>];<br>&#125; __attribute__((__packed__));<br></code></pre></td></tr></table></figure>
+<ul>
+<li>version：用于保证读取时的一致性（类似双缓冲机制）</li>
+<li>tsc_timestamp：记录了上次更新时间时的 TSC 值。</li>
+<li>system_time：对应的系统时间（通常以纳秒为单位）</li>
+<li>tsc_to_system_mul和tsc_shift：用于将 TSC
+增量转换为系统时间的比例因子</li>
+</ul></li>
+<li><p>更新策略：Hypervisor
+并不会在每次时间查询时都更新这块区域，而是在关键事件（如 VM
+启动、迁移、或其他时间敏感操作后）进行更新，以减少性能开销。</p></li>
+</ul>
+<p><strong>优缺点：</strong></p>
+<ul>
+<li><p>优点：</p>
+<ul>
+<li>低开销：共享内存的访问非常快，避免了 VM Exit</li>
+<li>高效性：减少了依赖传统硬件时钟带来的额外延迟</li>
+<li>单调性：提供一个单调递增的时间源，对时间敏感型应用（例如网络协议、会话管理）非常关键</li>
+</ul></li>
+<li><p>缺点：</p>
+<ul>
+<li><p>依赖host os更新：如果 hypervisor 更新不及时，guest
+可能会遇到时间漂移问题。</p></li>
+<li><p>特殊场景问题：在某些情况下（如热添加 CPU 等操作），kvm-clock
+可能会暴露出时间回退或不一致的问题，需要内核补丁或额外配置加以解决</p>
+<blockquote>
+<p>新加入的vCPU并不会立即与已有的vCPU同步它们的kvm-clock状态</p>
+</blockquote></li>
+</ul></li>
+</ul>
 <h2 id="时钟事件">时钟事件</h2>
 <h3 id="简介-1">简介</h3>
 <p><strong>功能：</strong>
