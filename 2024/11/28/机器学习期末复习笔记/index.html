@@ -1,0 +1,1768 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="机器学习期末复习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习期末复习笔记">
+<meta property="og:url" content="http://example.com/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="机器学习期末复习笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+<meta property="article:published_time" content="2024-11-28T08:38:38.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.077Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="machine learning">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+  
+  
+  
+  <title>机器学习期末复习笔记 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="机器学习期末复习笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-11-28 16:38" pubdate>
+          2024年11月28日, 4:38 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          11k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">机器学习期末复习笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>markdown文件下载：https://github.com/1037827920/SCUT-Notes</p>
+<h1 id="期末考试复习笔记">期末考试复习笔记</h1>
+<h2 id="机器学习简介">1. 机器学习简介</h2>
+<h3 id="什么是机器学习">1.1 什么是机器学习</h3>
+<p>如图所示：</p>
+<img src="/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241125144004699.png" srcset="/img/loading.gif" lazyload class="">
+<p>几乎所有的机器学习都包括以下三个部分：数据、模型和损失函数</p>
+<ul>
+<li>数据：不同的应用需要处理不同的数据</li>
+<li>模型：根据实际情况训练出特定的模型</li>
+<li>评估：通过损失函数来对模型进行统一的评价，主要包括三种：Hinge
+Loss、Logistic Loss、Softmax Loss</li>
+</ul>
+<h3 id="机器学习的分类">1.2 机器学习的分类</h3>
+<h4 id="有监督学习">1.2.1 有监督学习</h4>
+<p><strong>概述：</strong> superviseed learning
+的核心是利用标注好的数据进行训练，也就是输入数据(features)和对应的目标输出(labels)是已知的。目标是学习一个映射函数f(x)，可以将输入x映射到输出y</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>数据准备：收集和标注数据集，包括输入和输出树</li>
+<li>模型训练：用训练数据让模型学习输入和输出之间的关系</li>
+<li>模型验证：用测试数据评估模型的泛化能力</li>
+</ol>
+<p><strong>常见任务：</strong></p>
+<ul>
+<li>分类问题：将输入分配到离散的类比（例如垃圾邮箱检测、图片分类）</li>
+<li>回归问题：预测连续值（例如，房价预测、天气预测）</li>
+</ul>
+<p><strong>常用算法：</strong></p>
+<ul>
+<li>线性回归</li>
+<li>逻辑回归</li>
+<li>支持向量机(SVM)</li>
+<li>决策树、随机森林</li>
+<li>神经网络</li>
+</ul>
+<h4 id="无监督学习">1.2.2 无监督学习</h4>
+<p><strong>概述：</strong> Unsupervised Learning
+的输入数据没有标注（没有目标输出），目标是从数据中发掘隐藏的结构、模式或分布</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>数据分析：分析数据中的结构或分布</li>
+<li>模型训练：寻找数据的潜在模式（如聚类或降维）</li>
+<li>结果解释：将模式用于可视化或进一步分析</li>
+</ol>
+<p><strong>常用算法：</strong></p>
+<ul>
+<li>K均值</li>
+<li>DBSCAN</li>
+<li>主成分分析(PCA)</li>
+<li>自编码器</li>
+</ul>
+<h4 id="强化学习">1.2.3 强化学习</h4>
+<p><strong>概述：</strong> Reinforcement Learning
+模拟的是智能体(Agent)和环境(Environment)的交互过程。智能体通过观察环境状态(State)采取动作(Action)，从环境中接收奖励(Reward)并调整策略，以最大化累计奖励</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>数据不是预先标注的，而是通过与环境的交互产生</li>
+<li>需要权衡探索(Explore)和利用(Exploit)</li>
+</ul>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>智能体感知当前环境状态</li>
+<li>智能体根据策略选择动作</li>
+<li>环境根据动作反馈奖励和下一个状态</li>
+<li>智能体通过学习调整策略以优化未来行为</li>
+</ol>
+<p><strong>常见任务：</strong></p>
+<ul>
+<li>游戏AI（例如AlphaGo、强化学习玩Atari游戏）</li>
+<li>自动驾驶</li>
+<li>机器人控制</li>
+<li>动态资源分配（例如云计算资源管理）</li>
+</ul>
+<p><strong>常用算法：</strong></p>
+<ul>
+<li>Q学习</li>
+<li>深度Q网络(DQN)</li>
+<li>策略梯度方法（Policy Gradient）</li>
+<li>Actor-Critic 方法</li>
+</ul>
+<h4 id="对比总结">1.2.4 对比总结</h4>
+<table>
+
+<thead>
+<tr>
+<th style="text-align: center;">特性</th>
+<th style="text-align: center;">Supervised Learning</th>
+<th style="text-align: center;">Unsupervised Learning</th>
+<th style="text-align: center;">Reinforcement Learning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">数据类型</td>
+<td style="text-align: center;">有标签数据</td>
+<td style="text-align: center;">无标签数据</td>
+<td style="text-align: center;">与环境交互生成数据</td>
+</tr>
+<tr>
+<td style="text-align: center;">目标</td>
+<td style="text-align: center;">学习输入到输出的映射</td>
+<td style="text-align: center;">发现隐藏结构或模式</td>
+<td style="text-align: center;">最大化长期累计奖励</td>
+</tr>
+<tr>
+<td style="text-align: center;">应用场景</td>
+<td style="text-align: center;">分类、回归</td>
+<td style="text-align: center;">聚类、降维、异常检测</td>
+<td style="text-align: center;">游戏AI、自动驾驶</td>
+</tr>
+<tr>
+<td style="text-align: center;">反馈形式</td>
+<td style="text-align: center;">数据中提供明确反馈</td>
+<td style="text-align: center;">数据无明确反馈</td>
+<td style="text-align: center;">奖励信号作为反馈</td>
+</tr>
+</tbody>
+</table>
+<h3 id="机器学习与概率统计">1.3 机器学习与概率统计</h3>
+<p><strong>贝叶斯理论：</strong> <span class="math display">\[
+P(Y, X) = P(X|Y) * P(Y) \\
+P(X, Y) = P(Y|X) * P(X)
+\]</span></p>
+<p><span class="math display">\[
+P(Y|X) = \frac{P(X|Y)P(Y)}{P(X)} \\
+P(X) = \sum_YP(X|Y)P(Y)
+\]</span></p>
+<ul>
+<li>先验概率：在没有新信息之前，我相信的概率</li>
+<li>后验概率：在考虑新信息之后，我相信的概率</li>
+<li>边缘概率：在不考虑其因素的情况下，某个因素发生的概率</li>
+</ul>
+<p><strong>牙科例子：</strong></p>
+<ol type="1">
+<li><p>定义事件：</p>
+<ul>
+<li>A：患者有智齿发炎</li>
+<li>B：患者有蛀牙</li>
+<li>X：患者牙疼</li>
+</ul></li>
+<li><p>先验概率：</p>
+<ul>
+<li>P(A)：患者智齿发炎的先验概率</li>
+<li>P(B)：患者有蛀牙的先验概率</li>
+</ul></li>
+<li><p>似然性：</p>
+<ul>
+<li>P(X|A)：给定患者有智齿发炎的情况下牙疼的概率</li>
+<li>P(X|B)：给定患者有蛀牙的情况下牙疼的概率</li>
+</ul></li>
+<li><p>边缘概率：</p>
+<ul>
+<li>P(X)：患者牙疼的总概率，可以通过全概率公式计算： <span
+class="math display">\[
+P(X) = P(X|A)P(A) + P(X|B)P(B)
+\]</span></li>
+</ul></li>
+<li><p>后验概率：</p>
+<ul>
+<li>P(A|X)：给定患者牙疼的情况下，患者有智齿发炎的后验概率</li>
+<li>P(B|X)：给定患者牙疼的情况下，患者有蛀牙的后验概率</li>
+</ul></li>
+<li><p>贝叶斯定理：</p>
+<ul>
+<li>计算后验概率： <span class="math display">\[
+P(A|X) = \frac{P(X|A)P(A)}{P(X)} \\
+P(B|X) = \frac{P(X|B)P(B)}{P(X)}
+\]</span></li>
+</ul></li>
+</ol>
+<h3 id="信息论简介">1.4 信息论简介</h3>
+<p><strong>对于一个事件的信息度量：</strong> <span
+class="math display">\[
+I(A) = -log_bP(A)
+\]</span></p>
+<ul>
+<li>I(A)：表示信息的内容，是一个随机的变量</li>
+<li>P(A)：表示事件发生的概率</li>
+<li>b：基底</li>
+</ul>
+<p><strong>熵(Entropy)：</strong></p>
+<p>熵是一个用于表示预期平均信息含量的变量 <span class="math display">\[
+H(A) = -E[log_2P(A)] = -\sum_AP(A)log_2P(A)
+\]</span></p>
+<h2 id="线性回归和梯度下降">2. 线性回归和梯度下降</h2>
+<p>==线性回归是拟合数据的方法，梯度下降是寻找最优解的技巧==</p>
+<h3 id="线性回归">2.1 线性回归</h3>
+<p><strong>概述：</strong></p>
+<p>在一元线性回归中，我们假设目标变量y与特征变量x存在线性关系，模型表达式为：
+<span class="math display">\[
+y=W_0+W_1x_1+W_2x_2+\cdots+W_nx_n+\epsilon
+\]</span> 其中：</p>
+<ul>
+<li><span class="math inline">\(W_0\)</span>是截距(bias)</li>
+<li><span
+class="math inline">\(W_1,W_2,...,W_n\)</span>是回归系数（权重）</li>
+<li>ε是噪声或误差项</li>
+</ul>
+<p>对于多个样本的情况，可以将特征表示为矩阵X，目标值为向量y。在这种情况下，线性回归模型可以写作：
+<span class="math display">\[
+\hat{y}=XW
+\]</span> 其中：</p>
+<ul>
+<li>X是输入特征矩阵（包含所有样本）</li>
+<li>W是权重向量</li>
+<li><span class="math inline">\(\hat{y}\)</span>是模型的预测值向量</li>
+</ul>
+<p><strong>损失函数(MSE)：</strong></p>
+<p>为了让模型拟合数据，通常我们会使用均方误差(MSE)作为损失函数，来度量模型的预测值<span
+class="math inline">\(\hat{y}\)</span>与实际值y之间的差异： <span
+class="math display">\[
+J(W)=\frac1{2m}\sum_{i=1}^m(\hat{y}_i-y_i)^2=\frac1{2m}(XW-y)^T(XW-y)
+\]</span></p>
+<ul>
+<li>m：样本数</li>
+<li>损失函数越小，说明这个函数拟合越好。</li>
+</ul>
+<h3 id="闭式解">2.2 闭式解</h3>
+<p><strong>概述：</strong>
+指通过直接求解方程组，得到回归模型的参数（即权重向量）的解析解，而不需要通过迭代的优化算法（如梯度下降）来找到最优解</p>
+<p><strong>闭式解的推导：</strong></p>
+<p>最小化损失函数<span
+class="math inline">\(J(W)\)</span>以找到最优权重W。通过对<span
+class="math inline">\(W\)</span>求导并让导数为0，可以得到线性回归的解析解。首先对损失函数求导：
+<span class="math display">\[
+\frac{\partial J(W)}{\partial W}=\frac1mX^T(XW-y)
+\]</span> 将导数设置为0，求解<span class="math inline">\(W\)</span>：
+<span class="math display">\[
+\begin{gathered}
+X^T(XW-y)=0 \\
+X^TXW=X^Ty
+\end{gathered}
+\]</span> 可以通过矩阵求逆的方式得到<span
+class="math inline">\(W\)</span>： <span class="math display">\[
+W=(X^TX)^{-1}X^Ty
+\]</span> 这就是线性回归的闭式解公式</p>
+<p><strong>闭式解的核心思想：</strong></p>
+<ul>
+<li>直接求解：通过解析方法一次性求出最优权重<span
+class="math inline">\(W\)</span>，不需要像梯度下降一样逐步优化</li>
+<li>线性代数运行：通过矩阵转置、乘法和求逆等线性代数运算实现</li>
+<li>适用场景：对于小规模数据集、闭式解可以快速得到结果。然而当数据量非常大时，计算<span
+class="math inline">\(X^TX\)</span>的逆矩阵可能非常耗时，因此在大数据集上通常采用梯度下降等数据优化方法</li>
+</ul>
+<p><strong>优点与缺点：</strong></p>
+<ul>
+<li>优点：直接得到最优解，计算速度快（适合小数据集</li>
+<li>缺点：对于高维度数据集，矩阵求逆的计算复杂度较高<span
+class="math inline">\(O(n^3)\)</span>，在数据量过大时不适用</li>
+</ul>
+<p><strong>RLS(正则化最小方差)回归算法：</strong>
+在损失函数中增加一个常量用于处理正则化，从而避免了矩阵的逆无法求解的问题，线性回归是唯一一个可以正确找到正则化关系的机器学习回归方法。</p>
+<p>【没有详细了解】</p>
+<h3 id="梯度下降">2.3 梯度下降</h3>
+<p><strong>概述：</strong>
+除了求解闭式解外，还可以通过梯度下降的方法逼近最佳的w值</p>
+<p><strong>通用的优化方法：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span> (<span class="hljs-number">1</span>, epoches + <span class="hljs-number">1</span>):<br>    <span class="hljs-number">1.</span> 寻找一个可行的搜索方向d（找起来有难度<br>    <span class="hljs-number">2.</span> 寻找一个好的步长η[k]<br>    <span class="hljs-number">3.</span> 更新w的值：w[k+<span class="hljs-number">1</span>] = w[k] + η[k] * d[k]<br></code></pre></td></tr></table></figure>
+<p><strong>可以将三步走扩展到五步走：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">w[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span><br><span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span> (<span class="hljs-number">1</span>, epoches + <span class="hljs-number">1</span>):<br>    <span class="hljs-number">1.</span> 构造前向传播，用于求解损失函数L[w[k]]<br>    <span class="hljs-number">2.</span> 构造反向传播，用于计算梯度 w[k] = derication(L[w[k]], w[k])<br>    <span class="hljs-number">3.</span> d = -w[k]<br>    <span class="hljs-number">4.</span> 定义一个好的步长η[k]（步长过长会导致发散，步长过短会导致收敛过慢，所以需要开发者调节）。一般来说，调节方案可以是η[k+<span class="hljs-number">1</span>] = η[k]/(k+<span class="hljs-number">1</span>)<br>    <span class="hljs-number">5.</span> 更新w的值：w[k+<span class="hljs-number">1</span>] = w[k] + η[k] * d[k]<br></code></pre></td></tr></table></figure>
+<h2 id="线性分类svm随机梯度下降多分类">3.
+线性分类，SVM，随机梯度下降，多分类</h2>
+<h3 id="线性分类">3.1 线性分类</h3>
+<p><strong>概述：</strong>
+线性分类器是基于线性决策边界进行分类的模型，形式上它会学到一个权重向量W和一个偏置b，其决策规则可以表示为：
+<span class="math display">\[
+f(\mathbf{x})=\mathbf{w}^T\mathbf{x}+b
+\]</span> 在这种情况下，分类是根据f(X)的符号来进行的：</p>
+<ul>
+<li>如果f(x) &gt; 0，则将数据点分类为正类</li>
+<li>否则为负类</li>
+</ul>
+<p>这种方式只输出一个硬分类的结果，没有给出分类的概率</p>
+<h4 id="线性可分数据">3.1.1 线性可分数据</h4>
+<p><strong>概述：</strong>
+指的是数据集中的不同类别可以通过一条直线（在二维空间中）或一个超平面（在高维空间中）完全分开，没有任何重叠或错误分类</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>可以找到一个线性决策边界（如一条直线或一个超平面），使得数据集中所有点都可以准确分到正确的类别</li>
+<li>这种类比的数据适合使用线性分类器，如感知器、线性支持向量机（SVM）等</li>
+</ul>
+<p><strong>二维平面中的例子：</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-string">类别</span> <span class="hljs-attr">A:</span> <span class="hljs-string">(蓝色点)</span>   <span class="hljs-string">类别</span> <span class="hljs-attr">B:</span> <span class="hljs-string">(红色点)</span><br><br><span class="hljs-string">蓝</span>   <span class="hljs-string">蓝</span>   <span class="hljs-string">蓝</span>   <span class="hljs-string">蓝</span><br>                <span class="hljs-string">(直线)</span><br><span class="hljs-string">红</span>   <span class="hljs-string">红</span>   <span class="hljs-string">红</span>   <span class="hljs-string">红</span><br><br></code></pre></td></tr></table></figure>
+<p>在这种情况下，直线可以完全分开这两类点，没有任何交错</p>
+<h4 id="线性不可分数据">3.1.2 线性不可分数据</h4>
+<p><strong>概述：</strong>
+是指数据集中不同类别的点不能通过一条直线（或超平面）来完全分开，一些数据会落在错误的边界一侧，导致无法完美分类</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>没有单一的线性边界可以准确分隔数据类别</li>
+<li>线性分类器在这种情况下表现不佳，因为它们依赖于线性分界线</li>
+<li>处理线性不可分数据的常用方法包括使用非线性模型（如核化支持向量机、决策树）或者对特征进行转换，，使数据在更高维空间中线性可分</li>
+</ul>
+<p><strong>二维平面中的例子：</strong></p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-string">类别</span> <span class="hljs-attr">A:</span> <span class="hljs-string">(蓝色点)</span>   <span class="hljs-string">类别</span> <span class="hljs-attr">B:</span> <span class="hljs-string">(红色点)</span><br><br><span class="hljs-string">蓝</span>   <span class="hljs-string">红</span>   <span class="hljs-string">蓝</span>   <span class="hljs-string">红</span><br><span class="hljs-string">红</span>   <span class="hljs-string">蓝</span>   <span class="hljs-string">红</span>   <span class="hljs-string">蓝</span><br><br></code></pre></td></tr></table></figure>
+<p>在这种情况下，无论如何放置一条直线，总会有一部分点被错误分类。</p>
+<p><strong>解决线性不可分问题：</strong></p>
+<ul>
+<li>引入非线性分类器：如使用核支持向量机（SVM），将数据映射到高维空间，使其在高维空间中线性可分。</li>
+<li>增加特征：通过添加多项式特征或交互特征，可以在输入空间中创建一个更复杂的模型。</li>
+<li>使用核技巧 (Kernel Trick)：这是 SVM
+的一个重要特性，通过核函数将低维数据映射到高维空间，使原本线性不可分的数据在高维空间中变得线性可分。</li>
+</ul>
+<h3 id="支持向量机线性可分">3.2 支持向量机(线性可分)</h3>
+<p><strong>概述：</strong> Support Vector
+Machine是一种更为强大的分类算法，特别适合于线性不可分的数据集。SVM的目标是在特征空间中找到一个最优的决策边界（超平面），并且它有一个非常独特的特点：最大化分类边界的间隔</p>
+<p><strong>原理：</strong></p>
+<ul>
+<li><p>超平面：SVM在特征空间中寻找一个超平面，将数据点分类。对于线性可分数据，超平面的方程是：
+<span class="math display">\[
+w^Tx+b=0
+\]</span></p></li>
+<li><p>最大化间隔：SVM不仅寻找一个可以分开数据的超平面，还要找到那个离两类数据点最远的超平面，确保间隔最大化。这被称为最大化分类边界的间隔(Margin)。这样可以增强模型的鲁棒性，减少过拟合</p></li>
+<li><p>支持向量：距离决策边界最近的那些数据点被称为支持向量。这些点对决策边界有最重要的影响</p></li>
+</ul>
+<p><strong>损失函数：</strong></p>
+<ul>
+<li><p>合页损失函数(Hinge
+Loss)：是用于分类函数的损失函数，用来惩罚错误分类或分类边界附件的样本
+<span class="math display">\[
+L(y_i,f(x_i))=\max(0,1-y_if(x_i))
+\]</span> 其中：</p>
+<ul>
+<li><span class="math inline">\(y_i \in \{-1, 1\}\)</span>
+是样本i的真实标签(SVM通常处理二分类问题)</li>
+<li><span class="math inline">\(f(x_i)=\mathbf{w}^\top x_i+b\)</span>
+是模型对样本<span
+class="math inline">\(x_i\)</span>的预测结果，表示超平面w和<span
+class="math inline">\(x_i\)</span>的内积再加上偏置b</li>
+<li><span class="math inline">\(1-y_if(x_i)\)</span>
+是衡量样本离决策边界的距离</li>
+<li>如果样本被正确分类且距离边界大于 1，损失为
+0；否则，损失随着样本距离边界的接近或错误分类而增加。</li>
+</ul></li>
+<li><p>正则化项：SVM
+模型的目标是找到能够最大化分类间距（margin）的超平面。因此，为了平衡分类误差和间距的最大化，损失函数通常还包括一个正则化项，用来控制模型的复杂度（即防止过拟合）。常见的正则化项是L2
+正则化，其形式为： <span class="math display">\[
+R(\mathbf{w})=\frac12\|\mathbf{w}\|^2
+\]</span></p></li>
+<li><p>总损失函数： <span class="math display">\[
+J(\mathbf{w},b)=\frac12\|\mathbf{w}\|^2+C\sum_{i=1}^m\max(0,1-y_i(\mathbf{w}^\top
+x_i+b))
+\]</span></p>
+<ul>
+<li>其中：
+<ul>
+<li>C 是一个超参数，用于控制正则化项和合页损失之间的权衡。较大的 C
+会减少分类错误，但可能导致过拟合；较小的 C
+会增加容错性，防止过拟合。</li>
+<li>m 是训练样本的数量。</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>梯度公式：</strong></p>
+<ul>
+<li><p>对权重向量W的梯度： <span class="math display">\[
+\frac{\partial
+J(\mathbf{w},b)}{\partial\mathbf{w}}=\mathbf{w}-C\sum_{i\in\mathcal{M}}y_ix_i
+\]</span></p></li>
+<li><p>对偏置b的梯度： <span class="math display">\[
+\frac{\partial J(\mathbf{w},b)}{\partial b}=-C\sum_{i\in\mathcal M}y_i
+\]</span></p></li>
+</ul>
+<p><strong>核技巧(kernel Trick)：</strong>
+当数据无法通过线性超平面分割时，SVM使用核技巧将数据映射到高维空间。常见的核函数包括：</p>
+<ul>
+<li>多项式核(Polynomial Kernel)：将原始数据通过多项式映射到高维空间</li>
+<li>高斯核/径向基核(RBF
+Kernel)：将数据点投影到无穷维空间，使得非线性数据在高维空间中变得线性可分</li>
+</ul>
+<h3 id="支持向量机线性不可分">3.3 支持向量机(线性不可分)</h3>
+<p><strong>概述：</strong> 松弛变量(Slack
+Variable)是用来处理非线性可分情况的一种机制，它通过引入松弛变量允许一定程度的分类错误，从而使SVM能够在线性不可分的情形下仍然能找到一个较优的分类超平面</p>
+<p><strong>定义：</strong> 假设训练样本为<span
+class="math inline">\((x_i, y_i)\)</span>，其中<span
+class="math inline">\(x_i\)</span>是输入特征，<span
+class="math inline">\(y_i \in {-1,
+1}\)</span>是类比额标签。SVM的分类条件是 ： <span
+class="math display">\[
+y_i(w \cdot x_i + b) \geq 1
+\]</span> 对于线性不可分的情况，引入松弛变量<span
+class="math inline">\(\xi_i \geq 0\)</span>，允许某些点违反上述条件：
+<span class="math display">\[
+y_i(w \cdot x_i + b) \geq 1 - \xi_i
+\]</span> 这里：</p>
+<ul>
+<li><span class="math inline">\(\xi_i = 0\)</span>：点<span
+class="math inline">\(x_i\)</span>被正确分类且位于分类边界之外</li>
+<li>$0 &lt; _i <span
+class="math inline">\(：点\)</span>x_i$被正确分类且位于分类边界之内</li>
+<li><span class="math inline">\(\xi_i &gt; 1\)</span>：点<span
+class="math inline">\(x_i\)</span>被错误分类</li>
+</ul>
+<p><strong>优化目标(软边界SVM)：</strong></p>
+<p>引入松弛变量后，SVM的优化目标需要平衡两部分：</p>
+<ul>
+<li>最大化边界(Margin)，即最小化<span
+class="math inline">\(\frac{1}{2}||w||^2\)</span></li>
+<li>最小化分类错误的代价，即最小化<span
+class="math inline">\(\sum_i\xi_i\)</span></li>
+</ul>
+<p>最终目标函数为： <span class="math display">\[
+\mathop{max}\limits_{w,b,\xi} \frac{1}{2}||w||^2 + C\sum_i\xi_i
+\]</span> C 是正则化参数，用来权衡分类边界的宽度与分类错误的代价。</p>
+<ul>
+<li>较大的 C：更注重减少分类错误，容忍较小的边界。</li>
+<li>较小的 C：更注重增加边界宽度，容忍更多的分类错误。</li>
+</ul>
+<h3 id="梯度下降-1">3.4 梯度下降</h3>
+<p>是一种用于优化线性回归模型的迭代方法，通过计算损失函数的梯度，并沿着梯度的反方向迭代更新参数<span
+class="math inline">\(W\)</span>，逐步逼近最优解。梯度下降有三种主要变体：</p>
+<ul>
+<li>批量梯度下降(Batch Gradient Descent, BGD)</li>
+<li>随机梯度下降(Stochastic Gradient Descent, SGD)</li>
+<li>随机批量梯度下降(Mini-Batch Gradient Descent, MBGD)</li>
+</ul>
+<p><strong>样本数的对梯度公式的影响：</strong></p>
+<ul>
+<li>如果不除以样本数，计算得到的梯度是累计的梯度，也就是每个样本的误差对权重的累积影响</li>
+<li>如果除以样本数，计算得到的是平均梯度，每次更新会使用平均误差对权重进行更新</li>
+</ul>
+<p><strong>参数更新公式：</strong> <span class="math display">\[
+W=W-\eta\nabla L(W)
+\]</span> 其中：</p>
+<ul>
+<li><span class="math inline">\(W\)</span>是参数向量</li>
+<li><span
+class="math inline">\(\eta\)</span>是学习率，控制更新的步长</li>
+<li>损失函数<span
+class="math inline">\(J(W)\)</span>，在线性回归中有介绍，不同的模型可以选取不同的损失函数</li>
+<li><span class="math inline">\(\nabla L(W)\)</span>是损失函数<span
+class="math inline">\(J(W)\)</span>对参数W的梯度（也就是求导，一般来说，如果损失函数是每个样本损失的平均值，也就是除以了样本数m，那损失的函数的梯度就不再需要除以样本数m了</li>
+</ul>
+<h4 id="批量梯度下降">3.4.1 批量梯度下降</h4>
+<p><strong>概述：</strong> 在每次迭代中，使用整个训练集来计算梯度</p>
+<p><strong>过程：</strong></p>
+<ol type="1">
+<li>首先，初始化模型参数</li>
+<li>定义损失函数<span class="math inline">\(J(W)\)</span></li>
+<li>求解损失函数的导数，也就是损失函数的梯度函数<span
+class="math inline">\(L(W)\)</span></li>
+<li>根据上面给的参数更新公式更新W</li>
+<li>重复迭代</li>
+</ol>
+<p><strong>优点：</strong></p>
+<ul>
+<li>更新稳定，避免了由样本噪声引起的波动</li>
+<li>收敛到全局最优解，梯度方向更精确</li>
+</ul>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>计算成本高</li>
+<li>不适合大规模数据集</li>
+</ul>
+<h4 id="随机梯度下降">3.4.2 随机梯度下降</h4>
+<p><strong>概述：</strong> 在每次迭代中，只使用一个样本计算梯度</p>
+<p><strong>SGD优缺点：</strong></p>
+<ul>
+<li>优点：
+<ul>
+<li>效率高：对于大规模数据集，SGD不需要每次都遍历整个数据集，它每次只对一个样本进行更新，使得计算更快</li>
+<li>内存友好：由于它只需要处理一个样本，内存消耗相对较低，适合处理大数据</li>
+<li>在线学习：SGD可以随着新数据的到来在线更新模型，
+而不需要每次都从头开始训练</li>
+</ul></li>
+<li>缺点：
+<ul>
+<li>噪声较大：由于每次更新使用的是单个样本，更新方向可能不是全局最优，因此SGD的收敛路径往往比较噪声且不稳定</li>
+<li>需要调整学习率：学习率<span
+class="math inline">\(\eta\)</span>的选择至关重要。如果学习率过大，参数更新可能会错过最优点；如果学习率过小，收敛速度将非常慢</li>
+</ul></li>
+</ul>
+<p><strong>学习率衰减策略：</strong></p>
+<p>为了解决噪声问题，常见的做法是在训练过程中逐渐减低学习率，这种方法可以在训练初期进行较大步长的更新，使得模型快速接近最优解，而在后期逐渐减小步长，使得模型在最优解附件收敛</p>
+<p>学习率衰减公式的常见形式是： <span class="math display">\[
+\eta_t = \frac{\eta_0}{1 + \text{decay_rate} \cdot t}
+\]</span> 其中：</p>
+<ul>
+<li><span class="math inline">\(\eta_0\)</span>是初始学习率</li>
+<li><span class="math inline">\(t\)</span>是当前的迭代次数</li>
+<li><span
+class="math inline">\(\text{decay_rate}\)</span>是学习率的衰减系数</li>
+</ul>
+<p><strong>伪代码：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">初始化 W<br><span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_epochs):<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(m):  <span class="hljs-comment"># m是样本数量</span><br>        随机选取一个样本 (x_i, y_i)<br>        计算该样本的梯度： grad = x_i * (x_i W - y_i)<br>        取负梯度方向更新参数： W = W - η * grad<br>        记录训练集或验证集的损失<br></code></pre></td></tr></table></figure>
+<h4 id="批量随机梯度下降">3.4.3 批量随机梯度下降</h4>
+<p><strong>概述：</strong> 每次使用一小批随机样本计算梯度</p>
+<p><strong>过程：</strong></p>
+<ol type="1">
+<li><p>初始化权重W和b</p></li>
+<li><p>选择批量大小B（比如32，64等</p></li>
+<li><p>每次迭代时，从训练集中随机抽取一批样本，计算该批样本上的损失函数梯度，然后更新权重：
+<span class="math display">\[
+W=W-\eta\nabla L(W)
+\]</span> 其中<span class="math inline">\(\eta\)</span>是学习率， <span
+class="math inline">\(\eta\nabla L(W)\)</span>是对权重的梯度</p></li>
+</ol>
+<p><strong>优点：</strong></p>
+<ul>
+<li>在每次更新时引入随机性，避免陷入局部最优解</li>
+<li>更新效率较高，能在大规模数据集上加速训练</li>
+<li>在批量计算中还可以利用并行化处理，进一步提高效率</li>
+</ul>
+<h3 id="多类别分类问题">3.5 多类别分类问题</h3>
+<p><strong>概述：</strong> Multi-class classification
+是指预测一个实例属于多个类别中的某一个类别的问题。与二分类(Binary
+Classification)不同，二分类问题只有两个类比额，而多类别分类问题有三个或更多类比</p>
+<h4 id="问题定义">3.5.1 问题定义</h4>
+<p>给定一个包含n个样本的数据集，每个样本有m个特征，并且每个样本都属于k个类别中的某一个类别。目标是构建一个分类模型，能够根据输入特征预测该样本的类别</p>
+<h4 id="常见的多类别分类方法">3.5.2 常见的多类别分类方法</h4>
+<p><strong>一对多(One-vs-Rest, OvR)/一对其他(One-vs-All,
+OvA)：</strong></p>
+<ul>
+<li>原理：这种方法将多类别问题转换为多个二分类问题。对于每一个类别，都训练一个二分类模型，该模型用于判断样本是否属于该类别（”是“或”不是“）。最终预测结果是选择得分最高的类别
+<ul>
+<li>假设有k个类别，对于每个类别i，构建一个二分类模型<span
+class="math inline">\(h_i(x)\)</span>，其输出是”属于类别i“或”不属于类别i“</li>
+<li>在预测时，对于每个类别，计算其分类模型的输出得分，最终选择得分最高的类别作为预测类别</li>
+</ul></li>
+<li>优缺点：
+<ul>
+<li>优点：实现简单，能够与现有的二分类模型结合（如逻辑回归、支持向量机）</li>
+<li>缺点：如果类别数很大，每个类别需要训练一个二分器。可能会导致训练时间和计算开销增加</li>
+</ul></li>
+</ul>
+<p><strong>一对一(One-vs-One, OvO)：</strong></p>
+<ul>
+<li>原理：与一对多方法不同，一对一方法将多类别问题转换为多个二分类问题，但这里每对类别都会训练一个分类器，也就是说，对于每两个类别i和j，训练一个二分类模型<span
+class="math inline">\(h_{i,j}(x)\)</span>，用于判断一个样本是属于类别i还是类别j
+<ul>
+<li>对于k个类别，所有可能的类别对都会训练一个分类器，总共需要训练<span
+class="math inline">\(\frac{k(k-1)}{2}\)</span>个分类器</li>
+<li>在预测时，所有的二分类器都会给出一个预测类别，最终通过投票机制选择的票最多的类别作为最终分类结果</li>
+</ul></li>
+<li>优缺点：
+<ul>
+<li>优点：可以利用现有的二分类模型，并且每个模型只需处理少量类别之间的区别</li>
+<li>缺点：需要训练的分类器数量较多，计算开销大</li>
+</ul></li>
+</ul>
+<p><strong>直接多类别分类(Direct Multi-class
+Classification)：</strong></p>
+<ul>
+<li>原理：这种方法直接训练一个多类别分类器，避免将问题分解为多个二分类问题。常见的多类别分类算法包括：
+<ul>
+<li>Sofrmax回归：这是逻辑回归的扩展，适用于多类别分类问题。模型的输出是每个类别的概率，预测时选择概率最高的类别</li>
+<li>多类别支持向量机(C-SVC with multi-class
+strategy)：SVM本身是二分类算法，但可以通过直接使用多类别支持向量机来解决多类别问题，如使用”一对一“策略或”一对多“策略</li>
+<li>决策树：决策树自然适应多类别分类问题，因为每个节点的决策可以基于多个类别进行选择</li>
+</ul></li>
+<li>优缺点：
+<ul>
+<li>优点：在训练时直接处理多类别问题，不需要分解为多个二分类问题，计算上通常较为高效</li>
+<li>缺点：对于复杂的多类别问题，可能需要更复杂的模型和调优</li>
+</ul></li>
+</ul>
+<p><strong>基于神经网络的方法：</strong></p>
+<ul>
+<li><p>原理：神经网络可以自然地处理多类别分类问题，特别是通过使用
+softmax激活函数将网络的输出转换为每个类别的概率分布，具体做法是在网络的最后一层使用softmax激活函数，将网络的输出映射到每个类别的概率值</p>
+<ul>
+<li><p>softmax函数：softmax将一个向量转换为一个概率分布，输出中每个元素的值都在0到1之间，且所有元素的和为1，具体公式为：
+<span class="math display">\[
+\operatorname{Softmax}\left(z_{i}\right)=\frac{e^{z_{i}}}{\sum_{j}
+e^{z_{j}}}
+\]</span> 其中<span
+class="math inline">\(z_i\)</span>是模型输出的第i个类别的得分</p></li>
+<li><p>在训练时，使用交叉熵损失函数来优化模型的参数，目标是最小化真实类别与预测类别之间的差异</p></li>
+</ul></li>
+<li><p>优缺点：</p>
+<ul>
+<li>优点：神经网络能够自动提取特征并进行非线性映射，适合复杂的多类别问题</li>
+<li>缺点：训练过程可能需要更多的数据和计算资源</li>
+</ul></li>
+</ul>
+<h4 id="性能评估">3.5.3 性能评估</h4>
+<p><strong>评估指标：</strong></p>
+<ul>
+<li>准确率(Accuracy)：所有正确分类的样本占总样本的比例</li>
+<li>宏平均(Macro
+Average)：对每个类别计算精度(precision)、召回率(recall)和F1-score，然后取这些指标的平均值</li>
+<li>加权平均(Weighted
+Average)：对每个类别的精度、召回率和F1-score计算加权平均，权重是类别的支持度（样本数）</li>
+<li>混淆矩阵(Confusion
+Matrix)：对于每个类别，记录预测正确和错误的样本数，混淆矩阵帮助分析分类器的错误模式</li>
+</ul>
+<h2 id="逻辑回归和多分类逻辑回归">4. 逻辑回归和多分类逻辑回归</h2>
+<h3 id="逻辑回归">4.1 逻辑回归</h3>
+<p><strong>概述：</strong>
+是一种用于二分类问题的线性模型，尽管名字里有回归，它实际上用于分类任务。可以说是线性分类的一种特例，但它采用了概率的方式进行分类决策。</p>
+<p><strong>核心思想：</strong></p>
+<p>逻辑回归的目标是通过学习到的模型预测某个输入属于某个类别的概率。其基本形式是将线性回归的输出通过Sigmoid函数转换为一个介于0到1之间的概率值</p>
+<ul>
+<li><p>线性部分：给定一个输入向量X和模型参数W，线性部分的输出为： <span
+class="math display">\[
+z=W^TX+b
+\]</span> 这个W是权重向量，b是偏置</p></li>
+<li><p>Sigmoid函数：将线性输出z转换为概率值p： <span
+class="math display">\[
+p=\frac1{1+e^{-z}}
+\]</span> 这个p表示预测结果为正类的概率</p></li>
+<li><p>损失函数：逻辑回归的损失函数通常是交叉熵损失，用于评估模型预测的概率分布和实际标签之间的差异：
+<span class="math display">\[
+J(W)=-\frac1m\sum_{i=1}^m\left[y_i\log(\hat{y}_i)+(1-y_i)\log(1-\hat{y}_i)\right]
+\]</span> 其中，<span
+class="math inline">\(\hat{y}_i\)</span>是第i个样本的预测概率，<span
+class="math inline">\(y_i\)</span>是实际标签，m是样本数</p></li>
+<li><p>Logistic回归的梯度公式： <span class="math display">\[
+\nabla L(W)=X^T(\text{sigmoid}(XW)-y)
+\]</span></p></li>
+<li></li>
+</ul>
+<p><strong>训练逻辑回归的过程：</strong>
+通过最小化损失函数的值，调整权重W和偏置b。最常用的优化算法是梯度下降，其中包括不同的变体。</p>
+<h3 id="多分类逻辑回归">4.2 多分类逻辑回归</h3>
+<p><strong>基本原理：</strong>
+基于softmax函数，将输入样本映射到多个类别的概率分布。softmax函数的公式如下：
+<span class="math display">\[
+P(y=c|X) = \frac{exp(W_c^TX + b_c)}{\sum_{k=1}^Kexp(w_k^TX+b_k)}
+\]</span></p>
+<ul>
+<li>x是输入样本的特征向量</li>
+<li>y是类别标签，取值范围为{1,2,...,K}，K是类别数</li>
+<li><span class="math inline">\(w_c\)</span>和<span
+class="math inline">\(b_c\)</span>是类别c的权重向量和偏置</li>
+<li><span
+class="math inline">\(P(y=c|X)\)</span>是样本属于类别c的概率</li>
+</ul>
+<p><strong>损失函数：</strong>
+为了优化模型，多分类逻辑回归使用交叉熵损失函数： <span
+class="math display">\[
+\mathcal{L}=-\frac{1}{N}\sum_{i=1}^N\sum_{c=1}^K(y_i=c)logP(y_i=c|X_i)
+\]</span></p>
+<ul>
+<li>N是样本数量</li>
+<li>1(<span
+class="math inline">\(y_i=c\)</span>)是指示函数，当样本i的真实标签为c时取值为1，否则为0</li>
+<li><span
+class="math inline">\(P(y_i=c|X_i)\)</span>时通过softmax函数计算的概率</li>
+</ul>
+<p><strong>优化方法：</strong>
+通过梯度下降或其变种（如SGD、Adam等）优化损失函数，调整参数w和b来最小化误差</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>概率输出：模型输出类别概率，提供了不确定性信息</li>
+<li>可解释性强：权重w的大小和方向可以解释特征对分类的影响</li>
+<li>计算效率较高：适合小规模和中等规模的数据集</li>
+</ul>
+<h2 id="欠拟合过拟合交叉验证">5. 欠拟合、过拟合、交叉验证</h2>
+<h3 id="欠拟合和过拟合">5.1 欠拟合和过拟合</h3>
+<p><strong>欠拟合(Underfitting)：</strong></p>
+<ul>
+<li>loss_train和loss_val都很高，且无法持续下降到理想的范围。欠拟合表明模型对训练数据的学习不足，可能是由于模型过于简单（例如参数太少，模型不够复杂）</li>
+<li>解决方案：增加模型复杂度（例如增加特征、增加模型层数或参数），或者使用更强的模型</li>
+</ul>
+<p><strong>过拟合(Overfitting)：</strong></p>
+<ul>
+<li>loss_traing持续下降，但loss_val开始上升，这是典型的过拟合现象，意味着模型在训练集上表现良好，但在验证集上的表现变差，这表明模型在过度拟合训练集的细节和噪声，而没有学到验证集中的一般规律</li>
+<li>解决方案：
+<ul>
+<li>使用正则化方法来限制模型的复杂度</li>
+<li>增加训练集数据量或使用数据增强技术</li>
+<li>提前停止训练，即当loss_val开始上升时停止训练，以防止过拟合</li>
+</ul></li>
+</ul>
+<img src="/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241127162054986.png" srcset="/img/loading.gif" lazyload class="">
+<h3 id="偏差-方差权衡">5.2 偏差-方差权衡</h3>
+<p><strong>概述：</strong> 用于描述模型的复杂度与预测误差之间的关系</p>
+<p><strong>偏差(Bias)：</strong>
+描述了模型的预测值与真实值之间的偏离成都。反映了模型对数据的系统性错误，通常是由于模型假设过于简单导致的</p>
+<ul>
+<li>高偏差：模型无法很好地捕捉数据的复杂结果（欠拟合）
+<ul>
+<li>例如，用线性模型拟合非线性数据，模型无法表达数据中的非线性关系</li>
+</ul></li>
+<li>低偏差：模型能够准确地拟合训练数据，捕捉了数据的主要模式</li>
+</ul>
+<p><strong>方差(Variance)：</strong>
+描述了模型对数据变化的敏感性，反映了模型的预测结果在不同的训练数据集上的波动性</p>
+<ul>
+<li>高方差：模型过于复杂，过度拟合训练数据，对训练集中的噪声特别敏感(过拟合)
+<ul>
+<li>例如，用高阶多项式拟合简单线性关系的数据，模型可能对训练集表现和那后，但对测试集表现很差</li>
+</ul></li>
+<li>低方差：模型对数据的变化不敏感，预测稳定</li>
+</ul>
+<p><strong>偏差-方差分解：</strong> 总误差 =
+偏差<sup>2</sup>+方差+噪声</p>
+<ul>
+<li>偏差：模型假设的错误，与模型复杂度负相关</li>
+<li>方差：模型对数据扰动的敏感性，与模型复杂度正相关</li>
+<li>噪声：数据中的固有随机性，不可通过建模减少</li>
+</ul>
+<p><strong>偏差-方差权衡：</strong></p>
+<ul>
+<li>简单模型</li>
+<li>复杂模型</li>
+<li>最佳模型</li>
+</ul>
+<h3 id="交叉验证">5.3 交叉验证</h3>
+<p><strong>主要目的：</strong></p>
+<ul>
+<li>评估模型的泛化能力：交叉验证可以更全面地评估模型在未见数据上的表现，避免仅依赖单一训练集和测试集可能导致的评估偏差</li>
+<li>减少过拟合风险：如果模型在特定训练集上表现良好，但在其他数据上效果不佳，可能是过拟合的表现。交叉验证通过多次训练和验证，帮助检测和减少过拟合的风险</li>
+<li>优化模型参数：在交叉验证的过程中，可以调整模型的超参数，选择在不同的数据子集上表现最优的参数组合，从而提升模型的整体性能</li>
+</ul>
+<p><strong>常用的基奥查验证方法：</strong></p>
+<ul>
+<li>留出法(Holdout
+Method)：将数据集随机划分为训练集和测试集，通常按一定比例划分</li>
+<li>K折交叉验证(K-Fold
+Cross-Validation)：将数据集划分为K个子集，每次使用其中一个子集作为验证集，其余K-1个子集作为训练集，重复K次，确保每个子集都被用作验证集一次</li>
+<li>留一法(Leave-One-Out Cross-Validation,
+LOOCV)：当数据集较小，每次将一个样本作为验证集，其余样本作为训练集，重复进行，直到每个样本都被用作训验证集一次</li>
+</ul>
+<h2 id="非线性机器学习与集成方法">6. 非线性机器学习与集成方法</h2>
+<h3 id="决策树">6.1 决策树</h3>
+<img src="/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241127202130265.png" srcset="/img/loading.gif" lazyload class="">
+<img src="/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241127202138788.png" srcset="/img/loading.gif" lazyload class="">
+<img src="/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241127202948289.png" srcset="/img/loading.gif" lazyload class="">
+<img src="/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241127202955760.png" srcset="/img/loading.gif" lazyload class="">
+<img src="/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241127203005855.png" srcset="/img/loading.gif" lazyload class="">
+<h3 id="集成学习">6.2 集成学习</h3>
+<p><strong>概述：</strong>
+通过组合多个模型的预测结果来提高整体性能。核心思想是多个弱学习器(Weak
+Learners)结合起来可以形成一个强学习器(Strong Learner)</p>
+<p><strong>核心思想：</strong></p>
+<ul>
+<li>多样性：通过不同的模型或数据生成方式，确保其模型具有差异性</li>
+<li>组合策略：通过投票、加权平均或其他方法，将多个模型的预测结果进行融合</li>
+<li>提高性能：集成学习通常能够降低模型的方差和偏差，从而提高准确性和鲁棒性</li>
+</ul>
+<p><strong>分类：</strong></p>
+<ul>
+<li>Bagging：
+<ul>
+<li>全称：Bootstrap Aggregation</li>
+<li>原理：
+<ul>
+<li>从训练集随机采样（有放回地抽样，生成多个子数据集）</li>
+<li>每个子数据集训练一个模型（通常是同一种模型，如决策树）</li>
+<li>最终通过平均（回归）或投票（分类）的方式融合多个模型的预测结果</li>
+</ul></li>
+<li>特点：
+<ul>
+<li>减少方差，提升模型的稳定性</li>
+<li>基于独立训练的模型，易于并行化</li>
+</ul></li>
+<li>代表算法：随机森林(Random Forest)</li>
+<li>示例：数据集有100个样本，Bagging会随机抽样生成多个大小为100的数据子集，每个子集训练一个决策树模型，最后通过多数投票决定分类结果</li>
+</ul></li>
+<li>Boosting：
+<ul>
+<li>原理：
+<ul>
+<li>通过逐步训练模型，将重点放在之前模型容易出错的样本上</li>
+<li>每轮训练一个模型，并更根据该模型的错误情况调整样本的权重（错误的样本权重增加）</li>
+<li>最终通过加权平均的方式组合多个模型</li>
+</ul></li>
+<li>特点：
+<ul>
+<li>减少偏差，提升模型的预测能力</li>
+<li>各模型依赖顺序训练，串行化了</li>
+</ul></li>
+<li>代表算法：AdaBoost，Gradient Boosting，XGBoost，LightGBM</li>
+<li>示例：初始化所有样本的权重相同，训练第一个模型后，错误分类的样本权重增加；再用调整后的权重训练第二个模型，如此迭代，最后通过加权投票或加权求和得到最终结果</li>
+</ul></li>
+<li>Stacking
+<ul>
+<li>原理：
+<ul>
+<li>使用多个不同类型的模型作为基础学习器</li>
+<li>这些基础学习器的输出作为输入，训练一个"元学习器"来学习如何组合这些模型</li>
+</ul></li>
+<li>特点：
+<ul>
+<li>灵活性强，可以结合多种类型的基模型</li>
+<li>通常需要交叉验证来防止过拟合</li>
+</ul></li>
+<li>代表算法：无固定框架算法，常见于竞赛（如Kaggle )</li>
+<li>示例：使用逻辑回归、随机森林、支持向量机作为基学习器，将它们的预测输出输入到一个线性回归模型中，最终生成预测结果</li>
+</ul></li>
+</ul>
+<h2 id="无监督学习聚类问题">7. 无监督学习：聚类问题</h2>
+<h3 id="聚类基础">7.1 聚类基础</h3>
+<p><strong>概述：</strong>
+是一种无监督学习方法，目的是将一组数据点划分为若干个子集（称为簇，cluster），使得同一个簇内的数据点具有较高的相似性，而不同簇之间的数据点差异显著。聚类应用于数据没有明确标签的场景，例如客户细分、文本聚类、图像分割等</p>
+<p><strong>特点</strong></p>
+<ul>
+<li>无监督学习：没有标签，完全依赖数据的内在特征</li>
+<li>相似性衡量：通过某种距离度量（欧几里得距离、余弦相似度等）来判断数据点之间的相似性）</li>
+<li>簇的定义：不同算法对簇的定义可能不同，例如基于密度、基于距离或基于概率分布等</li>
+</ul>
+<p><strong>常见算法：</strong>
+K-Means算法、层次聚类、基于密度的聚类（DBSCAN）、高斯混合模型（Gaussiaan
+Mixture Model, GMM）</p>
+<p><strong>评价指标：</strong></p>
+<ul>
+<li>内部指标：
+<ul>
+<li>只是用数据本身和聚类结果，不依赖外部标签</li>
+<li>常见指标：
+<ul>
+<li>轮廓系数(Silhouette Coefficient)：
+<ul>
+<li>衡量簇内点的紧密性和簇间的分离度</li>
+<li>值范围：[-1, 1]，越接近1表明聚类效果越好</li>
+</ul></li>
+<li>簇内平方和(Inertia)：簇内点到簇中心的总平方和，值越小越好</li>
+</ul></li>
+</ul></li>
+<li>外部指标：
+<ul>
+<li>如果有标签，可以根据真实标签和聚类结果进行比较</li>
+<li>常见指标：
+<ul>
+<li>调整兰德指数(ARI)：真实标签和聚类结果的一致性</li>
+<li>归一化互信息(NMI)：聚类结果和标签的互信息值</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>应用场景：</strong></p>
+<ul>
+<li>文本分析：文本聚类（新闻分类、主题检测）</li>
+<li>图像处理：图像分割、相似图片检索</li>
+<li>市场营销：客户细分，发现具有相似购买行为的群体</li>
+<li>生物信息学：基因表达数据分析，发现基因簇</li>
+<li>推荐系统：通过聚类用户行为数据，推荐类似内容</li>
+</ul>
+<h3 id="k-means聚类重点">7.2 K-Means聚类【重点】</h3>
+<p><strong>概述：</strong>
+用于将数据集划分为k个cluster，以最小化簇内的样本与簇中心之间的距离。每个簇由其质心（中心点）表示</p>
+<p><strong>主要思想：</strong></p>
+<ul>
+<li><p>将数据集划分为k个cluster ，使得：</p>
+<ul>
+<li>同一cluster内的数据点批次相似</li>
+<li>不同cluster之间的数据点差异较大</li>
+</ul></li>
+<li><p>使用一种迭代优化方法最小化簇内平方和，即： <span
+class="math display">\[
+J=\sum_{i=1}^k\sum_{x\in C_i}||x-\mu_i||^2
+\]</span></p>
+<ul>
+<li><span class="math inline">\(C_i\)</span>：第i个cluster</li>
+<li><span class="math inline">\(\mu_i\)</span>：第i个簇的中心</li>
+<li><span
+class="math inline">\(||x-\mu_i||^2\)</span>：数据点x到簇中心的欧几里得距离</li>
+</ul></li>
+</ul>
+<p><strong>算法流程：</strong></p>
+<ol type="1">
+<li>初始化：随机选取k个点作为初始簇的中心点（质心）</li>
+<li>分配样本：对于每个数据点，计算它到k个簇中心的距离，并将其分配到最近的簇</li>
+<li>更新簇中心：重新计算每个簇的中心顶，作为该簇内所有点的均值</li>
+<li>重复迭代：重复步骤2、3，直到簇中心不再发生变化，或者达到最大迭代粗疏</li>
+<li>输出</li>
+</ol>
+<p><strong>示例：</strong> 数据集={(1,1),(2,1),(4,3),(5,4)}</p>
+<ol type="1">
+<li>初始化：随机选择k=2个点作为初始化簇中心，例如(1,1)和(5,4)</li>
+<li>计算每个点到中心的距离并分配簇
+<ol type="1">
+<li>点(1,1)(2,1)更接近(1,1)</li>
+<li>点(4,3)(5,4)更接近(5,4)</li>
+</ol></li>
+<li>更新簇中心：
+<ol type="1">
+<li>第一个簇的中心更新为(1.5, 1)</li>
+<li>第二个簇的中心更新为(4.5, 3.5)</li>
+</ol></li>
+<li>重复步骤2，3直到中心点不再变化</li>
+</ol>
+<p><strong>选择合适的k值：</strong></p>
+<ul>
+<li>肘部法则(Elbow Method)：
+<ul>
+<li>绘制簇内平方和随k变化的曲线</li>
+<li>选择肘部点作为最优的k值</li>
+</ul></li>
+<li>轮廓系数：
+<ul>
+<li>衡量样本在簇内的紧密性和簇间的分离度</li>
+<li>取轮廓系数最大的k值</li>
+</ul></li>
+</ul>
+<h3 id="层次聚合聚类hac">7.3 层次聚合聚类(HAC)</h3>
+<p><strong>概述：</strong>
+是一种基于树状结构的聚类方法，旨在通过递归地合并或分裂簇的方式，将数据组织成一个层次结构（通常表示为树状图）</p>
+<p><strong>策略：</strong></p>
+<ul>
+<li>自底向上（层次聚合， agglomerative）：
+<ul>
+<li>每个数据点开始作为一个独立的簇</li>
+<li>逐步将最相似的簇合并，直到所有的数据点都属于一个簇</li>
+<li>适用于数量较小的情况</li>
+</ul></li>
+<li>自顶向下（层次分裂，divisive）：
+<ul>
+<li>从一个包含所有数据点的簇开始</li>
+<li>逐步将簇分裂成更小的簇，直到每个簇只包含一个数据点</li>
+</ul></li>
+</ul>
+<p><strong>算法步骤：</strong></p>
+<ol type="1">
+<li>初始化：将每个数据点视为单独的一个簇</li>
+<li>计算距离：计算每对簇之间的距离（使用特定的距离度量方法）</li>
+<li>合并最近的簇：找到距离最近的两个簇，将它们合并为一个簇</li>
+<li>更新距离矩阵：重新计算新簇与其他簇之间的距离</li>
+<li>重复：重复步骤3和步骤4，直到所有的点被合并为一个簇，或者达到指定的递归次数</li>
+</ol>
+<p><strong>簇间的距离度量方法：</strong></p>
+<ul>
+<li>最小距离（单连接，Single Linkage）：
+<ul>
+<li>定义：两个簇中距离最近的点之间的距离</li>
+<li>容易受到噪声影响，可能产生链式簇</li>
+</ul></li>
+<li>最大距离（完全连接，Complete Linkage）：
+<ul>
+<li>定义：两个簇中距离最远的点之间的距离</li>
+<li>倾向于生成紧凑的、球形的簇、但可能分割自然的群体</li>
+</ul></li>
+<li>平均距离（Average Linkage）：
+<ul>
+<li>定义：每个簇中所有点对之间平均距离的加权平均</li>
+<li>在链式簇和紧密簇之间的表现较为平衡</li>
+</ul></li>
+<li>质心距离（Centroid Linkage）：
+<ul>
+<li>定义：两个簇的质心之间的距离</li>
+<li>敏感于簇内样本分布变化</li>
+</ul></li>
+<li>Ward方法：
+<ul>
+<li>基于最小化簇内的平方误差</li>
+<li>更倾向于生成大小相似的簇，适合数据分布均匀的情况</li>
+</ul></li>
+</ul>
+<h2 id="无监督学习主成分分析">8. 无监督学习：主成分分析</h2>
+<p><strong>概述：</strong>
+PCA是一种用于数据降维的技术，通过寻找数据中最大方差方向的线性组合，将高维数据映射到一个低维空间，同时尽可能保留数据的主要信息</p>
+<p><strong>核心思想：</strong> PCA的目标是：</p>
+<ul>
+<li>将数据投影到新的正交坐标系（主成分轴），这些轴按照数据的防擦好大小排序</li>
+<li>最终保留较少的主成分，用于近似原始数据，从而减少数据的纬度</li>
+</ul>
+<p>在降维的同时，PCA通过去除冗余特征和噪声提高模型的效率和泛化能力</p>
+<p><strong>PCA的数学步骤：</strong></p>
+<ol type="1">
+<li><p>数据标准化：为了消除量纲的影响，PCA的第一步通常是对数据进行标准化（如零均值和单位方差标准化）。假设数据集X的大小为<span
+class="math inline">\(n \times d\)</span>
+其中n是样本数，d是特征数，对每个特征数<span
+class="math inline">\(x_j\)</span>： <span class="math display">\[
+x_j&#39;=\frac{x_j - \mu_j}{\delta_j}
+\]</span> 其中<span class="math inline">\(\mu_j\)</span>是特征<span
+class="math inline">\(x_j\)</span>的均值，<span
+class="math inline">\(\delta_j\)</span>是标准差</p></li>
+<li><p>计算协方差矩阵：计算标准化后的数据的协方差矩阵<span
+class="math inline">\(\sum\)</span>： <span class="math display">\[
+\sum = \frac{1}{n-1}X^TX
+\]</span> 协方差矩阵描述了特征之间的线性相关性</p></li>
+<li><p>求解特征值和特征向量：计算协方差矩阵的特征值和特征向量： <span
+class="math display">\[
+\sum v = \lambda v
+\]</span></p>
+<ul>
+<li>特征向量v表示新的坐标轴方向（即主成分方向）</li>
+<li>特征值<span
+class="math inline">\(\lambda\)</span>表示沿主成分方向的方差大小</li>
+</ul></li>
+<li><p>选择主成分：按照特征值大小对特征向量排序，选择前k个对应的特征向量，形成主成分矩阵<span
+class="math inline">\(W_k\)</span></p></li>
+<li><p>降维：将原始数据X投影到主成分矩阵<span
+class="math inline">\(W_k\)</span>上： <span class="math display">\[
+Z=XW_k
+\]</span> Z是降维后的数据</p></li>
+</ol>
+<p><strong>主成分解释：</strong></p>
+<ul>
+<li>第一主成分：数据方差最大的方向， 最能反映数据的变化</li>
+<li>第二主成分：与第一主成分正交，反映剩余的次要变化</li>
+</ul>
+<p><strong>优点：</strong></p>
+<ul>
+<li>降维效果显著</li>
+<li>去噪能力强</li>
+<li>解释性强</li>
+</ul>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>线性假设</li>
+<li>信息丢失</li>
+<li>易受异常值影响</li>
+</ul>
+<p><strong>应用场景：</strong></p>
+<ul>
+<li>数据预处理：用于特征选择和去除冗余特征</li>
+<li>可视化：将高维数据降到2D或3D空间进行可视化</li>
+<li>压缩：通过降维实现数据压缩</li>
+<li>去噪：舍弃低方差成分，降低数据噪声</li>
+<li>推荐系统</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A4%A7%E5%AD%A6%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/" class="category-chain-item">大学课程笔记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/machine-learning/" class="print-no-link">#machine learning</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>机器学习期末复习笔记</div>
+      <div>http://example.com/2024/11/28/机器学习期末复习笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年11月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/" title="OpenGL阴影映射技术介绍">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OpenGL阴影映射技术介绍</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/11/20/OpenGL%E5%85%A5%E9%97%A8009%E2%80%94%E2%80%94%E6%BC%AB%E5%8F%8D%E5%B0%84%E5%9C%A8%E7%89%87%E6%AE%B5%E7%9D%80%E8%89%B2%E5%99%A8%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" title="OpenGL入门009——漫反射在片段着色器中的应用">
+                        <span class="hidden-mobile">OpenGL入门009——漫反射在片段着色器中的应用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

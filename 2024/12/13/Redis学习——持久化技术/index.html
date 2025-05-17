@@ -1,0 +1,861 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="简要介绍Redis的两种持久化技术——AOF和RDB快照">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习——持久化技术">
+<meta property="og:url" content="http://example.com/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="简要介绍Redis的两种持久化技术——AOF和RDB快照">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF.png">
+<meta property="article:published_time" content="2024-12-12T16:37:07.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.074Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF.png">
+  
+  
+  
+  <title>Redis学习——持久化技术 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Redis学习——持久化技术"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-12-13 00:37" pubdate>
+          2024年12月13日, 12:37 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          1.4k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Redis学习——持久化技术</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="redis学习持久化技术">Redis学习——持久化技术</h1>
+<p>简要介绍Redis的两种持久化技术——AOF和RDB快照</p>
+<h2 id="rdb快照">RDB快照</h2>
+<p><strong>概述：</strong> Redis
+DataBase通过创建内存快照的方式，将redis数据以二进制格式保存到磁盘中，形成一个时间点的备份</p>
+<p><strong>实现机制：</strong></p>
+<ul>
+<li>在指定的时间间隔内检查是否满足触发条件，如果满足，则执行快照操作</li>
+<li>快照操作会将数据存储到一个RDB文件中（默认名为<code>dump.rdb</code>），存储的内存是某个时间点的数据状态</li>
+<li>触发方式：
+<ul>
+<li>定时保存：通过配置文件中的save参数，指定触发条件（如“在多少s内有多少次写操作”）</li>
+<li>手动触发：使用<code>save</code>或者是<code>bgsave</code>命令
+<ul>
+<li><code>save</code>会阻塞主线程进行保存</li>
+<li><code>bgsave</code>在创建异步子进程执行保存操作，主线程可以继续处理客户端请求</li>
+</ul></li>
+</ul></li>
+<li>相关文件：
+<ul>
+<li>默认保存文件：<code>dump.rdb</code></li>
+<li>可以通过配置文件<code>redis.conf</code>修改保存文件名及路径</li>
+</ul></li>
+<li>优点：
+<ul>
+<li>文件体积小，适合用于全量备份</li>
+<li>恢复速度快，适合灾难恢复</li>
+</ul></li>
+<li>缺点：
+<ul>
+<li>不能保存实时数据（数据可能因系统故障丢失）</li>
+<li>生成快照时可能占用较多资源（如CPU和内存）</li>
+</ul></li>
+</ul>
+<p><strong>写时复制技术(Copy-On-Write, COW)：</strong></p>
+<p>在执行bgsave的过程中，redis仍然可以继续执行命令，也就是数据能够被修改。
+如果redis没有执行修改数据的操作，那bgsave执行的子进程和父进程用的是同一个物理内存
+<img src="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/image-20241212001020185.png" srcset="/img/loading.gif" lazyload class=""></p>
+<p>如果redis执行了修改数据的操作，子进程就会从原来的使用的内存数据复制一份出来继续进行rdb快照，因此，rdb快照保存的是<strong>原来的数据</strong>。在执行bgsave的过程中，redis修改的数据并不在bgsave保存的范围内，只能等待下一次bgsave。
+<img src="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/image-20241212001306225.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="aof持久化">AOF持久化</h2>
+<p><strong>概述：</strong> Append Only
+File是通过记录每次写操作的日志，将这些操作按顺序写入日志文件，确保数据可以完整恢复</p>
+<p><strong>实现机制：</strong></p>
+<ul>
+<li>Redis将每次<strong>写操作记录</strong>到AOF文件中（默认名为<code>appendonly.aof</code>）
+<ul>
+<li>注意：是命令执行成功后才写入文件中</li>
+</ul></li>
+<li>AOF文件采用追加的方式，确保写操作是顺序的</li>
+<li>日志格式是Redis的协议格式，便于解析和重放</li>
+<li>AOF文件会定期通过重写来压缩日志文件，避免日志文件过大
+<ul>
+<li>原理是根据某个键值对的最新状态，用一条命令去记录这个键值对</li>
+<li>重写的时候先写入临时文件，成功后再覆盖原文件（防止失败污染原文件）</li>
+<li>在后台进行重写，同样使用了COW技术，并将在重写期间执行的命令追加到<strong>AOF缓冲区</strong>(写入旧aof文件的)和<strong>AOF重写缓冲区</strong>(等会追加到重写aof文件的)，等待后台重写完毕，会通知主线程，然后主线程将AOF重写缓冲区中的所有内容追加到新的AOF文件中，保证新旧AOF文件所保存的数据库状态一致，然后新AOF覆盖旧AOF</li>
+</ul></li>
+<li>配置参数决定写入磁盘的同步策略：
+<ul>
+<li>always：每次写入操作立即同步（立即执行fsync函数），性能最低但数据最安全</li>
+<li>everysec：每秒同步一次默认值，性能与安全性的折中（创建一个异步任务来执行fsync函数）</li>
+<li>no：完全依赖操作系统决定何时同步，性能最高但数据可能丢失（永不执行fsync函数）</li>
+</ul></li>
+</ul>
+<p><strong>相关文件：</strong></p>
+<ul>
+<li>默认保存文件：<code>ppendonly.aof</code></li>
+<li>可通过配置文件<code>redis.conf</code>修改保存文件名及路径</li>
+</ul>
+<p><strong>优点：</strong></p>
+<ul>
+<li>数据恢复更安全，可以记录每个写操作，最大限度减少数据丢失</li>
+<li>追加写操作性能较好</li>
+</ul>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>文件体积较大</li>
+<li>恢复速度比RDB满</li>
+<li>初始状态可能会占用更多的存储资源</li>
+</ul>
+<h2 id="rdb和aof混合持久化">RDB和AOF混合持久化</h2>
+<p>在配置文件中开启：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs conf">aof-use-rdb-preamble yes<br></code></pre></td></tr></table></figure>
+<p>混合持久化工作在<strong>AOF日志重写过程</strong></p>
+<p>在AOF重写日志时，fork出来的重写子线程会先将主线程共享的内存数据以RDB方式写入AOF文件，然后主线程处理的操作命令会被记录在重写缓冲区，以AOF方式写入到AOF文件，完成后主线程将含有RDB格式和AOF格式文件替换旧的AOF文件。</p>
+<h2 id="大key对aof日志的影响">大Key对AOF日志的影响</h2>
+<h3 id="对aof日志的影响">对AOF日志的影响</h3>
+<p>只有always策略可能会阻塞主线程，所以如果写入的是一个大Key，阻塞的时间会比较久</p>
+<h3 id="对aof重写和rdb的影响">对AOF重写和RDB的影响</h3>
+<p>如果大Key可能会很快触发AOF重写机制</p>
+<p>然后执行AOF重写机制和RDB快照都需要fork主线程，这时候fork出来的也变可能会很大，因此会很耗时阻塞主线程</p>
+<p>同时，如果发生了写时复制，需要复制物理内存，这个过程也会耗时阻塞主线程</p>
+<p><strong>建议：</strong></p>
+<ul>
+<li>如果redis只是当作缓存，可以关闭AOF和AOF重写以及RDB，不关心数据安全性问题，可以提升性能</li>
+<li>linux的hugepage机制也会影响redis性能，hugepage支持2MB/1GB等大小的内存，在发生COW后，redis也需要拷贝相应hugepage大小的内存</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/redis/" class="print-no-link">#redis</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Redis学习——持久化技术</div>
+      <div>http://example.com/2024/12/13/Redis学习——持久化技术/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年12月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/16/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="软件架构期末复习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">软件架构期末复习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/12/O1%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B/" title="O(1)和CFS调度算法简介">
+                        <span class="hidden-mobile">O(1)和CFS调度算法简介</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

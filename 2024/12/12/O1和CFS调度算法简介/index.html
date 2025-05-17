@@ -1,0 +1,858 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="简要介绍linux中的O(1)调度算法和CFS调度算法的雏形（发展及设计思想）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="O(1)和CFS调度算法简介">
+<meta property="og:url" content="http://example.com/2024/12/12/O1%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="简要介绍linux中的O(1)调度算法和CFS调度算法的雏形（发展及设计思想）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/O(1)%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B.png">
+<meta property="article:published_time" content="2024-12-12T14:55:44.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.047Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="进程">
+<meta property="article:tag" content="调度">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/O(1)%E5%92%8CCFS%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E7%AE%80%E4%BB%8B.png">
+  
+  
+  
+  <title>O(1)和CFS调度算法简介 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="O(1)和CFS调度算法简介"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-12-12 22:55" pubdate>
+          2024年12月12日, 10:55 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          2k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">O(1)和CFS调度算法简介</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="o1和cfs调度算法简介">O(1)和CFS调度算法简介</h1>
+<p>简要介绍linux中的O(1)调度算法和CFS调度算法的雏形（发展及设计思想）</p>
+<h2 id="o1调度算法">O(1)调度算法</h2>
+<p><strong>概述：</strong> 是linux kernel
+2.6引入的一种调度算法，无论系统中有多少进程，调度器总能在恒定时间内完成操作，即时间复杂度为O(1)</p>
+<p><strong>什么是调度？</strong></p>
+<p>假设这样一个场景，只有一个CPU，然后有两个进程需要执行，可以让它们交替执行。为了实现切换，我们提供一个API函数，这些进程执行一会就主动调用一下这个API函数，实现进程的切换执行，这是一种主动配合式的调度</p>
+<p><strong>进程切换的本质：</strong></p>
+<p>把当前进程的上下文（也就是CPU的一堆寄存器值）保存到该进程的PCB（进程控制块），然后把另一个进程的上下文放到CPU寄存器中开始执行。</p>
+<p><strong>中断抢占式调度：</strong></p>
+<p>有些进程在CPU执行过程中可能死锁，这样另一个进程就永远没有执行的机会了。可以利用<strong>时钟中断</strong>（一旦有中断事件到CPU，CPU就得去执行中断处理程序），在时钟中断的中断处理程序加入调度入口，就能抢到CPU的执行权。可以让每个进程都执行一个时间片（比如100ms），然后每隔一个时间片就会有一个中断事件到来，切换进程的执行。</p>
+<p><strong>就绪队列：</strong></p>
+<p>准备被CPU执行的进程，会被存储在一个队列中，这个队列就叫就绪队列</p>
+<p><strong>等待队列：</strong></p>
+<p>当有进程等待锁、IO等待或者sleep的时候，让CPU时间白白浪费了，调度程序需要介入，将其移动到等待队列，等它没有上述情况后再移动到就绪队列</p>
+<p><strong>优先级：</strong></p>
+<p>当进程数逐渐多起来，这时候进程执行一次后，等下次执行可能需要等长时间，这是不合理（比如键盘输入等1、2s才响应）。需要给每个进程设置优先级，从0-139（这里假设数字越高优先级越大，实际上并不是这样，后面有结介绍）。这样调度就需要先遍历就绪队列，这样复杂度就是O(N)了。</p>
+<p>可以按照优先级拆分成不同的队列，0-139一共140个队列，调度可以先从高优先级队列查起，可以通过一个位图(10001000....)，1表示该队列有等待调度的进程，0则无。</p>
+<p><strong>active队列和expired队列：</strong></p>
+<p>为了防止低优先级进程starvation（也就是一直没有被调度），多添加一个队列expired队列。调度器从active队列中选择最高优先级的进程运行，运行完时间片的进程被移动到expired队列，当active进程中所有进程都被移动到expired队列，直接交换两个队列（active和expired定义为指针，交换队列直接交换指针即可</p>
+<p><strong>时间片机制：</strong></p>
+<p>到上面这一步，好像跟一开始没啥区别了（也就是进程执行完一次，下一次执行需要经过很长时间，如果进程数量多的话）。故引入时间片机制，优先级越高的进程时间片越长（根据权重划分），需要设定一个最小值，不然进程数多的话有的进程时间片太小，这样调度切换多了，实际CPU执行时间就少了。</p>
+<p>这样就是O(1)调度算法的一个雏形了</p>
+<p><strong>优点：</strong></p>
+<ul>
+<li>时间复杂度为O(1)</li>
+<li>优先级机制</li>
+</ul>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>不够公平</li>
+</ul>
+<h2 id="完全公平调度算法">完全公平调度算法</h2>
+<p><strong>概述：</strong> CFS(Completely Fair
+Scheduler)是Linux内核2.6.23引入的调度算法，旨在更加公平的调度</p>
+<p><strong>虚拟运行时间(vruntime)：</strong></p>
+<p>为了让优先级较小的进程能“追赶”到公平的水平，引入vruntime的概念，也就是低优先级的vruntime增长的更快，高优先级的进程vruntime增长较慢，可以把vruntime作为衡量任务实际消耗CPU时间的账本，所以为了公平调度，每次选择vruntime最小的进程运行（让它吃个饱</p>
+<p>举个例子，假设有三个任务A,B，权重分别为2,1，三个任务刚进入系统，vruntime都是0，调度器先选择优先级高的A执行，运行10ms后，A的vruntime增加5（因为优先级高的进程vruntime增长慢），然后调度选择vrumtime目前最小的B运行10ms后，B的vruntime增加10（低优先级进程vruntime增长快），第三次调度器仍选择vruntime最小的A执行。</p>
+<p>把CPU比作很多个蛋糕，任务的优先级比作拿到蛋糕的能力（A拿蛋糕速度快吃得也快，B拿蛋糕速度慢）。调度器通过监控每个任务拿的蛋糕数量（vruntime），优先让蛋糕少的人去拿，确保大家都能吃到蛋糕，同时让能力强的人吃得多一些。</p>
+<p><strong>红黑树：</strong></p>
+<p>那要怎么去取vruntime最小的进程效率最高呢？答案是红黑树，因为它是一棵<strong>近似平衡的二叉搜索树</strong>，也就是这颗树最左节点是vruntime最小的进程，也就是需要调度的进程</p>
+<p><strong>AVL vs. 红黑树：</strong></p>
+<p>红黑树的近似平衡规则：</p>
+<ul>
+<li>每个节点是红色或黑色（颜色用于控制树的平衡调整）</li>
+<li>根节点始终是黑色的（确保树的整体平衡从根节点开始）</li>
+<li>每个叶子节点（nil节点）是黑色（nil节点是所有空子树的占位符）</li>
+<li>红色节点的子节点必须是黑色的</li>
+<li>从任一节点到其叶子节点的每条路径必须包含相同数量的黑色节点（黑高）</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs css">   (<span class="hljs-number">10</span>B)<br>  /    \<br>(<span class="hljs-number">5</span>R)   (<span class="hljs-number">15</span>R)<br></code></pre></td></tr></table></figure>
+<p>插入2：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs css">       (<span class="hljs-number">10</span>B)<br>      /    \<br>   (<span class="hljs-number">5</span>R)    (<span class="hljs-number">15</span>R)<br>  /<br>(<span class="hljs-number">2</span>R)<br></code></pre></td></tr></table></figure>
+<p>将5改为黑色，右旋（以5为轴：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs css">    (<span class="hljs-number">5</span>B)<br>   /    \<br>(<span class="hljs-number">2</span>R)   (<span class="hljs-number">10</span>B)<br>          \<br>          (<span class="hljs-number">15</span>R)<br></code></pre></td></tr></table></figure>
+<p>而AVL树是严格平衡的，也就是节点的左右子树高度差不超过1，而CFS更看重<strong>实时响应性</strong>，AVL树需要更加频繁地调整，且红黑树的实现较简单，旋转次数更少，<strong>较低的调度延迟</strong>。</p>
+<p><strong>优点：</strong></p>
+<ul>
+<li>公平性</li>
+<li>高效，红黑树操作时间复杂度是O(logN)</li>
+<li>CFS支持调度公平性程序（如通过<code>sched_latenct</code>和<code>sched_min_granularity</code>参数）</li>
+</ul>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>较高复杂度相比O(1)调度算法</li>
+<li>对实时任务支持较弱</li>
+</ul>
+<h2 id="其他">其他</h2>
+<p><strong>二者的对比：</strong></p>
+<p>O(1)调度算法更适合实时系统和对复杂性要求较高的场景，CFS调度是现代通用linux系统的默认调度器，它在公平性和灵活性上显著优于O(1)调度</p>
+<p><strong>调度的是线程：</strong></p>
+<p>在现代linux内核中，参与调度的实体是线程而不是进程，linux将线程视为轻量级线程(LWP)。</p>
+<p>相比于进程：</p>
+<ul>
+<li>线程的上下文切换开销更小，因为线程共享进程资源，不需要切换整个地址空间等信息</li>
+<li>符合现代应用程序的并发需求，现代程序常常通过多线程模型来实现高性能并发</li>
+<li>更好地支持多核架构，不同线程可以同时运行在多个CPU核心上，而且线程粒度更细</li>
+</ul>
+<p><strong>实时优先级和普通优先级：</strong></p>
+<ul>
+<li>0-99：实时优先级，用于实时任务，更高数字表示更高优先级</li>
+<li>100-139：普通优先级，更低数字表示更高的优先级</li>
+</ul>
+<p><strong>nice值：</strong></p>
+<p>进程通过一个nice值（对其他进程的友好度，nice越大越友好，越谦让，优先级越低）映射到优先级，nice越大优先级越低</p>
+<p><strong>进程优先级是分动态和静态的</strong></p>
+<p><strong>在多核模式下，为了防止加锁带来的性能损失，每个CPU核都有自己的调度队列</strong></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/linux/" class="print-no-link">#linux</a>
+      
+        <a href="/tags/%E8%BF%9B%E7%A8%8B/" class="print-no-link">#进程</a>
+      
+        <a href="/tags/%E8%B0%83%E5%BA%A6/" class="print-no-link">#调度</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>O(1)和CFS调度算法简介</div>
+      <div>http://example.com/2024/12/12/O1和CFS调度算法简介/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年12月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/" title="Redis学习——持久化技术">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis学习——持久化技术</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/11/ubuntu22%E5%AE%89%E8%A3%85docker%E5%B9%B6%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F/" title="ubuntu22安装docker并配置镜像">
+                        <span class="hidden-mobile">ubuntu22安装docker并配置镜像</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

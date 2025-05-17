@@ -1,0 +1,852 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="OpenGL阴影映射技术介绍——SM、PCF、PCSS、VSM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenGL阴影映射技术介绍">
+<meta property="og:url" content="http://example.com/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="OpenGL阴影映射技术介绍——SM、PCF、PCSS、VSM">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D.png">
+<meta property="article:published_time" content="2024-12-02T10:16:20.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.068Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="opengl">
+<meta property="article:tag" content="阴影映射">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D.png">
+  
+  
+  
+  <title>OpenGL阴影映射技术介绍 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="OpenGL阴影映射技术介绍"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-12-02 18:16" pubdate>
+          2024年12月02日, 6:16 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          2.1k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">OpenGL阴影映射技术介绍</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="opengl阴影映射技术介绍">OpenGL阴影映射技术介绍</h1>
+<h2 id="sm">SM</h2>
+<p><strong>概述：</strong> Shadow
+Mapping，最基本的阴影算法之一，通过使用光源的视角渲染场景的深度信息来生成阴影，其核心思想时将光源的深度信息存储在一个深度贴图中，在进行渲染时，利用该深度信息来判断每个片段是否在阴影中</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>生成深度贴图：对场景进行一次光源视角的渲染，生成一个深度贴图，该贴图存储了光源照射到场景中的每个像素的深度值
+<ul>
+<li>在光源的视角中，进行正交或透视投影渲染</li>
+<li>将深度值存储在深度贴图中</li>
+</ul></li>
+<li>使用深度贴图进行阴影测试：在场景的主渲染阶段，首先将每个片段（像素）的世界坐标转换到光源的视角空间，然后在光源的深度贴图查询该位置的深度值，如果当前片段的深度值大于深度贴图中的值，说明该片段在阴影中</li>
+</ol>
+<p><strong>算法实现：</strong></p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs glsl"><span class="hljs-type">float</span> SM(<span class="hljs-type">vec4</span> fragPosLightSpace,<span class="hljs-type">vec3</span> normal,<span class="hljs-type">vec3</span> lightDir,<span class="hljs-type">sampler2D</span> shadowMap)&#123;<br>    <span class="hljs-comment">// 转换为标准齐次坐标 z[-1, 1]</span><br>    <span class="hljs-type">vec3</span> projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;<br>    <span class="hljs-comment">// xyz: [-1, 1] -&gt; [0, 1]</span><br>    projCoords=projCoords*<span class="hljs-number">.5</span>+<span class="hljs-number">.5</span>;<br>    <span class="hljs-comment">// 只要投影向量的z坐标大于1.0或小于0.0，就把shadow设置为1.0(即超出了光源视锥体的最远处，这样最远处也不会处在阴影中，导致采样过多不真实)</span><br>    <span class="hljs-keyword">if</span>(projCoords.z&gt;<span class="hljs-number">1.</span>||projCoords.z&lt;<span class="hljs-number">0.</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    <br>    <span class="hljs-comment">// 从光源视角看到的深度值（从阴影贴图获取</span><br>    <span class="hljs-type">float</span> closestDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy).r;<br>    <span class="hljs-comment">// 从摄像机视角看到的深度值</span><br>    <span class="hljs-type">float</span> currentDepth=projCoords.z;<br>    <span class="hljs-comment">// 偏移量，解决阴影失真的问题, 根据表面朝向光线的角度更改偏移量</span><br>    <span class="hljs-type">float</span> bias=<span class="hljs-built_in">max</span>(<span class="hljs-number">.05</span>*(<span class="hljs-number">1.</span>-<span class="hljs-built_in">dot</span>(normal,lightDir)),<span class="hljs-number">.005</span>);<br>    <span class="hljs-comment">/// 常规做法：如果currentDepth大于closetDepth，说明当前fragment被某个物体遮挡住了，在阴影之中</span><br>    <span class="hljs-type">float</span> shadow=currentDepth-bias&gt;closestDepth?<span class="hljs-number">1.</span>:<span class="hljs-number">0.</span>;<br>    <br>    <span class="hljs-keyword">return</span> shadow;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>效果图：</strong> <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201160122292.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="pcf">PCF</h2>
+<p><strong>概述：</strong> Percentage Closer
+Filter是对阴影贴图的一种后处理技术，用于减少阴影的锯齿状边缘，通过对阴影贴图中的多个样本进行采样，计算它们的平均值，从而实现阴影的模糊过渡</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>多次采样：在阴影测试阶段，针对每个片段，不仅仅检查单个像素的深度值，而是对一个小范围内的小像素进行采样（例如3×3或5×5的采样区域）</li>
+<li>计算平均值：对采样的范围进行阴影测试，如果当前片段大于从深度贴图采样的值，认为其在阴影中，累加到shadow变量中，最后对shadow变量取平均值</li>
+</ol>
+<p><strong>算法实现：</strong></p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs glsl"><span class="hljs-type">float</span> PCF(<span class="hljs-type">vec4</span> fragPosLightSpace,<span class="hljs-type">vec3</span> normal,<span class="hljs-type">vec3</span> lightDir,<span class="hljs-type">sampler2D</span> shadowMap)&#123;<br>    <span class="hljs-comment">// 转换为标准齐次坐标 z[-1, 1]</span><br>    <span class="hljs-type">vec3</span> projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;<br>    <span class="hljs-comment">// xyz: [-1, 1] -&gt; [0, 1]</span><br>    projCoords=projCoords*<span class="hljs-number">.5</span>+<span class="hljs-number">.5</span>;<br>    <span class="hljs-comment">// 只要投影向量的z坐标大于1.0或小于0.0，就把shadow设置为1.0(即超出了光源视锥体的最远处，这样最远处也不会处在阴影中，导致采样过多不真实)</span><br>    <span class="hljs-keyword">if</span>(projCoords.z&gt;<span class="hljs-number">1.</span>||projCoords.z&lt;<span class="hljs-number">0.</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    <br>    <span class="hljs-comment">// 从光源视角看到的深度值（从阴影贴图获取</span><br>    <span class="hljs-type">float</span> closestDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy).r;<br>    <span class="hljs-comment">// 从摄像机视角看到的深度值</span><br>    <span class="hljs-type">float</span> currentDepth=projCoords.z;<br>    <span class="hljs-comment">// 偏移量，解决阴影失真的问题, 根据表面朝向光线的角度更改偏移量</span><br>    <span class="hljs-type">float</span> bias=<span class="hljs-built_in">max</span>(<span class="hljs-number">.05</span>*(<span class="hljs-number">1.</span>-<span class="hljs-built_in">dot</span>(normal,lightDir)),<span class="hljs-number">.005</span>);<br>    <span class="hljs-comment">/// PCF:</span><br>    <span class="hljs-type">float</span> shadow=<span class="hljs-number">0.</span>;<br>    <span class="hljs-comment">// 计算每个纹素的大小</span><br>    <span class="hljs-type">vec2</span> texelSize=<span class="hljs-number">1.</span>/<span class="hljs-built_in">textureSize</span>(shadowMap,<span class="hljs-number">0</span>);<br>    <span class="hljs-comment">// 遍历3x3的邻域</span><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> x=-PCF_RADIUS;x&lt;=PCF_RADIUS;++x)<br>    &#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> y=-PCF_RADIUS;y&lt;=PCF_RADIUS;++y)<br>        &#123;<br>            <span class="hljs-comment">// 从阴影贴图中采样深度值</span><br>            <span class="hljs-type">float</span> pcfDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy+<span class="hljs-type">vec2</span>(x,y)*texelSize).r;<br>            <span class="hljs-comment">// 如果当前片段的深度值大于采样的深度值，则在阴影中</span><br>            shadow+=currentDepth-bias&gt;pcfDepth?<span class="hljs-number">1.</span>:<span class="hljs-number">0.</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// 计算平均阴影值</span><br>    <span class="hljs-type">float</span> total=<span class="hljs-number">2</span>*PCF_RADIUS+<span class="hljs-number">1</span>;<br>    shadow/=(total*total);<br>    <br>    <span class="hljs-keyword">return</span> shadow;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>特点：</strong>
+PCF的优点是相对简单，但可能会导致较为模糊的阴影，且在高分辨率阴影贴图上会更有效。</p>
+<p><strong>效果图：</strong> <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201161755195.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="pcss">PCSS</h2>
+<p><strong>概述：</strong> Percentage Closer Soft
+Shadows是一种基于PCF的扩展，旨在生成更自然的软阴影效果。PCSS通过在阴影贴图的采样过程中引入光源半径的概念，来根据片段距离光源的远近来调整阴影的柔和成都</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>计算光源的大小：由于距离光源较远的区域阴影边缘应该更加模糊，PCSS根据光源的大小（即阴影的投射区域）来动态调整阴影的软化程度</li>
+<li>应用阴影半径：对于每个片段，计算该片段距离光源的距离，并基于该距离来调整PCF的采样区域大小。距离较远的片段采用较大的采样区域，从而产生更软的阴影</li>
+</ol>
+<p><strong>算法实现：</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">float</span> <span class="hljs-title">PCSS</span><span class="hljs-params">(vec4 fragPosLightSpace,vec3 normal,vec3 lightDir,sampler2D shadowMap)</span></span>&#123;<br>    <span class="hljs-comment">// 转换为标准齐次坐标 z[-1, 1]</span><br>    vec3 projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;<br>    <span class="hljs-comment">// xyz: [-1, 1] -&gt; [0, 1]</span><br>    projCoords=projCoords*<span class="hljs-number">.5</span><span class="hljs-number">+.5</span>;<br>    <span class="hljs-comment">// 只要投影向量的z坐标大于1.0或小于0.0，就把shadow设置为1.0(即超出了光源视锥体的最远处，这样最远处也不会处在阴影中，导致采样过多不真实)</span><br>    <span class="hljs-keyword">if</span>(projCoords.z&gt;<span class="hljs-number">1.</span>||projCoords.z&lt;<span class="hljs-number">0.</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    <br>    <span class="hljs-comment">// 从光源视角看到的深度值（从阴影贴图获取</span><br>    <span class="hljs-type">float</span> closestDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy).r;<br>    <span class="hljs-comment">// 从摄像机视角看到的深度值</span><br>    <span class="hljs-type">float</span> currentDepth=projCoords.z;<br>    <span class="hljs-comment">// 偏移量，解决阴影失真的问题, 根据表面朝向光线的角度更改偏移量</span><br>    <span class="hljs-type">float</span> bias=<span class="hljs-built_in">max</span>(<span class="hljs-number">.05</span>*(<span class="hljs-number">1.</span>-<span class="hljs-built_in">dot</span>(normal,lightDir)),<span class="hljs-number">.005</span>);<br>    <span class="hljs-comment">/// PCSS:</span><br>    <span class="hljs-comment">// 计算平均遮挡物体的深度值</span><br>    <span class="hljs-type">float</span> avgDepth=<span class="hljs-built_in">findBlocker</span>(projCoords.xy,currentDepth,shadowMap,bias);<br>    <span class="hljs-comment">// 如果没有遮挡物体，则直接返回0.0(不在阴影中)</span><br>    <span class="hljs-keyword">if</span>(avgDepth==<span class="hljs-number">-1.</span>)&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    &#125;<br>    <span class="hljs-comment">// 半影大小</span><br>    <span class="hljs-type">float</span> penumbra=(currentDepth-avgDepth)/avgDepth*lightWidth;<br>    <span class="hljs-comment">// 采样半径</span><br>    <span class="hljs-type">float</span> filterRadius=penumbra*NEAR_PLANE/currentDepth;<br>    <span class="hljs-comment">// PCF</span><br>    filterRadius*=PCFSampleRadius;<br>    <span class="hljs-type">float</span> shadow=<span class="hljs-number">0.</span>;<br>    <span class="hljs-comment">// 计算每个纹素的大小</span><br>    vec2 texelSize=<span class="hljs-number">1.</span>/<span class="hljs-built_in">textureSize</span>(shadowMap,<span class="hljs-number">0</span>);<br>    <span class="hljs-comment">// 遍历邻域</span><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> x=-PCF_RADIUS;x&lt;=PCF_RADIUS;++x)<br>    &#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> y=-PCF_RADIUS;y&lt;=PCF_RADIUS;++y)<br>        &#123;<br>            <span class="hljs-comment">// 从阴影贴图中采样深度值</span><br>            <span class="hljs-type">float</span> shadowMapDepth=<span class="hljs-built_in">texture</span>(shadowMap,projCoords.xy+filterRadius*<span class="hljs-built_in">vec2</span>(x,y)*texelSize).r;<br>            <span class="hljs-comment">// 如果当前片段的深度值大于采样的深度值，则在阴影中</span><br>            shadow+=currentDepth-bias&gt;shadowMapDepth?<span class="hljs-number">1.</span>:<span class="hljs-number">0.</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// 计算平均阴影值</span><br>    <span class="hljs-type">float</span> total=<span class="hljs-number">2</span>*PCF_RADIUS<span class="hljs-number">+1</span>;<br>    shadow/=(total*total);<br>    <br>    <span class="hljs-keyword">return</span> shadow;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>特点：</strong>
+PCSS能够产生更加平滑和逼真的阴影效果，但相对于普通的PCF，计算开销较大。</p>
+<p><strong>效果图：</strong> <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241201204040348.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="vsm">VSM</h2>
+<p><strong>概述：</strong> Variance Shadow Mapping
+是一种通过利用方差来改进传统阴影贴图的方法，与传统的阴影贴图不同，VSM使用每个光源的深度值的均值和方差来创建阴影，这样可以在计算中处理阴影的模糊化，同时避免了对深度贴图的多次采样</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>存储深度和方差：在深度贴图中，不仅存储每个像素的深度值，还存储该深度值的方差，这样，光源照射到场景中的区域可以通过方差值来表示阴影的软化程度
+<ul>
+<li>第一通道存储深度值(z)</li>
+<li>第二通道存储深度值的方差(<span
+class="math inline">\(\delta^2\)</span>)</li>
+</ul></li>
+<li>深度比较：在片段着色器中，使用一个不等式来判断一个片段是否被阴影遮挡，由于存储了方差，阴影边缘会变得更平滑</li>
+</ol>
+<p><strong>算法实现：</strong></p>
+<ul>
+<li>需要两个纹理来存储对应点周围区域内的方差和均值</li>
+<li>两趟pass可以把每个点的复杂度从<span
+class="math inline">\((2R+1)^2\)</span>降到<span
+class="math inline">\((4R+2)\)</span></li>
+</ul>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs glsl"><span class="hljs-type">float</span> VSM(<span class="hljs-type">vec4</span> fragPosLightSpace,<span class="hljs-type">vec3</span> normal,<span class="hljs-type">vec3</span> lightDir,<span class="hljs-type">sampler2D</span> d_d2_filter)&#123;<br>    <span class="hljs-type">vec3</span> projCoords=fragPosLightSpace.xyz/fragPosLightSpace.w;<br>    <span class="hljs-comment">// [-1, 1] =&gt; [0, 1]</span><br>    projCoords=projCoords*<span class="hljs-number">.5</span>+<span class="hljs-number">.5</span>;<br>    <span class="hljs-keyword">if</span>(projCoords.z&gt;<span class="hljs-number">1.</span>||projCoords.z&lt;<span class="hljs-number">0.</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0.</span>;<br>    <br>    depth=projCoords.z;<br>    <br>    <span class="hljs-comment">// 从模糊后的纹理中获得深度值均值和方差</span><br>    d_d2=<span class="hljs-built_in">texture</span>(d_d2_filter,projCoords.xy).rg;<br>    <span class="hljs-type">float</span> var=d_d2.y-d_d2.x*d_d2.x;<span class="hljs-comment">// E(X-EX)^2 = EX^2-E^2X</span><br>    <br>    <span class="hljs-comment">// 偏移量，解决阴影失真的问题, 根据表面朝向光线的角度更改偏移量</span><br>    <span class="hljs-type">float</span> bias=<span class="hljs-built_in">max</span>(<span class="hljs-number">.05</span>*(<span class="hljs-number">1.</span>-<span class="hljs-built_in">dot</span>(normal,lightDir)),<span class="hljs-number">.005</span>);<br>    <span class="hljs-comment">// float bias=.005;</span><br>    <span class="hljs-type">float</span> visibility;<br>    <span class="hljs-keyword">if</span>(depth-bias&lt;d_d2.x)&#123;<br>        visibility=<span class="hljs-number">1.</span>;<span class="hljs-comment">// 没有阴影</span><br>    &#125;<br>    <span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-comment">// 使用切比雪夫不等式计算阴影</span><br>        <span class="hljs-type">float</span> t_minus_mu=depth-d_d2.x;<br>        visibility=var/(var+t_minus_mu*t_minus_mu);<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1.</span>-visibility;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>特点：</strong>
+VSM能提供相对较好的阴影效果，且具有较低的计算开销，但可能会面临一些噪声问题，特别是在低对比度区域</p>
+<p><strong>效果图：</strong> <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160611579.png" srcset="/img/loading.gif" lazyload class=""></p>
+<p><strong>与PCSS对比：</strong></p>
+<p>PCSS： <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160757509.png" srcset="/img/loading.gif" lazyload class=""></p>
+<p>VSM: <img src="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/image-20241202160922226.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h2 id="csm">CSM</h2>
+<p><strong>概述：</strong> Cascaded shadow map(联级阴影贴图)</p>
+<p>（待补充）</p>
+<h2 id="其他">其他</h2>
+<p><strong>参考：</strong></p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://learnopengl-cn.github.io/05%20Advanced%20Lighting/03%20Shadows/01%20Shadow%20Mapping/">阴影映射
+- LearnOpenGL CN</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://banbao991.github.io/2021/06/18/CG/Algorithm/SM-PCF-PCSS-VSM/#阴影算法的实现">阴影算法的实现(SM、PCF、PCSS、VSM)
+| Banbao</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://blog.csdn.net/m0_56399931/article/details/123593345">算法复现：OpenGL-ShadowMap/PCSS/CSM_opengl
+csm-CSDN博客</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/OpenGL/" class="category-chain-item">OpenGL</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/opengl/" class="print-no-link">#opengl</a>
+      
+        <a href="/tags/%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84/" class="print-no-link">#阴影映射</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>OpenGL阴影映射技术介绍</div>
+      <div>http://example.com/2024/12/02/OpenGL阴影映射技术介绍/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年12月2日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/05/Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Linux Cgroup学习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Linux Cgroup学习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/11/28/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="机器学习期末复习笔记">
+                        <span class="hidden-mobile">机器学习期末复习笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

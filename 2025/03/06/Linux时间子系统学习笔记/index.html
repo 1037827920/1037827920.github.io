@@ -1,0 +1,954 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="简要介绍linux中的时间子系统，涉及到clocksource、clocksource等知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux时间子系统学习笔记">
+<meta property="og:url" content="http://example.com/2025/03/06/Linux%E6%97%B6%E9%97%B4%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="简要介绍linux中的时间子系统，涉及到clocksource、clocksource等知识">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/Linux%E6%97%B6%E9%97%B4%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+<meta property="article:published_time" content="2025-03-06T06:28:26.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.047Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="time">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/Linux%E6%97%B6%E9%97%B4%E5%AD%90%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+  
+  
+  
+  <title>Linux时间子系统学习笔记 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Linux时间子系统学习笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-03-06 14:28" pubdate>
+          2025年03月06日, 2:28 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          3.1k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Linux时间子系统学习笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="时间子系统">时间子系统</h1>
+<p><strong>概述：</strong>
+主要负责时间管理、时钟源选择、计时器事件处理、时间同步等核心功能。</p>
+<h2 id="时钟源">时钟源</h2>
+<h3 id="简介">简介</h3>
+<p><strong>概述：</strong>
+是硬件计时器，用于提供高精度、连续不断的计数值，常用的时钟源包括TSC（跟cpu频率相关，且通过hpet等其他时钟源校准tsc频率）、HPET、ACPI定时器等。内核在启动过程中会探测可用的时钟源，并选择精度高、稳定性好的作为系统的主要时间计数器。</p>
+<p><strong>作用：</strong>
+内核利用时钟源的计数值计算经过的时间，通过将计数器的变化量转换为实际时间（通常通过除以配置的时钟频率CONFIG_HZ），从而维护系统时间和其他时间相关功能。</p>
+<p><strong>物理时钟源：</strong></p>
+<ul>
+<li>rtc：独立于CPU的实时时钟，通常用于保存系统时间。由电池供电，即使在系统断电时也能持续运行。系统会在启动时从RTC读取当前时间，作为系统时间的初始值，并在关机或定期校正时将系统时间写回RTC。</li>
+<li>tsc：x86
+CPU内置的时间戳计数器，精度高但可能不稳定（多核同步问题）</li>
+<li>hpet：高精度定时器</li>
+<li>acpi pm timer：用于acpi电源管理，精度低但稳定</li>
+</ul>
+<p><strong>虚拟时钟源：</strong></p>
+<ul>
+<li>kvm-clock：KVM提供的高效时钟源，适用于KVM/QEMU虚拟机，减少VM-Exit，提高精度</li>
+<li>xen-clocksource：Xen虚拟机环境下的时钟源</li>
+<li>hypervclock：Microsoft Hyper-V提供的时钟源</li>
+</ul>
+<p><strong>时钟源选择：</strong></p>
+<ul>
+<li>通过/sys/devices/system/clocksource/clocksource0/current_clocksource选择时钟源</li>
+<li>cat /proc/uptime也可以间接反映时钟源的精度</li>
+</ul>
+<h3 id="tsc">TSC</h3>
+<p><strong>概述：</strong> 现代cpu通常支持invariant
+tsc，即TSC的计数速率固定，不受CPU频率变化影响，如果硬件满足这一条件，linux内核通常会优先选择TSC作为主时钟源，因为其开销低且读取迅速</p>
+<p><strong>怎么读取tsc值：</strong></p>
+<ul>
+<li>直接使用汇编指令<code>rdtsc</code>
+：tsc是一个64位的寄存器，自系统启动后开始计数，每个时钟周期递增。rdtsc的作用就是将这个计数器的当前值读取出来。</li>
+<li>内核态中可以使用<code>tsc_read_refs</code>函数：这个在上面汇编指令的基础上进一步做一个高级抽象的时钟源，原因：
+<ul>
+<li>linux内核不仅可能使用tsc，也可能使用hpet等其他时钟源，这样做抽象方便管理</li>
+<li>校准与转换：直接读取返回的是时钟周期数，要需要进一步进行转换为标准的时间单位（如纳秒），以便在调度、定时器和用户空间应用中使用一致的时间格式</li>
+<li>保证单调性与跨核一致性：多核系统中，各个核心tsc可能不同步或存在细微差别，在tsc抽象实现中会采取相应措施保证单调性和一致性（比如rdtsc指令本身是非序列化的，可以配合其他指令（CPUID或RDTSCP）确保时间戳读取的顺序）</li>
+</ul></li>
+<li>用户态可以使用<code>clock_gettime</code>系统调用：linux内核一般会选tsc</li>
+</ul>
+<h3 id="稳定性检测">稳定性检测</h3>
+<p><strong>频率漂移检测：</strong></p>
+<ul>
+<li>内核会定期测量不同时钟源的频率，并对比它们之间的偏差</li>
+<li>例如，TSC可能会受到CPU频率调节影响，因此会与HPET、ACPI PM
+Timer等参考时钟进行对比</li>
+<li>若发现某个时钟源的频率偏差超出允许范围，则可能会被降级或禁用</li>
+</ul>
+<p><strong>单调性检查：</strong>
+内核会确保时钟源的时间值是单调递增的，不能出现回退现象</p>
+<p><strong>时间跳变检测：</strong>
+通过定期对比系统时间与参考时钟（如NTP服务器），检测是否出现了异常跳变</p>
+<p><strong>多核一致性检测：</strong>
+对于TSC，linux会检测多个CPU核心的TSC是否同步，以防止不同核心返回的TSC不一致</p>
+<p><strong>定期重新校准：</strong>
+linux可能会周期性地使用hpet活外部时钟（NTP）重新校准TSC</p>
+<h3 id="kvm-clock">kvm-clock</h3>
+<p><strong>概述：</strong>
+KVM提供的一个半虚拟化时钟源，其核心目的是为guest
+os提供一个高效、低开销、尽可能准确的计时机制。避免传统硬件时钟（如TSC、HPET）在虚拟化场景中可能遇到的同步、漂移或性能问题。【本质上其实也依赖于TSC吧，只是依赖的host
+os的tsc，可能误差更小】</p>
+<p><strong>工作原理：</strong></p>
+<ul>
+<li>共享内存区域：
+<ul>
+<li>Guest
+OS在初始化时会为kvm-clock分配一段共享内存，这块内存区域是由hypervisor（例如qemu/kvm）映射给guest</li>
+<li>该区域存储一个数据结构（<code>pvclock_vcpu_time_info</code>），其中包含当前的tsc值，系统时间、以及一些转换参数（如<code>tsc_to_system_mul</code>和<code>tsc_shift</code>）</li>
+<li>Guest通过读取这个共享区域，就可以直接获得当前时间，而不需要进行昂贵的系统调用或VM
+Exit</li>
+</ul></li>
+<li>主机与客机时间同步：
+<ul>
+<li>Hypervisor定期更新这块共享内存区域，确保guest看到的时间与host系统时间保持一致</li>
+<li>不仅降低了guest
+os对硬件时钟的依赖，而且可以减少虚拟化带来的时间漂移问题</li>
+</ul></li>
+<li>效率与精度：
+<ul>
+<li>由于 kvm-clock 利用共享内存而非每次调用硬件寄存器（如
+TSC），因此能够避免频繁的虚拟机退出（VM Exit），降低延迟。</li>
+<li>同时，通过对 TSC 值进行适当转换，kvm-clock
+能够提供一个相对稳定、单调递增的时钟源，即使在 CPU
+频率变动或多核环境下也能维持较高的精度。</li>
+</ul></li>
+</ul>
+<p><strong>实现细节：</strong></p>
+<ul>
+<li><p>数据结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">pvclock_vcpu_time_info</span> &#123;</span><br>    u32   version;<br>    u32   pad0;<br>    u64   tsc_timestamp;<br>    u64   system_time;<br>    u32   tsc_to_system_mul;<br>    s8    tsc_shift;<br>    u8    flags;<br>    u8    pad[<span class="hljs-number">2</span>];<br>&#125; __attribute__((__packed__));<br></code></pre></td></tr></table></figure>
+<ul>
+<li>version：用于保证读取时的一致性（类似双缓冲机制）</li>
+<li>tsc_timestamp：记录了上次更新时间时的 TSC 值。</li>
+<li>system_time：对应的系统时间（通常以纳秒为单位）</li>
+<li>tsc_to_system_mul和tsc_shift：用于将 TSC
+增量转换为系统时间的比例因子</li>
+</ul></li>
+<li><p>更新策略：Hypervisor
+并不会在每次时间查询时都更新这块区域，而是在关键事件（如 VM
+启动、迁移、或其他时间敏感操作后）进行更新，以减少性能开销。</p></li>
+</ul>
+<p><strong>优缺点：</strong></p>
+<ul>
+<li><p>优点：</p>
+<ul>
+<li>低开销：共享内存的访问非常快，避免了 VM Exit</li>
+<li>高效性：减少了依赖传统硬件时钟带来的额外延迟</li>
+<li>单调性：提供一个单调递增的时间源，对时间敏感型应用（例如网络协议、会话管理）非常关键</li>
+</ul></li>
+<li><p>缺点：</p>
+<ul>
+<li><p>依赖host os更新：如果 hypervisor 更新不及时，guest
+可能会遇到时间漂移问题。</p></li>
+<li><p>特殊场景问题：在某些情况下（如热添加 CPU 等操作），kvm-clock
+可能会暴露出时间回退或不一致的问题，需要内核补丁或额外配置加以解决</p>
+<blockquote>
+<p>新加入的vCPU并不会立即与已有的vCPU同步它们的kvm-clock状态</p>
+</blockquote></li>
+</ul></li>
+</ul>
+<h2 id="时钟事件">时钟事件</h2>
+<h3 id="简介-1">简介</h3>
+<p><strong>功能：</strong>
+时钟事件设备负责生成定时中断，用以触发内核中断各类定时任务，例如，任务调度、定时器超时处理以及高精度定时器的触发都依赖于时钟事件设备（比如APIC定时器设备）</p>
+<p><strong>抽象接口：</strong>
+linux为了兼容不同硬件平台，定义了统一的时钟事件接口，这样无论底层硬件如何差异化，内核上层的定时器管理和调度代码都能以相同的方式调用，极大提高代码的可移植性和维护性</p>
+<h2 id="计时器">计时器</h2>
+<p><strong>周期性计时器：</strong></p>
+<ul>
+<li>jiffies：是一个全局计时变量，用来记录自系统启动以来经过的时钟tick数，虽然jiffies本身不是以秒为单位的，但通过与时钟频率(HZ)的结合，可以方便地将其转换为秒数或其他时间单位。本身单位是ticks，在内核中通过HZ来定义，一个tick通常是100或1000，这意味着每秒会有100或1000次jiffies更新，可以说是0.1ms或1ms（而HPET和ACPI
+PM Timer的单位为ns，可见精度更高）</li>
+<li>tickless（NO_HZ模式）：允许系统在空闲时关闭定时器，降低功耗。系统在空闲状态下不再产生周期性中断，而是根据定时器的到期时间动态安排中断，从而减少不必要的中断开销，并改善系统在低功耗状态下的表现。</li>
+</ul>
+<p><strong>高精度计时器：</strong></p>
+<ul>
+<li>提供纳秒级精度，例如hpet等</li>
+</ul>
+<p><strong>定时器中断：</strong></p>
+<ul>
+<li>由硬件触发，如APIC timer、PIT（可编程间隔定时器）</li>
+</ul>
+<h2 id="时间管理">时间管理</h2>
+<h3 id="系统时间">系统时间</h3>
+<p><strong>墙上时间：</strong>
+指的是系统的“当前时间”，通常由<code>CLOCK_REALTIME</code>表示。反映了真实世界的时间，这个时间可以通过系统管理员手动设置、从硬件实时时钟(RTC)读取，或者通过网络时间协议（NTP）以及HPET等进行矫正</p>
+<p><strong>单调时间：</strong>
+是一个只会不断递增、不受外部时间调整影响的时间计数。通常由CLOCK_MONOTONIC提供，主要特点：</p>
+<ul>
+<li>始终递增：无论系统时间如何调整，它总是保证不会倒退</li>
+<li>适合测量时间间隔：用于计算事件之间的持续时间、超时或调度，而不必担心因墙上时间被修改而导致错误</li>
+</ul>
+<p><strong>二者区别：</strong></p>
+<ul>
+<li>使用场景：
+<ul>
+<li>墙上时间：适合需要显示或记录“真实”时间的应用，如日志记录、文件时间戳、用户界面显示等</li>
+<li>单调时间：适合需要精确测量事件间隔的长i纪念馆，如性能测试、任务调度、超时管理等</li>
+</ul></li>
+<li>底层实现：
+<ul>
+<li>墙上时间：依赖于硬件时钟(RTC)以及系统软件对时间的同步和矫正机制</li>
+<li>单调时间：依赖于系统内部的高精度计时器（如TSC、HPET或其他硬件时钟），并经过内核抽象层保证其单调性和一致性</li>
+</ul></li>
+</ul>
+<h3 id="时钟同步">时钟同步</h3>
+<p><strong>NTP与时间平滑调整：</strong>
+系统时间可能会因网络时间同步(NTP)而进行调整，为了防止时间突然跳变（如突然回调或前移），内核采用slewing算法来平滑调整系统时间，使得时间校正过程对应用层的影响降到最低</p>
+<p><strong>多处理器同步：</strong>
+在SMP系统中，确保各个CPU核心时间一致性是非常关键的。内核通过同步机制使得所有核心共享同一时间基准，避免因各核心时间不同步而引发调度和资源竞争问题</p>
+<h2 id="watchdog">Watchdog</h2>
+<p><strong>目的：</strong>
+确保系统使用的时钟源稳定且精确。因为时钟源直接影响到系统时间的计算和更新，所以必须排除那些在短时间内发生大幅偏差的不可靠时钟源</p>
+<p><strong>背景：</strong>
+在系统启动过程中，内核会注册多个clocksource，每个clocksource都会被赋予一个rating，表示它的精度和稳定性。为了避免由于硬件故障或环境因素导致某个时钟源计数异常，内核引入了watchdog机制来动态监控各个clocksource的表现</p>
+<p><strong>实现原理：</strong></p>
+<ol type="1">
+<li>周期性检测：watchdog会定期检查所有支持watchdog功能的clocksource。他会读取当前的周期计数值，并与前一次检查时保存的值进行比较</li>
+<li>预期增量计算：根据clocksource的已知频率、mult和shift参数，内核可以将计数器的增量转换为经过的时间，此时就有一个“预期”的时间增量值</li>
+<li>偏差比较：如果实际读出的增量与预期值之间的差异超过了预定义的阈值，则认为该时钟源存在问题。</li>
+<li>动态降级与选择：在检测到偏差过大时，watchdog会降低clocksource的rating，从而防止它被选为当前系统的主要时钟源。然后watchdog会选择rating更高的时钟源作为系统时间的基础</li>
+</ol>
+<blockquote>
+<p>简单来说，所有支持watchdog的clocksource都会被加入一个list，内核利用定时器或专用内核线程定期遍历该列表</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/linux/" class="print-no-link">#linux</a>
+      
+        <a href="/tags/time/" class="print-no-link">#time</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Linux时间子系统学习笔记</div>
+      <div>http://example.com/2025/03/06/Linux时间子系统学习笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年3月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/03/06/Linux%E4%B8%AD%E7%9A%84SMEP/" title="Linux中的SMEP&amp;SMAP">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Linux中的SMEP&amp;SMAP</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/02/27/%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E7%9A%84%E6%96%B9%E5%BC%8F/" title="进程间通信的方式">
+                        <span class="hidden-mobile">进程间通信的方式</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

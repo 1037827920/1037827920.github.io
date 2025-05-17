@@ -1,0 +1,885 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="引用计数Rc 概述： Rc是Rust中用于实现引用计数的类型，它允许多个所有者共享同一个数据。 用法详解：  每当clone一个Rc时，引用计数增加，而每当一个Rc退出作用域时，引用计数减少。 当引用计数变为0时，Rc和它所包裹的数据都会被销毁。 Rc的clone不会进行深拷贝，指创建另一个指向包裹值的指针，并增加引用计数  示例： 12345678910111213141516171819202">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rust中的Rc, Cell, RefCell">
+<meta property="og:url" content="http://example.com/2025/01/15/Rust%E4%B8%AD%E7%9A%84RcCellRefCell/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="引用计数Rc 概述： Rc是Rust中用于实现引用计数的类型，它允许多个所有者共享同一个数据。 用法详解：  每当clone一个Rc时，引用计数增加，而每当一个Rc退出作用域时，引用计数减少。 当引用计数变为0时，Rc和它所包裹的数据都会被销毁。 Rc的clone不会进行深拷贝，指创建另一个指向包裹值的指针，并增加引用计数  示例： 12345678910111213141516171819202">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/Rust%E4%B8%AD%E7%9A%84Rc,%20Cell,%20RefCell.png">
+<meta property="article:published_time" content="2025-01-15T14:04:45.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.074Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="rc">
+<meta property="article:tag" content="cell">
+<meta property="article:tag" content="refcell">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/Rust%E4%B8%AD%E7%9A%84Rc,%20Cell,%20RefCell.png">
+  
+  
+  
+  <title>Rust中的Rc, Cell, RefCell - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Rust中的Rc, Cell, RefCell"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-15 22:04" pubdate>
+          2025年01月15日, 10:04 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          1.7k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Rust中的Rc, Cell, RefCell</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="引用计数rc">引用计数Rc</h1>
+<p><strong>概述：</strong>
+Rc是Rust中用于实现引用计数的类型，它允许多个所有者共享同一个数据。</p>
+<p><strong>用法详解：</strong></p>
+<ul>
+<li>每当clone一个Rc时，引用计数增加，而每当一个Rc退出作用域时，引用计数减少。</li>
+<li>当引用计数变为0时，Rc和它所包裹的数据都会被销毁。</li>
+<li>Rc的clone不会进行深拷贝，指创建另一个指向包裹值的指针，并增加引用计数</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::rc::Rc;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">rc_examples</span> = <span class="hljs-string">&quot;Rc examples&quot;</span>.<span class="hljs-title function_ invoke__">to_string</span>();<br>    &#123;<br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;rc_a is created&quot;</span>);<br>        <br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">rc_a</span>: Rc&lt;<span class="hljs-type">String</span>&gt; = Rc::<span class="hljs-title function_ invoke__">new</span>(rc_examples);<br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Reference Count of rc_a: &#123;&#125;&quot;</span>, Rc::<span class="hljs-title function_ invoke__">strong_count</span>(&amp;rc_a)); <br><br>        &#123;<br>            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;rc_a is cloned to rc_b&quot;</span>);<br><br>            <span class="hljs-keyword">let</span> <span class="hljs-variable">rc_b</span>: Rc&lt;<span class="hljs-type">String</span>&gt; = Rc::<span class="hljs-title function_ invoke__">clone</span>(&amp;rc_a);<br>            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Reference Count of rc_b: &#123;&#125;&quot;</span>, Rc::<span class="hljs-title function_ invoke__">strong_count</span>(&amp;rc_b));<br>            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Reference Count of rc_a: &#123;&#125;&quot;</span>, Rc::<span class="hljs-title function_ invoke__">strong_count</span>(&amp;rc_a));<br><br>            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;rc_a and rc_b are equal: &#123;&#125;&quot;</span>, rc_a.<span class="hljs-title function_ invoke__">eq</span>(&amp;rc_b));<br>            <span class="hljs-comment">// 可以直接使用值的方法</span><br>            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Length of the value inside rc_a: &#123;&#125;&quot;</span>, rc_a.<span class="hljs-title function_ invoke__">len</span>());<br>            <span class="hljs-comment">// 直接使用值</span><br>            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Value of rc_b: &#123;&#125;&quot;</span>, rc_b);<br><br>            <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;rc_b is dropped out of scope&quot;</span>);<br>        &#125;<br><br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Reference Count of rc_a: &#123;&#125;&quot;</span>, Rc::<span class="hljs-title function_ invoke__">strong_count</span>(&amp;rc_a));<br><br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;rc_a is dropped out of scope&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h1 id="cell和refcell">Cell和RefCell</h1>
+<p><strong>概述：</strong>
+Rust编译器通过严格的借用规则（多个不可变引用或只有一个可变引用存在）确保程序安全性，但是会降低灵活性。因此提供了Cell和RefCell类型，允许在不可变引用的情况下修改数据。内部是通过unsafe代码实现的</p>
+<h2 id="cell">Cell</h2>
+<p><strong>概述：</strong>
+Cell和RefCell在功能上没有区别，区别在于Cell&lt;T&gt;适用于T实现Copy的情况</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::cell::Cell;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">c</span> = Cell::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-string">&quot;asdf&quot;</span>);<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">one</span> = c.<span class="hljs-title function_ invoke__">get</span>();<br>    c.<span class="hljs-title function_ invoke__">set</span>(<span class="hljs-string">&quot;qwer&quot;</span>);<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">two</span> = c.<span class="hljs-title function_ invoke__">get</span>();<br>    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;&#125;, &#123;&#125;&quot;</span>, one, two);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>asdf是&amp;str类型，实现了Copy
+trait，取到值保存在one变量后，还能同时进行修改，这个违背了Rust的借用规则，但通过Cell就能做到这一点</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">c</span> = Cell::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-type">String</span>::<span class="hljs-title function_ invoke__">from</span>(<span class="hljs-string">&quot;asdf&quot;</span>));<br></code></pre></td></tr></table></figure>
+<p>这段代码编译器会报错，因为String没有实现Copy trait</p>
+<h2 id="refcell">RefCell</h2>
+<table>
+
+<thead>
+<tr>
+<th>Rust规则</th>
+<th>智能指针带来的额外规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一个数据只有一个所有者</td>
+<td>Rc/Arc让一个数据可以拥有多个所有者</td>
+</tr>
+<tr>
+<td>要么多个不可变借用，要么一个可变借用</td>
+<td>RefCell实现编译器可变、不可变引用共存</td>
+</tr>
+<tr>
+<td>违背规则导致编译错误</td>
+<td>违背规则导致运行时panic</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::cell::RefCell;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">s</span> = RefCell::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-type">String</span>::<span class="hljs-title function_ invoke__">from</span>(<span class="hljs-string">&quot;hello, wolrd&quot;</span>));<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">s1</span> = s.<span class="hljs-title function_ invoke__">borrow</span>();<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">s2</span> = s.<span class="hljs-title function_ invoke__">borrow_mut</span>();<br>    <br>    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;&#125;,&#123;&#125;&quot;</span>, s1, s2);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>上面这段代码不会出现编译错误，但是运行时会panic</p>
+<p><strong>RefCell为何存在？</strong></p>
+<p>从上面看，通过RefCell并不能绕过rust的借用规则，那还有什么用？</p>
+<p>对于大型的复杂程序，可以选择使用RefCell来让事情简化。在Rust编译器的<a
+target="_blank" rel="noopener" href="https://github.com/rust-lang/rust/blob/620d1ee5346bee10ba7ce129b2e20d6e59f0377d/src/librustc/middle/ty.rs#L803-L987">ctxt结构体</a>中有大量的RefCell类型的map字段，主要原因是这些map会被分散在各个地方的代码片段所广泛使用或修改，很容易就碰到编译器跑出来的各种错误，但是你不知道如何解决。这时候可以使用RefCell，在运行时发现这些错误，因为一旦有的代码使用不正确，就会panic，我们就知道哪里借用冲突了。</p>
+<h2 id="cell-or-refcell">Cell or RefCell</h2>
+<p><strong>主要区别：</strong></p>
+<ul>
+<li>Cell只适用于实现了Copy
+trait类型，用于提供值，而RefCell用于提供引用</li>
+<li>Cell不会panic，而RefCell会在运行时panic</li>
+</ul>
+<p><strong>性能比较：</strong></p>
+<p>Cell没有额外的开销，下面两段代码的性能是一样的</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// code 1</span><br><span class="hljs-keyword">let</span> <span class="hljs-variable">x</span> = Cell::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-number">1</span>);<br><span class="hljs-keyword">let</span> <span class="hljs-variable">y</span> = &amp;x;<br><span class="hljs-keyword">let</span> <span class="hljs-variable">z</span> = &amp;x;<br>x.<span class="hljs-title function_ invoke__">set</span>(<span class="hljs-number">2</span>);<br>y.<span class="hljs-title function_ invoke__">set</span>(<span class="hljs-number">3</span>);<br>z.<span class="hljs-title function_ invoke__">set</span>(<span class="hljs-number">4</span>);<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>, x.<span class="hljs-title function_ invoke__">get</span>());<br><br><span class="hljs-comment">// code 2</span><br><span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">x</span> = <span class="hljs-number">2</span>;<br><span class="hljs-keyword">let</span> <span class="hljs-variable">y</span> = &amp;<span class="hljs-keyword">mut</span> x;<br><span class="hljs-keyword">let</span> <span class="hljs-variable">z</span> = &amp;<span class="hljs-keyword">mut</span> x;<br>x = <span class="hljs-number">2</span>;<br>*y = <span class="hljs-number">3</span>;<br>*z = <span class="hljs-number">4</span>;<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;&#125;&quot;</span>, x);<br></code></pre></td></tr></table></figure>
+<p>但是代码2不能编译成功，因为只能存在一个可变引用</p>
+<h2 id="内部可变性">内部可变性</h2>
+<p><strong>概述：</strong>
+对一个不可变的值进行可变借用，就是内部可变性</p>
+<p><strong>无内部可变性：</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">x</span> = <span class="hljs-number">5</span>;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">y</span> = &amp;<span class="hljs-keyword">mut</span> x;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>尝试对一个不可变值进行可变借用，破坏了Rust的借用规则</p>
+<p><strong>RefCell应用场景：</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// 定义在外部库的trait</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">trait</span> <span class="hljs-title class_">Messnger</span> &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">send</span>(&amp;<span class="hljs-keyword">self</span>, msg: <span class="hljs-type">String</span>);<br>&#125;<br><br><span class="hljs-comment">// 我们自己写的代码</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">MsgQueue</span> &#123;<br>    msg_cache: <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">String</span>&gt;,<br>&#125;<br><br><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Messnger</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">MsgQueue</span> &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">send</span>(&amp;<span class="hljs-keyword">self</span>, msg: <span class="hljs-type">String</span>) &#123;<br>        <span class="hljs-keyword">self</span>.msg_cache.<span class="hljs-title function_ invoke__">push</span>(msg);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>上面代码会编译错误，因为需要修改self的msg_cache，但是外部库的self是不可变的self，这时候RefCell就派上用场了。</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::cell::RefCell;<br><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">trait</span> <span class="hljs-title class_">Messnger</span> &#123;<br>	<span class="hljs-keyword">fn</span> <span class="hljs-title function_">send</span>(&amp;<span class="hljs-keyword">self</span>, msg: <span class="hljs-type">String</span>);<br>&#125;<br><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">struct</span> <span class="hljs-title class_">MsgQueue</span> &#123;<br>    msg_cache: RefCell&lt;<span class="hljs-type">Vec</span>&lt;<span class="hljs-type">String</span>&gt;&gt;&gt;,<br>&#125;<br><br><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Messnger</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">MsgQueue</span> &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">send</span>(&amp;<span class="hljs-keyword">self</span>, msg: <span class="hljs-type">String</span>) &#123;<br>        <span class="hljs-keyword">self</span>.msg_cache.<span class="hljs-title function_ invoke__">borrow_mut</span>().<span class="hljs-title function_ invoke__">push</span>(msg);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">mq</span> = MsgQueue &#123;<br>        msg_cache: RefCell::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-type">Vec</span>::<span class="hljs-title function_ invoke__">new</span>());<br>    &#125;;<br>    mq.<span class="hljs-title function_ invoke__">send</span>(<span class="hljs-string">&quot;hello, world&quot;</span>.<span class="hljs-title function_ invoke__">to_string</span>());<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="rcrefcell">Rc+RefCell</h2>
+<p><strong>概述：</strong>
+这是一个很常见的组合，前者可以实现一个数据拥有多个所有者，后者可以实现数据的内部可变性</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::cell::RefCell;<br><span class="hljs-keyword">use</span> std::rc::Rc;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">s</span> = Rc::<span class="hljs-title function_ invoke__">new</span>(RefCell::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-string">&quot;Hello, wolrd&quot;</span>.<span class="hljs-title function_ invoke__">to_string</span>()));<br>    <br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">s1</span> = s.<span class="hljs-title function_ invoke__">clone</span>();<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">s2</span> = s.<span class="hljs-title function_ invoke__">clone</span>();<br>    <br>    s2.<span class="hljs-title function_ invoke__">borrow_mut</span>().<span class="hljs-title function_ invoke__">push_str</span>(<span class="hljs-string">&quot;, on yeah!&quot;</span>);<br>    <br>    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;&#123;:?&#125;\n&#123;:?&#125;\n&#123;:?&#125;&quot;</span>, s, s1, s2);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>性能损耗：</strong></p>
+<p>非常高，大致相当于没有线程安全版本的C++
+std::shared_ptr指针。C++这个指针的主要开销也在于原子性这个并发原语上，毕竟线程安全在哪个语言开销都不小</p>
+<p><strong>内存损耗：</strong></p>
+<p>二者结合的数据结构与下面类似：</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Wrapper</span>&lt;T&gt; &#123;<br>    <span class="hljs-comment">// Rc</span><br>    strong_count: <span class="hljs-type">usize</span>,<br>    weak_count: <span class="hljs-type">usize</span>,<br>    <br>    <span class="hljs-comment">// RefCell</span><br>    borrow_count: <span class="hljs-type">isize</span>,<br>    <br>    <span class="hljs-comment">// 包裹的数据</span><br>    item: T,<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>仅仅多分配了三个usize/isize</p>
+<p><strong>CPU损耗：</strong></p>
+<p>从CPU来看， 损耗如下：</p>
+<ul>
+<li>对Rc&lt;T&gt;解引用是免费的（编译期），但是<code>*</code>带来的间接取值并不免费</li>
+<li>clone
+Rc&lt;T&gt;需要将当前的引用计数跟0和usize::Max进行一次比较，然后将计数值加1</li>
+<li>drop Rc&lt;T&gt;需要将计数值减1，然后跟0进行一次比较</li>
+<li>对RefCell进行不可变借用，需要将isize类型的借用计数加1，然后跟0进行比较</li>
+<li>对RefCell的不可变借用进行释放，需要将isize减1</li>
+<li>对RefCell的可变借用大致跟上面差不多，但需要先跟0比较，然后再减1</li>
+<li>对RefCell的可变借用进行释放，需要将isize加1</li>
+</ul>
+<h2 id="解决借用冲突">解决借用冲突</h2>
+<p><strong>两种方法：</strong></p>
+<ul>
+<li>Cell::from_mut，将&amp;mut T转换为Cell&lt;T&gt;</li>
+<li>Cell::as_slice_of_cells，将&amp;Cell&lt;T&gt;转换为&amp;[Cell&lt;T&gt;]</li>
+</ul>
+<p><strong>常见的借用冲突问题：</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">is_even</span>(i: <span class="hljs-type">i32</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">bool</span> &#123;<br>    i % <span class="hljs-number">2</span> == <span class="hljs-number">0</span><br>&#125;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">retain_even</span>(nums: &amp;<span class="hljs-keyword">mut</span> <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">i32</span>&gt;) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">i</span> = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> <span class="hljs-variable">num</span> <span class="hljs-keyword">in</span> nums.<span class="hljs-title function_ invoke__">iter</span>().<span class="hljs-title function_ invoke__">filter</span>(|&amp;num| <span class="hljs-title function_ invoke__">is_even</span>(num)) &#123;<br>        nums[i] = *num;<br>        i += <span class="hljs-number">1</span>;<br>    &#125;<br>    nums.<span class="hljs-title function_ invoke__">truncate</span>(i);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>会编译错误，因为同时使用了可变借用和不可变借用</p>
+<p>可以通过索引来解决这个问题：</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">fn</span> <span class="hljs-title function_">retain_even</span>(nums: &amp;<span class="hljs-keyword">mut</span> <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">i32</span>&gt;) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">i</span> = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> <span class="hljs-variable">j</span> <span class="hljs-keyword">in</span> <span class="hljs-number">0</span>..nums.<span class="hljs-title function_ invoke__">len</span>() &#123;<br>        <span class="hljs-keyword">if</span> <span class="hljs-title function_ invoke__">is_even</span>(nums[j]) &#123;<br>            nums[i] = nums[j];<br>            i += <span class="hljs-number">1</span>;<br>        &#125;<br>    &#125;<br>    nums.<span class="hljs-title function_ invoke__">truncate</span>(i);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>但这样不够最佳实践，使用迭代器才是最佳实践</p>
+<p>可以使用上面提到的两种方法：</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> std::cell::Cell;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">retain_even</span>(nums: &amp;<span class="hljs-keyword">mut</span> <span class="hljs-type">Vec</span>&lt;<span class="hljs-type">i32</span>&gt;) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">slice</span>: &amp;[Cell&lt;<span class="hljs-type">i32</span>&gt;] = Cell::<span class="hljs-title function_ invoke__">from_mut</span>(&amp;<span class="hljs-keyword">mut</span> nums[..]).<span class="hljs-title function_ invoke__">as_slice_of_cells</span>();<br>    <br>    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">i</span> = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> <span class="hljs-variable">num</span> <span class="hljs-keyword">in</span> slice.<span class="hljs-title function_ invoke__">iter</span>().<span class="hljs-title function_ invoke__">filter</span>(|num| <span class="hljs-title function_ invoke__">is_even</span>(num.<span class="hljs-title function_ invoke__">get</span>())) &#123;<br>        slice[i].<span class="hljs-title function_ invoke__">set</span>(num.<span class="hljs-title function_ invoke__">get</span>());<br>        i += <span class="hljs-number">1</span>;<br>    &#125;<br>    <br>    nums.<span class="hljs-title function_ invoke__">truncate</span>(i);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/rust/" class="category-chain-item">rust</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/rust/" class="print-no-link">#rust</a>
+      
+        <a href="/tags/rc/" class="print-no-link">#rc</a>
+      
+        <a href="/tags/cell/" class="print-no-link">#cell</a>
+      
+        <a href="/tags/refcell/" class="print-no-link">#refcell</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Rust中的Rc, Cell, RefCell</div>
+      <div>http://example.com/2025/01/15/Rust中的RcCellRefCell/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/01/19/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" title="为什么要内存对齐">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">为什么要内存对齐</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/08/%E4%B8%BA%E4%BB%80%E4%B9%88linux-kernel%E5%96%9C%E6%AC%A2%E8%BF%99%E6%A0%B7%E5%86%99/" title="为什么linux kernel喜欢这样写">
+                        <span class="hidden-mobile">为什么linux kernel喜欢这样写</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

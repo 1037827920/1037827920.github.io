@@ -1,0 +1,851 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="简要介绍linux robust futex的原理、功能以及示例程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux-Robust-Futex学习笔记">
+<meta property="og:url" content="http://example.com/2025/01/30/Linux-Robust-Futex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="简要介绍linux robust futex的原理、功能以及示例程序">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/Linux-Robust-Futex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+<meta property="article:published_time" content="2025-01-30T11:28:37.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.046Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="futex">
+<meta property="article:tag" content="robust">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/Linux-Robust-Futex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+  
+  
+  
+  <title>Linux-Robust-Futex学习笔记 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Linux-Robust-Futex学习笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-30 19:28" pubdate>
+          2025年01月30日, 7:28 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          2.7k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Linux-Robust-Futex学习笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="robust-futex">robust futex</h1>
+<h2 id="简介">简介</h2>
+<p><strong>概述：</strong>
+为了保证futex的robustness，添加了一种能够用于处理进程异常终止时锁状态的机制，就是当拥有锁的线程异常终止时，该线程能够将锁进行释放</p>
+<p><strong>基本原理：</strong> 每个线程都有一个私有的robust
+list，这个list在线程生命周期只能注册一次。在线程退出时，kernel会检查这个list，并进行相应的清理操作。</p>
+<p><strong>线程在执行do_exit()时常见的情况以及相应的处理方式：</strong></p>
+<ul>
+<li>常见情况：在大多数情况下，在线程执行do_exit函数时，kernel并没有注册任何list，因此对于robust
+list的处理成本仅仅是进行一个简单的比较，即检查当前线程的robust
+list是否为空</li>
+<li>已注册list的情况：如果线程已经注册了list，通常这个list也大概率是空的，如果是正常退出的</li>
+<li>线程异常退出的情况：如果注册的list不为空，则kernel会遍历这个list，并将所有由该线程拥有的锁标记为FUTEX_OWNER_DIED，然后唤醒一个waiter</li>
+</ul>
+<p><strong>潜在的竞争条件：</strong>
+由于添加和删除list是在获取锁之后进行的，所以给线程留下了一个小窗口，在此期间可能导致线程异常退出，从而使锁被悬挂，为了防止这种可能性，还需要多维护一个list_op_pending字段，并在完成列表的添加或删除操作后将其清除【存在疑惑】</p>
+<h2 id="实现细节">实现细节</h2>
+<p><strong>新系统调用：</strong></p>
+<ul>
+<li><p>sys_set_robust_list：注册robust list，接收一个指向robust list
+head的指针和list head的长度作为参数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">long</span> <span class="hljs-title function_">get_robust_list</span><span class="hljs-params">(<span class="hljs-type">int</span> pid, <span class="hljs-keyword">struct</span> robust_list_head **head_ptr, <span class="hljs-type">size_t</span> *len_ptr)</span>;<br></code></pre></td></tr></table></figure></li>
+<li><p>sys_get_robust_list：查询已注册的robust
+list，接收一个PID作为参数，并返回指向robust list
+head的指针和len指针。</p>
+<ul>
+<li><p>如果传入的PID为0，则返回调用线程自身的robust list head指针</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">long</span> <span class="hljs-title function_">set_robust_list</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> robust_list_head *head, <span class="hljs-type">size_t</span> len)</span>;<br></code></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p>当操作成功，返回0，否则返回错误码：</p>
+<ul>
+<li>set_robust_list()：
+<ul>
+<li>EINVAL：len和kernel预期的结构体robust_list_head的大小不匹配</li>
+</ul></li>
+<li>get_robust_list()：
+<ul>
+<li>ERERM：调用进程无权查看TID为PID的线程的robust
+list，并且不具有CAP_SYS_PTRACE功能（这是一个linux中的特权能力，用于允许进程进行调试和trace其他进程，具有该能力的成可以使用ptrace()系统调用来观察和控制其他进程的执行，包括读取和修改其内存、寄存器和指令流）</li>
+<li>ESRCH：找不到TID为PID的线程</li>
+<li>EFALUT：robust list head不能存储在location head中</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>注册list：</strong> robust
+list指针简单存储在robust_list字段中，如果robus
+futex比较普通，可以通过扩展sys_clone来为新线程注册robust list
+head，而无需通过sys_set_robust_list注册</p>
+<p><strong>系统调用开销：</strong></p>
+<ul>
+<li>不使用robust futex的任务：几乎没有额外开销</li>
+<li>使用robust
+futex的任务：每个线程的生命周期只会增加一个额外的系统调用，清理futex的操作时快速且简单的</li>
+</ul>
+<h2 id="futex字段值">Futex字段值</h2>
+<ul>
+<li>如果未获取锁，futex值的后面30位（即TID位）为0，所以只需要看后面30位是否有值就知道该futex是否被上锁</li>
+<li>如果锁被获取，futex值的后面30位（即TID位）为拥有该锁的线程的TID</li>
+<li>如果锁时拥有的，并且有线程争用锁，则应在futex中标识FUTEX_WAITERS位，即FUTEX_WAITERS
+| TID（FUTEX_WAITERS为0x8000_0000，也就是第一位）</li>
+<li>如果线程退出时发现某个robust
+futex仍被持有，kernel会设置相应的futex字段的FUTEX_OWNER_DIED位（0x4000_0000，也就是第二位），然后唤醒下一个waiter（如果存在）。其余清理工作由用户空间完成</li>
+</ul>
+<h2 id="代码示例">代码示例</h2>
+<h3 id="使用示例程序">使用示例程序</h3>
+<p><strong>代码仓库：</strong> <a
+target="_blank" rel="noopener" href="https://github.com/1037827920/Futex-Example-Program">1037827920/Futex-Example-Program</a></p>
+<p><strong>Rust示例程序：</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">use</span> libc::&#123;<br>    syscall, SYS_futex, SYS_get_robust_list, SYS_gettid, SYS_set_robust_list, FUTEX_WAIT,<br>    FUTEX_WAKE,<br>&#125;;<br><span class="hljs-keyword">use</span> std::&#123;<br>    io, mem, panic, ptr,<br>    sync::&#123;<br>        atomic::&#123;AtomicU32, Ordering&#125;,<br>        Arc, Mutex,<br>    &#125;,<br>    thread,<br>    time::Duration,<br>&#125;;<br><br><span class="hljs-keyword">const</span> FUTEX_INIT: <span class="hljs-type">u32</span> = <span class="hljs-number">0x0000_0000</span>;<br><span class="hljs-keyword">const</span> FUTEX_WAITERS: <span class="hljs-type">u32</span> = <span class="hljs-number">0x8000_0000</span>;<br><span class="hljs-keyword">const</span> FUTEX_TID_MASK: <span class="hljs-type">u32</span> = <span class="hljs-number">0x3fff_ffff</span>;<br><br><span class="hljs-meta">#[repr(C)]</span><br><span class="hljs-meta">#[derive(Debug, Clone)]</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">RobustList</span> &#123;<br>    next: *<span class="hljs-keyword">mut</span> RobustList,<br>    <span class="hljs-comment">// futex: u32, (通过偏移量访问)</span><br>&#125;<br><br><span class="hljs-meta">#[repr(C)]</span><br><span class="hljs-meta">#[derive(Debug, Clone)]</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">RobustListHead</span> &#123;<br>    list: RobustList,<br>    <span class="hljs-comment">/// 这个偏移量的作用是为了能够通过（list项的地址+偏移量）得到futex用户空间地址</span><br>    <span class="hljs-comment">/// futex_offset的单位为字节，即1表示一个字节的偏移量</span><br>    <span class="hljs-comment">/// 在用户空间添加这个字段还能进行灵活编码偏移量而不是在内核硬编码</span><br>    futex_offset: <span class="hljs-type">i64</span>,<br>    list_op_pending: *<span class="hljs-keyword">mut</span> RobustList,<br>&#125;<br><br><span class="hljs-keyword">impl</span> <span class="hljs-title class_">RobustListHead</span> &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">new</span>(futex_offset: <span class="hljs-type">i64</span>) <span class="hljs-punctuation">-&gt;</span> RobustListHead &#123;<br>        RobustListHead &#123;<br>            list: RobustList &#123;<br>                next: ptr::<span class="hljs-title function_ invoke__">null_mut</span>(),<br>            &#125;,<br>            futex_offset,<br>            list_op_pending: ptr::<span class="hljs-title function_ invoke__">null_mut</span>(),<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">push</span>(&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">self</span>, futex: AtomicU32) &#123;<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">new_node</span> = <span class="hljs-type">Box</span>::<span class="hljs-title function_ invoke__">into_raw</span>(<span class="hljs-type">Box</span>::<span class="hljs-title function_ invoke__">new</span>(RobustList &#123;<br>            next: <span class="hljs-keyword">self</span>.list.next,<br>        &#125;));<br>        <span class="hljs-keyword">unsafe</span> &#123;<br>            ((new_node <span class="hljs-keyword">as</span> *<span class="hljs-keyword">mut</span> <span class="hljs-type">u8</span>).<span class="hljs-title function_ invoke__">offset</span>(<span class="hljs-keyword">self</span>.futex_offset <span class="hljs-keyword">as</span> <span class="hljs-type">isize</span>) <span class="hljs-keyword">as</span> *<span class="hljs-keyword">mut</span> AtomicU32)<br>                .<span class="hljs-title function_ invoke__">write</span>(futex);<br>        &#125;<br>        <span class="hljs-keyword">self</span>.list.next = new_node;<br>    &#125;<br><br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">print_robust_list</span>(&amp;<span class="hljs-keyword">self</span>) &#123;<br>        <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">current</span> = <span class="hljs-keyword">self</span>.list.next;<br>        <span class="hljs-keyword">while</span> !current.<span class="hljs-title function_ invoke__">is_null</span>() &#123;<br>            <span class="hljs-keyword">unsafe</span> &#123;<br>                <span class="hljs-built_in">print!</span>(<br>                    <span class="hljs-string">&quot;&#123;:?&#125;(futex: &#123;:?&#125;, futex_val: &#123;:?&#125;) -&gt; &quot;</span>,<br>                    current,<br>                    (current <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> <span class="hljs-type">u8</span>).<span class="hljs-title function_ invoke__">add</span>(<span class="hljs-keyword">self</span>.futex_offset <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>),<br>                    ((current <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> <span class="hljs-type">u8</span>).<span class="hljs-title function_ invoke__">add</span>(<span class="hljs-keyword">self</span>.futex_offset <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>) <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> AtomicU32)<br>                        .<span class="hljs-title function_ invoke__">read</span>(),<br>                );<br>                current = (*current).next;<br>            &#125;<br>        &#125;<br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;NULL&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">get_futex</span>(&amp;<span class="hljs-keyword">self</span>, index: <span class="hljs-type">usize</span>) <span class="hljs-punctuation">-&gt;</span> *<span class="hljs-keyword">const</span> AtomicU32 &#123;<br>        <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">current</span> = <span class="hljs-keyword">self</span>.list.next;<br>        <span class="hljs-keyword">for</span> <span class="hljs-variable">_</span> <span class="hljs-keyword">in</span> <span class="hljs-number">0</span>..index &#123;<br>            <span class="hljs-keyword">if</span> current.<span class="hljs-title function_ invoke__">is_null</span>() &#123;<br>                <span class="hljs-keyword">return</span> ptr::<span class="hljs-title function_ invoke__">null_mut</span>();<br>            &#125;<br>            <span class="hljs-keyword">unsafe</span> &#123;<br>                current = (*current).next;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">if</span> current.<span class="hljs-title function_ invoke__">is_null</span>() &#123;<br>            <span class="hljs-keyword">return</span> ptr::<span class="hljs-title function_ invoke__">null_mut</span>();<br>        &#125;<br>        <span class="hljs-keyword">unsafe</span> &#123; (current <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> <span class="hljs-type">u8</span>).<span class="hljs-title function_ invoke__">add</span>(<span class="hljs-keyword">self</span>.futex_offset <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>) <span class="hljs-keyword">as</span> *<span class="hljs-keyword">mut</span> AtomicU32 &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">unsafe</span> <span class="hljs-keyword">impl</span> <span class="hljs-title class_">Send</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">RobustListHead</span> &#123;&#125;<br><span class="hljs-keyword">unsafe</span> <span class="hljs-keyword">impl</span> <span class="hljs-title class_">Sync</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">RobustListHead</span> &#123;&#125;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">main</span>() &#123;<br>    <span class="hljs-title function_ invoke__">test_set_and_get_robust_list</span>();<br>    <span class="hljs-title function_ invoke__">test_robust_futex</span>();<br>&#125;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">futex_wait</span>(futex: *<span class="hljs-keyword">const</span> AtomicU32, thread: &amp;<span class="hljs-type">str</span>, tid: <span class="hljs-type">i64</span>) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">futex_ref</span> = <span class="hljs-keyword">unsafe</span> &#123; &amp;*futex &#125;;<br>    <span class="hljs-keyword">loop</span> &#123;<br>        <span class="hljs-comment">// 如果当前futex没有被其他线程持有</span><br>        <span class="hljs-keyword">if</span> (futex_ref.<span class="hljs-title function_ invoke__">load</span>(Ordering::SeqCst) &amp; FUTEX_TID_MASK) == <span class="hljs-number">0</span> &#123;<br>            futex_ref.<span class="hljs-title function_ invoke__">swap</span>(tid <span class="hljs-keyword">as</span> <span class="hljs-type">u32</span>, Ordering::SeqCst);<br>            <span class="hljs-comment">// 加锁后直接返回，这样就不用执行系统调用，减少一定开销</span><br>            <span class="hljs-built_in">println!</span>(<br>                <span class="hljs-string">&quot;线程&#123;thread&#125;上锁成功, futex值: &#123;:#x&#125;&quot;</span>,<br>                (*futex_ref).<span class="hljs-title function_ invoke__">load</span>(Ordering::SeqCst)<br>            );<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br><br>        <span class="hljs-comment">// 标识futex的FUTEX_WAITERS位</span><br>        futex_ref.<span class="hljs-title function_ invoke__">fetch_or</span>(FUTEX_WAITERS, Ordering::SeqCst);<br>        <span class="hljs-built_in">println!</span>(<br>            <span class="hljs-string">&quot;线程&#123;thread&#125;正在等待futex, futex值: &#123;:#x&#125;&quot;</span>,<br>            (*futex_ref).<span class="hljs-title function_ invoke__">load</span>(Ordering::SeqCst)<br>        );<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">ret</span> = <span class="hljs-keyword">unsafe</span> &#123;<br>            <span class="hljs-title function_ invoke__">syscall</span>(<br>                SYS_futex,<br>                futex_ref <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> AtomicU32 <span class="hljs-keyword">as</span> *<span class="hljs-keyword">mut</span> <span class="hljs-type">u32</span>,<br>                FUTEX_WAIT,<br>                futex_ref.<span class="hljs-title function_ invoke__">load</span>(Ordering::SeqCst),<br>                <span class="hljs-number">0</span>,<br>                <span class="hljs-number">0</span>,<br>                <span class="hljs-number">0</span>,<br>            )<br>        &#125;;<br>        <span class="hljs-keyword">if</span> ret == -<span class="hljs-number">1</span> &#123;<br>            <span class="hljs-built_in">panic!</span>(<span class="hljs-string">&quot;futex_wait系统调用执行失败&quot;</span>);<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">futex_wake</span>(futex: *<span class="hljs-keyword">const</span> AtomicU32, thread: &amp;<span class="hljs-type">str</span>) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">futex_ref</span> = <span class="hljs-keyword">unsafe</span> &#123; &amp;*futex &#125;;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">ret</span> = <span class="hljs-keyword">unsafe</span> &#123;<br>        <span class="hljs-title function_ invoke__">syscall</span>(<br>            SYS_futex,<br>            futex_ref <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> AtomicU32 <span class="hljs-keyword">as</span> *<span class="hljs-keyword">mut</span> <span class="hljs-type">u32</span>,<br>            FUTEX_WAKE,<br>            <span class="hljs-number">1</span>,<br>            <span class="hljs-number">0</span>,<br>            <span class="hljs-number">0</span>,<br>            <span class="hljs-number">0</span>,<br>        )<br>    &#125;;<br>    <span class="hljs-keyword">if</span> ret == -<span class="hljs-number">1</span> &#123;<br>        <span class="hljs-built_in">panic!</span>(<span class="hljs-string">&quot;futex_wake系统调用执行失败&quot;</span>);<br>    &#125;<br>    futex_ref.<span class="hljs-title function_ invoke__">store</span>(FUTEX_INIT, Ordering::SeqCst);<br>    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;线程&#123;thread&#125;释放锁&quot;</span>);<br>&#125;<br><br><span class="hljs-comment">/// 向kernel注册一个robust list</span><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">set_robust_list</span>(robust_list_head_ptr: *<span class="hljs-keyword">const</span> RobustListHead) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">ret</span> = <span class="hljs-keyword">unsafe</span> &#123; <span class="hljs-title function_ invoke__">syscall</span>(SYS_set_robust_list, robust_list_head_ptr, mem::size_of::&lt;RobustListHead&gt;()) &#125;;<br>    <span class="hljs-keyword">if</span> ret == -<span class="hljs-number">1</span> &#123;<br>        <span class="hljs-built_in">panic!</span>(<br>            <span class="hljs-string">&quot;set_robust_list系统调用执行失败, Err: &#123;:?&#125;&quot;</span>,<br>            io::Error::<span class="hljs-title function_ invoke__">last_os_error</span>()<br>        );<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/// 获取kernel注册的robust list</span><br><span class="hljs-comment">/// 当pid=0时，表示获取当前进程的robust list</span><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">get_robust_list</span>(pid: <span class="hljs-type">i32</span>, robust_list_head_ptr: &amp;<span class="hljs-keyword">mut</span> *<span class="hljs-keyword">mut</span> RobustListHead, len: &amp;<span class="hljs-keyword">mut</span> <span class="hljs-type">usize</span>) &#123;<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">ret</span> = <span class="hljs-keyword">unsafe</span> &#123; <span class="hljs-title function_ invoke__">syscall</span>(SYS_get_robust_list, pid, robust_list_head_ptr, len) &#125;;<br>    <span class="hljs-keyword">if</span> ret == -<span class="hljs-number">1</span> &#123;<br>        <span class="hljs-built_in">panic!</span>(<br>            <span class="hljs-string">&quot;get_robust_list系统调用执行失败, Err: &#123;:?&#125;&quot;</span>,<br>            io::Error::<span class="hljs-title function_ invoke__">last_os_error</span>()<br>        );<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/// 测试set_robust_list系统调用和get_robust_list系统调用</span><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">test_set_and_get_robust_list</span>() &#123;<br>    <span class="hljs-comment">// 初始化robust list head</span><br>    <span class="hljs-comment">// 8字节为RobustList的大小</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">robust_list_head</span> = RobustListHead::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-number">8</span>);<br><br>    <span class="hljs-comment">// 初始化robust list</span><br>    robust_list_head.<span class="hljs-title function_ invoke__">push</span>(AtomicU32::<span class="hljs-title function_ invoke__">new</span>(FUTEX_INIT));<br>    robust_list_head.<span class="hljs-title function_ invoke__">print_robust_list</span>();<br><br>    <span class="hljs-comment">// 设置robust list</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">robust_list_head_ptr</span> = &amp;robust_list_head <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> RobustListHead;<br>    <span class="hljs-built_in">println!</span>(<br>        <span class="hljs-string">&quot;robust_list_head_ptr: &#123;:?&#125;, len: &#123;:?&#125;&quot;</span>,<br>        robust_list_head_ptr, mem::size_of::&lt;RobustListHead&gt;()<br>    );<br>    <span class="hljs-title function_ invoke__">set_robust_list</span>(robust_list_head_ptr);<br><br>    <span class="hljs-comment">// 获取robust list</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">robust_list_head_ptr_geted</span>: *<span class="hljs-keyword">mut</span> RobustListHead = ptr::<span class="hljs-title function_ invoke__">null_mut</span>();<br>    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">len_geted</span>: <span class="hljs-type">usize</span> = <span class="hljs-number">0</span>;<br>    <span class="hljs-title function_ invoke__">get_robust_list</span>(<span class="hljs-number">0</span>, &amp;<span class="hljs-keyword">mut</span> robust_list_head_ptr_geted, &amp;<span class="hljs-keyword">mut</span> len_geted);<br>    <span class="hljs-built_in">println!</span>(<br>        <span class="hljs-string">&quot;robust_list_head_ptr_geted: &#123;:?&#125;, robust_list_head: &#123;:?&#125; len_geted: &#123;:?&#125;&quot;</span>,<br>        robust_list_head_ptr_geted,<br>        <span class="hljs-keyword">unsafe</span> &#123; &amp;*robust_list_head_ptr_geted &#125;,<br>        len_geted<br>    );<br>&#125;<br><br><span class="hljs-comment">/// 测试一个线程异常退出时，robust list的表现</span><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">test_robust_futex</span>() &#123;<br>    <span class="hljs-comment">// 创建robust list head</span><br>    <span class="hljs-comment">// 8字节为RobustList的大小</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">robust_list_head</span> = Arc::<span class="hljs-title function_ invoke__">new</span>(Mutex::<span class="hljs-title function_ invoke__">new</span>(RobustListHead::<span class="hljs-title function_ invoke__">new</span>(<span class="hljs-number">8</span>)));<br><br>    <span class="hljs-comment">// 初始化robust list</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-keyword">mut </span><span class="hljs-variable">robust_list_head_guard</span> = robust_list_head.<span class="hljs-title function_ invoke__">lock</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br>    (*robust_list_head_guard).<span class="hljs-title function_ invoke__">push</span>(AtomicU32::<span class="hljs-title function_ invoke__">new</span>(FUTEX_INIT));<br>    <span class="hljs-title function_ invoke__">drop</span>(robust_list_head_guard);<br><br>    <span class="hljs-comment">// 线程1</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">robust_list_head_clone1</span> = robust_list_head.<span class="hljs-title function_ invoke__">clone</span>();<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">thread1</span> = thread::<span class="hljs-title function_ invoke__">spawn</span>(<span class="hljs-keyword">move</span> || &#123;<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">tid</span> = <span class="hljs-keyword">unsafe</span> &#123; <span class="hljs-title function_ invoke__">syscall</span>(SYS_gettid) &#125;;<br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;线程1的线程号: &#123;tid&#125;&quot;</span>);<br><br>        <span class="hljs-comment">// 向kernel注册robust list</span><br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">robust_list_head_guard</span> = robust_list_head_clone1.<span class="hljs-title function_ invoke__">lock</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">robust_list_head_ptr</span> = &amp;(*robust_list_head_guard) <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> RobustListHead;<br>        <span class="hljs-title function_ invoke__">set_robust_list</span>(robust_list_head_ptr);<br><br>        <span class="hljs-comment">// 尝试获取锁</span><br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">futex</span> = robust_list_head_guard.<span class="hljs-title function_ invoke__">get_futex</span>(<span class="hljs-number">0</span>);<br>        <span class="hljs-title function_ invoke__">futex_wait</span>(futex, <span class="hljs-string">&quot;1&quot;</span>, tid);<br>        <span class="hljs-comment">// 执行具体的业务逻辑</span><br>        thread::<span class="hljs-title function_ invoke__">sleep</span>(Duration::<span class="hljs-title function_ invoke__">from_secs</span>(<span class="hljs-number">5</span>));<br><br>        <span class="hljs-comment">// 模拟线程异常退出，是否会正常把未释放的锁释放掉</span><br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;thread1异常退出&quot;</span>);<br>        <span class="hljs-keyword">return</span>;<br>    &#125;);<br><br>    thread::<span class="hljs-title function_ invoke__">sleep</span>(Duration::<span class="hljs-title function_ invoke__">from_secs</span>(<span class="hljs-number">3</span>));<br><br>    <span class="hljs-comment">// 线程2</span><br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">robust_list_head_clone2</span> = robust_list_head.<span class="hljs-title function_ invoke__">clone</span>();<br>    <span class="hljs-keyword">let</span> <span class="hljs-variable">thread2</span> = thread::<span class="hljs-title function_ invoke__">spawn</span>(<span class="hljs-keyword">move</span> || &#123;<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">tid</span> = <span class="hljs-keyword">unsafe</span> &#123; <span class="hljs-title function_ invoke__">syscall</span>(SYS_gettid) &#125;;<br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;线程2的线程号: &#123;tid&#125;&quot;</span>);<br><br>        <span class="hljs-comment">// 向kernel注册robust list</span><br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">robust_list_head_guard</span> = robust_list_head_clone2.<span class="hljs-title function_ invoke__">lock</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">robust_list_head_ptr</span> = &amp;(*robust_list_head_guard) <span class="hljs-keyword">as</span> *<span class="hljs-keyword">const</span> RobustListHead;<br>        <span class="hljs-title function_ invoke__">set_robust_list</span>(robust_list_head_ptr);<br><br>        <span class="hljs-comment">// 尝试获取锁</span><br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">futex</span> = robust_list_head_guard.<span class="hljs-title function_ invoke__">get_futex</span>(<span class="hljs-number">0</span>);<br>        <span class="hljs-built_in">println!</span>(<br>            <span class="hljs-string">&quot;线程2尝试获取锁, futex值: &#123;:#x&#125;&quot;</span>,<br>            <span class="hljs-keyword">unsafe</span> &#123; &amp;*futex &#125;.<span class="hljs-title function_ invoke__">load</span>(Ordering::SeqCst)<br>        );<br>        <span class="hljs-title function_ invoke__">futex_wait</span>(futex, <span class="hljs-string">&quot;2&quot;</span>, tid);<br>        <span class="hljs-comment">// 执行具体的业务逻辑</span><br>        thread::<span class="hljs-title function_ invoke__">sleep</span>(Duration::<span class="hljs-title function_ invoke__">from_secs</span>(<span class="hljs-number">3</span>));<br>        <span class="hljs-comment">// 释放锁</span><br>        <span class="hljs-title function_ invoke__">futex_wake</span>(futex, <span class="hljs-string">&quot;2&quot;</span>);<br>    &#125;);<br><br>    thread1.<span class="hljs-title function_ invoke__">join</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br>    thread2.<span class="hljs-title function_ invoke__">join</span>().<span class="hljs-title function_ invoke__">unwrap</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>C示例程序：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/futex.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdatomic.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/syscall.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;pthread.h&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> FUTEX_INIT 0x00000000</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> FUTEX_WAITERS 0x80000000</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> FUTEX_TID_MASK 0x3fffffff</span><br><br><span class="hljs-comment">// 定义一个结构体来封装线程任务参数</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list_head</span>* <span class="hljs-title">rlh</span>;</span><br>    <span class="hljs-type">int</span> thread;<br>&#125; thread_task_args;<br><br><span class="hljs-comment">// 向robust list插入新节点</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">robust_list_push</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> robust_list_head* rlh, <span class="hljs-type">atomic_uint</span> futex)</span> &#123;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list</span>* <span class="hljs-title">new_robust_list</span> =</span> (<span class="hljs-keyword">struct</span> robust_list*)<span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> robust_list));<br>    <span class="hljs-keyword">if</span> (new_robust_list == <span class="hljs-literal">NULL</span>) &#123;<br>        perror(<span class="hljs-string">&quot;new robust list分配内存失败&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment">// 通过偏移量将futex写入新robust list</span><br>    <span class="hljs-type">atomic_uint</span>* futex_ptr = (<span class="hljs-type">atomic_uint</span>*)((<span class="hljs-type">uint8_t</span>*)new_robust_list + rlh-&gt;futex_offset);<br>    *futex_ptr = futex;<br><br>    rlh-&gt;<span class="hljs-built_in">list</span>.next = new_robust_list;<br>&#125;<br><br><span class="hljs-comment">// 获取索引为index的futex地址</span><br><span class="hljs-type">atomic_uint</span>* <span class="hljs-title function_">robust_list_get_futex</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> robust_list_head* rlh, <span class="hljs-type">size_t</span> index)</span> &#123;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list</span>* <span class="hljs-title">current</span> =</span> rlh-&gt;<span class="hljs-built_in">list</span>.next;<br>    <span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">while</span> (current != <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-keyword">if</span> (i == index) &#123;<br>            <span class="hljs-keyword">return</span> (<span class="hljs-type">atomic_uint</span>*)((<span class="hljs-type">uint8_t</span>*)current + rlh-&gt;futex_offset);<br>        &#125;<br>        current = current-&gt;next;<br>        i++;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>&#125;<br><br><span class="hljs-comment">// 打印robust list</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">robust_list_print</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> robust_list_head* rlh)</span> &#123;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list</span>* <span class="hljs-title">current</span> =</span> rlh-&gt;<span class="hljs-built_in">list</span>.next;<br>    <span class="hljs-keyword">while</span> (current != <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-type">atomic_uint</span>* futex_ptr = (<span class="hljs-type">atomic_uint</span>*)((<span class="hljs-type">uint8_t</span>*)current + rlh-&gt;futex_offset);<br>        <span class="hljs-type">atomic_int</span> futex = *futex_ptr;<br><br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%p(futex: %p, futex_val: %u) -&gt; &quot;</span>, (<span class="hljs-type">void</span>*)current, (<span class="hljs-type">void</span>*)futex_ptr, futex);<br><br>        current = current-&gt;next;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;NULL\n&quot;</span>);<br>&#125;<br><br><span class="hljs-comment">// 向kernel注册robust list</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">set_robust_list</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> robust_list_head* rlh)</span> &#123;<br>    <span class="hljs-type">long</span> ret = syscall(SYS_set_robust_list, rlh, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> robust_list_head));<br>    <span class="hljs-keyword">if</span> (ret == <span class="hljs-number">-1</span>) &#123;<br>        perror(<span class="hljs-string">&quot;set_robust_list系统调用执行失败\n&quot;</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// 从kernel获取robust list</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">get_robust_list</span><span class="hljs-params">(<span class="hljs-type">int</span> pid, <span class="hljs-keyword">struct</span> robust_list_head** rlh, <span class="hljs-type">size_t</span>* len)</span> &#123;<br>    <span class="hljs-type">long</span> ret = syscall(SYS_get_robust_list, pid, rlh, len);<br>    <span class="hljs-keyword">if</span> (ret == <span class="hljs-number">-1</span>) &#123;<br>        perror(<span class="hljs-string">&quot;get_robust_list系统调用执行失败\n&quot;</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// futex_wait函数</span><br><span class="hljs-type">void</span>* <span class="hljs-title function_">futex_wait</span><span class="hljs-params">(<span class="hljs-type">atomic_uint</span>* futex, <span class="hljs-type">int</span> thread, <span class="hljs-type">long</span> tid)</span> &#123;<br>    <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>        <span class="hljs-comment">// 如果当前futex没有其他线程持有</span><br>        <span class="hljs-keyword">if</span> ((*futex &amp; FUTEX_TID_MASK) == <span class="hljs-number">0</span>) &#123;<br>            atomic_exchange(futex, (<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span>)tid);<br>            <span class="hljs-comment">// 加锁后直接返回</span><br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;线程%d上锁成功. futex值: 0x%x\n&quot;</span>, thread, *futex);<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        &#125;<br><br>        <span class="hljs-comment">// 线程进入等待状态</span><br>        atomic_fetch_or(futex, FUTEX_WAITERS);<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;线程%d正在等待futex, futex值: 0x%x\n&quot;</span>, thread, *futex);<br>        <span class="hljs-type">long</span> ret = syscall(SYS_futex, (<span class="hljs-type">unsigned</span>*)futex, FUTEX_WAIT, *futex, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br>        <span class="hljs-keyword">if</span> (ret == <span class="hljs-number">-1</span>) &#123;<br>            perror(<span class="hljs-string">&quot;futex_wait系统调用执行失败\n&quot;</span>);<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// futex_wake函数</span><br><span class="hljs-type">void</span>* <span class="hljs-title function_">futex_wake</span><span class="hljs-params">(<span class="hljs-type">atomic_uint</span>* futex, <span class="hljs-type">int</span> thread)</span> &#123;<br>    <span class="hljs-type">long</span> ret = syscall(SYS_futex, (<span class="hljs-type">unsigned</span>*)futex, FUTEX_WAKE, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">if</span> (ret == <span class="hljs-number">-1</span>) &#123;<br>        perror(<span class="hljs-string">&quot;futex_wake系统调用执行失败\n&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    &#125;<br>    <span class="hljs-type">atomic_store</span>(futex, FUTEX_INIT);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;线程%d释放锁\n&quot;</span>, thread);<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>&#125;<br><br><span class="hljs-comment">// 测试set_robust_list系统调用和get_robust_list系统调用</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">test_set_and_get_robust_list</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// 创建一个robust list head</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list_head</span>* <span class="hljs-title">rlh</span> =</span> (<span class="hljs-keyword">struct</span> robust_list_head*)<span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> robust_list_head));<br>    rlh-&gt;futex_offset = <span class="hljs-number">8</span>;<br><br>    <span class="hljs-comment">// 初始化robust list</span><br>    robust_list_push(rlh, <span class="hljs-number">0x00000000</span>);<br>    robust_list_print(rlh);<br><br>    <span class="hljs-comment">// 设置robust list</span><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;robust_list_head_ptr: %p, len: %ld\n&quot;</span>, rlh, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> robust_list_head));<br>    set_robust_list(rlh);<br><br>    <span class="hljs-comment">// 获取robust list</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list_head</span>* <span class="hljs-title">rlh_geted</span> =</span> (<span class="hljs-keyword">struct</span> robust_list_head*)<span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> robust_list_head));<br>    <span class="hljs-type">size_t</span> len_geted;<br>    get_robust_list(<span class="hljs-number">0</span>, &amp;rlh_geted, &amp;len_geted);<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;robust_list_head_geted_ptr: %p, len_geted: %ld\n&quot;</span>, rlh_geted, len_geted);<br>&#125;<br><br><span class="hljs-type">void</span>* <span class="hljs-title function_">thread1_task</span><span class="hljs-params">(<span class="hljs-type">void</span>* arg)</span> &#123;<br>    thread_task_args* args = (thread_task_args*)arg;<br>    <span class="hljs-comment">// robust list head指针</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list_head</span>* <span class="hljs-title">rlh</span> =</span> args-&gt;rlh;<br>    <span class="hljs-comment">// 线程号</span><br>    <span class="hljs-type">int</span> thread = args-&gt;thread;<br>    <span class="hljs-comment">// TID</span><br>    <span class="hljs-type">long</span> tid = syscall(SYS_gettid);<br><br>    <span class="hljs-comment">// 注册robust list</span><br>    set_robust_list(rlh);<br><br>    <span class="hljs-comment">// 尝试获取锁</span><br>    <span class="hljs-type">atomic_uint</span>* futex = robust_list_get_futex(rlh, <span class="hljs-number">0</span>);<br>    futex_wait(futex, thread, tid);<br>    <span class="hljs-comment">// 执行具体的业务逻辑</span><br>    sleep(<span class="hljs-number">5</span>);<br><br>    <span class="hljs-comment">// 线程异常退出</span><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;线程%d异常退出\n&quot;</span>, thread);<br>    pthread_exit(<span class="hljs-literal">NULL</span>);<br>&#125;<br><br><span class="hljs-type">void</span>* <span class="hljs-title function_">thread2_task</span><span class="hljs-params">(<span class="hljs-type">void</span>* arg)</span> &#123;<br>    thread_task_args* args = (thread_task_args*)arg;<br>    <span class="hljs-comment">// robust list head指针</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list_head</span>* <span class="hljs-title">rlh</span> =</span> args-&gt;rlh;<br>    <span class="hljs-comment">// 线程号</span><br>    <span class="hljs-type">int</span> thread = args-&gt;thread;<br>    <span class="hljs-comment">// TID</span><br>    <span class="hljs-type">long</span> tid = syscall(SYS_gettid);<br><br>    <span class="hljs-comment">// 注册robust list</span><br>    set_robust_list(rlh);<br><br>    <span class="hljs-comment">// 尝试获取锁</span><br>    <span class="hljs-type">atomic_uint</span>* futex = robust_list_get_futex(rlh, <span class="hljs-number">0</span>);<br>    futex_wait(futex, thread, tid);<br>    <span class="hljs-comment">// 执行具体的业务逻辑</span><br>    sleep(<span class="hljs-number">5</span>);<br>    <span class="hljs-comment">// 释放锁</span><br>    futex_wake(futex, thread);<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>&#125;<br><br><span class="hljs-comment">// 测试一个线程异常退出时，robust list的表现</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">test_robust_futex</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// 线程句柄</span><br>    <span class="hljs-type">pthread_t</span> t1, t2;<br><br>    <span class="hljs-comment">// 创建robust list head</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">robust_list_head</span>* <span class="hljs-title">rlh</span> =</span> (<span class="hljs-keyword">struct</span> robust_list_head*)<span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> robust_list_head));<br><br>    <span class="hljs-comment">// 初始化robust list</span><br>    robust_list_push(rlh, <span class="hljs-number">0x00000000</span>);<br><br>    <span class="hljs-comment">// 构建线程参数</span><br>    thread_task_args args1 = &#123; rlh, <span class="hljs-number">1</span> &#125;;<br>    thread_task_args args2 = &#123; rlh, <span class="hljs-number">2</span> &#125;;<br><br>    <span class="hljs-comment">// 线程1</span><br>    pthread_create(&amp;t1, <span class="hljs-literal">NULL</span>, thread1_task, (<span class="hljs-type">void</span>*)&amp;args1);<br><br>    <span class="hljs-comment">// 等线程1先获取futex锁</span><br>    sleep(<span class="hljs-number">3</span>);<br><br>    <span class="hljs-comment">// 线程2</span><br>    pthread_create(&amp;t2, <span class="hljs-literal">NULL</span>, thread2_task, (<span class="hljs-type">void</span>*)&amp;args2);<br><br>    <span class="hljs-comment">// 等待线程结束</span><br>    pthread_join(t1, <span class="hljs-literal">NULL</span>);<br>    pthread_join(t2, <span class="hljs-literal">NULL</span>);<br>&#125;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>    test_set_and_get_robust_list();<br>    test_robust_futex();<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>运行结果：</strong></p>
+<img src="/2025/01/30/Linux-Robust-Futex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20250130183735637.png" srcset="/img/loading.gif" lazyload class="">
+<h3 id="实现示例程序">实现示例程序</h3>
+<p>【待完成】</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://www.man7.org/linux/man-pages/man2/futex.2.html">futex(2) -
+Linux 手册页 --- futex(2) - Linux manual page</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/linux/" class="print-no-link">#linux</a>
+      
+        <a href="/tags/futex/" class="print-no-link">#futex</a>
+      
+        <a href="/tags/robust/" class="print-no-link">#robust</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Linux-Robust-Futex学习笔记</div>
+      <div>http://example.com/2025/01/30/Linux-Robust-Futex学习笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/02/01/%E9%A1%B5%E8%A1%A8/" title="页表(Page Table)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">页表(Page Table)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/25/Linux-Futex%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="Linux Futex学习笔记">
+                        <span class="hidden-mobile">Linux Futex学习笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

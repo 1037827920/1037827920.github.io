@@ -1,0 +1,2935 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="介绍了linux cgroup v1&#x2F;v2 cpu&#x2F;memory&#x2F;io&#x2F;pid等子系统接口文件的功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux Cgroup学习笔记">
+<meta property="og:url" content="http://example.com/2024/12/05/Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="介绍了linux cgroup v1&#x2F;v2 cpu&#x2F;memory&#x2F;io&#x2F;pid等子系统接口文件的功能">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/Linux%20Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+<meta property="article:published_time" content="2024-12-05T10:19:31.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.040Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="cgroup">
+<meta property="article:tag" content="shell">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/Linux%20Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+  
+  
+  
+  <title>Linux Cgroup学习笔记 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Linux Cgroup学习笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-12-05 18:19" pubdate>
+          2024年12月05日, 6:19 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          34k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Linux Cgroup学习笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="cgroupcontrol-group">Cgroup(Control Group)</h1>
+<h2 id="引言">引言</h2>
+<p><a
+target="_blank" rel="noopener" href="https://github.com/1037827920/tst-cgroup.git">tst-cgroup</a>是用来测试cgroup
+v1/v2大部分接口文件的测试套（用shell编写），共有118个测试用例，涵盖了CPU/内存/IO/网络/进程功能的接口文件测试，可以用来了解cgroup
+v1/v2大部分接口文件的基础用法。</p>
+<p><strong>参考：</strong></p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v1/index.html">Control
+Groups version 1 — The Linux Kernel documentation</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#">Control
+Group v2 — The Linux Kernel documentation</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://github.com/torvalds/linux/tree/master/tools/testing/selftests/cgroup">linux/tools/testing/selftests/cgroup
+at master · torvalds/linux</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://arthurchiao.art/blog/cgroupv2-zh/#hugetlb-interface-files">[译]
+Control Group v2（cgroupv2 权威指南）（KernelDoc, 2021）</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://docs.redhat.com/zh-cn/documentation/red_hat_enterprise_linux/6/html/resource_management_guide/ch-subsystems_and_tunable_parameters#ch-Subsystems_and_Tunable_Parameters">第
+3 章 子系统和可调参数 | Red Hat Product Documentation</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://ggaaooppeenngg.github.io/zh-CN/2017/05/19/cgroup-子系统之-net-cls-和-net-prio/">cgroup
+子系统之 net_cls 和 net_prio | ggaaooppeenngg</a></li>
+</ul>
+<h2 id="简介">简介</h2>
+<p><strong>概述：</strong>
+Cgroups允许限制、优先处理、隔离和监控系统资源（如CPU、内存、磁盘I/O、网络带宽等）在进程或进程组之间的使用。这对于多租户环境、资源隔离和容器技术尤为重要，是linux内核自带的工具。</p>
+<p><strong>cgroup v1/v2：</strong> cgroup有两个版本</p>
+<ul>
+<li><p>cgroup v1
+使用的是层级式结构，将子系统接口文件分开放在单独的目录，进程可能会在不同的子系统中参与不同的资源管理。
+<img src="/2024/12/05/Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241205105844360-1733388768258.png" srcset="/img/loading.gif" lazyload class=""></p></li>
+<li><p>cgroup v2
+设计上更加简化和统一，所有的核心和控制器接口文件共享同一个目录
+<img src="/2024/12/05/Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241205105542034.png" srcset="/img/loading.gif" lazyload class=""></p></li>
+</ul>
+<p><strong>实例对比：</strong></p>
+<ul>
+<li><p>Cgroup V1示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 创建CPU和内存控制组</span><br><span class="hljs-built_in">mkdir</span> /sys/fs/cgroup/cpu/my_cgroup<br><span class="hljs-built_in">mkdir</span> /sys/fs/cgroup/memory/my_cgroup<br><br><span class="hljs-comment"># 设置CPU和内存限制</span><br><span class="hljs-built_in">echo</span> 50000 &gt; /sys/fs/cgroup/cpu/my_cgroup/cpu.cfs_quota_us<br><span class="hljs-built_in">echo</span> 100M &gt; /sys/fs/cgroup/memory/my_cgroup/memory.limit_in_bytes<br><br><span class="hljs-comment"># 将进程添加到控制组</span><br><span class="hljs-built_in">echo</span> &lt;PID&gt; &gt; /sys/fs/cgroup/cpu/my_cgroup/tasks<br><span class="hljs-built_in">echo</span> &lt;PID&gt; &gt; /sys/fs/cgroup/memory/my_cgroup/tasks<br><br></code></pre></td></tr></table></figure></li>
+<li><p>Cgroup V2示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 挂载Cgroup v2</span><br>mount -t cgroup2 none /sys/fs/cgroup/unified<br><br><span class="hljs-comment"># 创建控制组</span><br><span class="hljs-built_in">mkdir</span> /sys/fs/cgroup/unified/my_cgroup<br><br><span class="hljs-comment"># 设置CPU和内存限制</span><br><span class="hljs-built_in">echo</span> 50000 &gt; /sys/fs/cgroup/unified/my_cgroup/cpu.max<br><span class="hljs-built_in">echo</span> 100M &gt; /sys/fs/cgroup/unified/my_cgroup/memory.max<br><br><span class="hljs-comment"># 将进程添加到控制组</span><br><span class="hljs-built_in">echo</span> &lt;PID&gt; &gt; /sys/fs/cgroup/unified/my_cgroup/cgroup.procs<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>Cgroup
+V2在设计上更加简洁和统一，提供了更一致的资源控制和监控接口。</p>
+<p><strong>如何切换cgroup版本：</strong></p>
+<ul>
+<li>切换到cgroup
+v1，在<code>/etc/default/grub</code>的<code>GRUB_CMDLINE_LINUX</code>添加<code>systemd.unified_cgroup_hierarchy=0</code></li>
+<li>切换到cgroup
+v1，在<code>/etc/default/grub</code>的<code>GRUB_CMDLINE_LINUX</code>添加<code>systemd.unified_cgroup_hierarchy=1</code></li>
+</ul>
+<p>然后更新配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> update-grab <span class="hljs-comment"># ubuntu22</span><br><span class="hljs-built_in">sudo</span> grub2-mkconfig -o /boot/grub2/grub.cfg <span class="hljs-comment"># opencloudos 8.8/9.2/Stream 23</span><br></code></pre></td></tr></table></figure>
+<p>最后重启系统即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">reboot<br></code></pre></td></tr></table></figure>
+<h2 id="cgroup-v1">Cgroup v1</h2>
+<h3 id="通用接口文件">通用接口文件</h3>
+<p><strong>tasks：</strong></p>
+<p>包含一系列在cgroup中运行的进程（由它们的PID表示）。PID列表不一定是有序的，也不一定是特有的。将PID写入一个cgroup的tasks文件，可将此进程移动至cgroup</p>
+<p>跟下面的cgroup.procs功能一样，cgroup
+v2取消了这个接口文件，只保留了cgroup.procs</p>
+<p><strong>cgroup.procs：</strong></p>
+<p>包含在cgroup中运行的进程组列表（由它们的TGID表示）。TGID列表不一定有序的，也不一定是特有的。将TGID写入cgroup的cgroup.procs文件，可将此线程组群移至该cgroup</p>
+<p><strong>cgroup.event_control：</strong></p>
+<p>与cgroup的通知API一起，允许cgroup的变更状态通知被发送</p>
+<p><strong>notify_on_release：</strong></p>
+<p>包含Boolean值，1或者0，分别可以启动和禁用释放代理的指令。如果notify_on_release启用，当cgroup不再包含任何任务时（即cgroup的tasks文件包含PID，而PID被移除，致使文件变空），kernel会执行release_agent文件的内容。通向此空cgroup的路径会作为release_agent的参数被提供。notify_on_realease参数的默认值在root
+cgroup中是0。所有非root
+cgroup从其父cgroup处继承notify_on_realese的值</p>
+<p><strong>release_agent（仅在root cgroup中出现）：</strong></p>
+<p>当notify on
+realeas被触发，它包含要执行的指令。一旦cgroup的所有进程被清空，并且notify_on_realease标记被启用，kernel会运行release_agent文件中的指令，并且提供通向被清空cgroup的相关路径（与root
+cgroup相关）作为参数。（例如可以用来自动移除空cgroup）</p>
+<p>自动移除空cgroup的例子：可将空cgroup从cpu cgroup中自动移除</p>
+<ol type="1">
+<li><p>创建一个shell脚本用来移除空cpu cgroups,
+将其放入/usr/local/bin，并使其可运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /usr/local/bin/remove-empty-cpu-cgroup.sh<br>output:<br><span class="hljs-comment">#!/bin/sh</span><br><span class="hljs-comment"># $1变量包含到达已清空cgroup的相对路径</span><br><span class="hljs-built_in">rmdir</span> /cgroup/cpu/<span class="hljs-variable">$1</span><br><span class="hljs-built_in">chmod</span> +x /usr/local/bin/remove-empty-cpu-cgroup.sh<br></code></pre></td></tr></table></figure></li>
+<li><p>在cpu cgroup，启动notify_on_release标签</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> 1 &gt; notify_on_release<br></code></pre></td></tr></table></figure></li>
+<li><p>在cpu cgroup中，指定一个可用的释放代理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;/usr/local/bin/remove-empty-cpu-cgroup.sh&quot;</span> &gt; /cgroup/cpu/release_agent<br></code></pre></td></tr></table></figure></li>
+<li><p>测试配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs bash">cpu]# <span class="hljs-built_in">pwd</span>; <span class="hljs-built_in">ls</span><br>/cgroup/cpu<br>cgroup.event_control  cgroup.procs  cpu.cfs_period_us  cpu.cfs_quota_us  cpu.rt_period_us  cpu.rt_runtime_us  cpu.shares  cpu.stat  libvirt  notify_on_release  release_agent  tasks<br>cpu]# <span class="hljs-built_in">cat</span> notify_on_release <br>1<br>cpu]# <span class="hljs-built_in">cat</span> release_agent <br>/usr/local/bin/remove-empty-cpu-cgroup.sh<br>cpu]# <span class="hljs-built_in">mkdir</span> blue; <span class="hljs-built_in">ls</span><br>blue  cgroup.event_control  cgroup.procs  cpu.cfs_period_us  cpu.cfs_quota_us  cpu.rt_period_us  cpu.rt_runtime_us  cpu.shares  cpu.stat  libvirt  notify_on_release  release_agent  tasks<br>cpu]# <span class="hljs-built_in">cat</span> blue/notify_on_release <br>1<br>cpu]# cgexec -g cpu:blue <span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/zero of=/dev/null bs=1024k &amp;<br>[1] 8623<br>cpu]# <span class="hljs-built_in">cat</span> blue/tasks <br>8623<br>cpu]# <span class="hljs-built_in">kill</span> -9 8623<br>cpu]# <span class="hljs-built_in">ls</span><br>cgroup.event_control  cgroup.procs  cpu.cfs_period_us  cpu.cfs_quota_us  cpu.rt_period_us  cpu.rt_runtime_us  cpu.shares  cpu.stat  libvirt  notify_on_release  release_agent  tasks【可以看到blue cgroup已经被自动移除】<br></code></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="blkio子系统">blkio子系统</h3>
+<p><strong>概述：</strong>
+限制cgroup对IO的使用，两种控制策略，weight和throttling。</p>
+<p><strong>需要开启的<a href="#%20内核配置">内核配置</a>：</strong></p>
+<p>CONFIG_BLK_CGROUP：启用blkio子系统</p>
+<p>CONFIG_IOSCHED_BFQ：支持weight控制策略</p>
+<p>CONFIG_BLK_DEV_THROTTLING：支持throttling控制策略</p>
+<p>CONFIG_BFQ_CGROUP_DEBUG：如果启用了这个选项，在cgroup中会显示一些额外的统计文件和控制文件（blkio.bfg.weight，blkio.bfg.weight_device)</p>
+<p><strong>weight控制策略接口文件：</strong></p>
+<ul>
+<li><p>blkio.bfq.weight：读写文件。指定每个cgroup组的权重。这是组在所有设备上的默认权重，除非被blkio.bfq.weight_device覆盖。目前允许的范围是1到1000</p></li>
+<li><p>blkio.bfq.weight_device:
+读写文件。指定每个cgroup中每个设备的权重，覆盖blkio.bfq.weight</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> dev_maj:dev_minor weight &gt; blkio.bfq.weight_device<br><span class="hljs-comment"># 设置权重</span><br><span class="hljs-built_in">echo</span> 8:16 300 &gt; blkio.bfq.weight_device <br><span class="hljs-comment"># 移除权重</span><br><span class="hljs-built_in">echo</span> 8:16 0 &gt; blkio.bfq.weight_device<br></code></pre></td></tr></table></figure></li>
+<li><p>blkio.bfq.io_service_bytes：只读文件。cgroup传输到磁盘/从磁盘传输的字节数</p></li>
+<li><p>blkio.bfq.io_serviced: 只读文件。cgroup向磁盘发出的
+IO（bio）数量。</p></li>
+</ul>
+<p><strong>throttling控制策略接口文件：</strong></p>
+<p><strong>控制文件：</strong></p>
+<ul>
+<li><p>blkio.throttle.read_bps_device：读写文件。设置从设备读取速率的上限。单位是<code>byets/s</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;major&gt;:&lt;minor&gt; &lt;rate_bytes_per_second&quot;</span> blkio.throttle.read_bps_device<br></code></pre></td></tr></table></figure></li>
+<li><p>blkio.throttle.write_bps_device：读写文件。设置对设备的写速率上限。单位是<code>byets/s</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;major&gt;:&lt;minor&gt;  &lt;rate_bytes_per_second&gt;&quot;</span> &gt; blkio.throttle.write_bps_device<br></code></pre></td></tr></table></figure></li>
+<li><p>blkio.throttle.read_iops_device：读写文件。设置从设备读取速率的上限。单位是<code>IO/s</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;major&gt;:&lt;minor&gt;  &lt;rate_io_per_second&gt;&quot;</span> &gt; blkio.throttle.read_iops_device<br></code></pre></td></tr></table></figure></li>
+<li><p>blkio.throttle.write_iops_device：读写文件。设置对设备的写速率上限。单位是<code>IO/s</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;&lt;major&gt;:&lt;minor&gt;  &lt;rate_io_per_second&gt;&quot;</span> &gt; blkio.throttle.write_iops_device<br></code></pre></td></tr></table></figure>
+<ul>
+<li>注意：如果为设备制定了BW和IOPS规则，那么IO将同时受到这两个约束</li>
+</ul></li>
+<li><p>blkio.throttle.io_serviced：只读文件。记录自从cgroup创建以来，对于每种操作的已完成的I/O操作数。按操作类型进一步划分——读或写，同步或异步。</p>
+<ul>
+<li>第一个字段：设备的主号</li>
+<li>第二个字段：设备的副号</li>
+<li>第三个字段：操作类型</li>
+<li>第四个字段：IOs数量</li>
+</ul></li>
+<li><p>bklio.throttle.io_service_bytes：只读文件。记录自从cgroup创建以来，对于每种操作的已完成的向磁盘传输/从磁盘传输的字节数。按操作类型进一步划分——读或写，同步或异步。</p>
+<ul>
+<li>第一个字段：设备的主号</li>
+<li>第二个字段：设备的副号</li>
+<li>第三个字段：操作类型</li>
+<li>第四个字段：字节数</li>
+</ul></li>
+</ul>
+<p><strong>其他接口文件：</strong></p>
+<ul>
+<li><p>blkio.reset_stats：读写文件。向该文件写入int将导致重置该cgroup中的所有统计信息</p></li>
+<li><p>blkio.time：读写文件。每个设备分配给cgroup的磁盘时间（以ms为单位），前两个字段指定设备的主号和副号，第三个字段指定分配给cgroup的磁盘时间</p></li>
+<li><p>blkio.sectors：读写文件。组从磁盘传输或传输到磁盘的扇区数。前两个字段指定设备的主扇区号和副扇区号，第三个字段指定与设备之间传输的扇区数</p></li>
+<li><p>blkio.io_service_time：只读文件。由该cgroup组完成的IOs的请求分派和请求完成之间的总时间。以ns为单位，对闪存设备也有意义。对于队列深度为1的设备，该时间表示实际服务时间。当队列深度大于1时，这种情况就不再成立，因为请求可能被乱序处理，这可能会导致给定的IO服务时间包括多个IO的服务时间，但服务无序时，这可能会导致总io_service_time大于实际经过的时间。这段时间根据操作类型进一步划分——读或写、同步或异步。前两个字段表示操作类型，第四个字段表示io_service_time，单位为ns</p></li>
+<li><p>blkio.io_wait_time：只读文件。此cgroup组的IOs在调度程序队列中等待服务的总时间。这可能大于总时间，因为它是所有IOs的累积io_wait_time，不是cgroup等待总时间的度量，而是单个IOs的等待时间的度量。对于队列深度大于1的设备，这个指标不包括IO被分配到设备后等待服务的时间，而是直到它真正得到服务（这里可能有一个时间延迟，因为设备重新排序请求），以ns为单位。这对闪存设备也有意义，这段时间根据操作类型进一步划分——读或写、同步或异步吗。前两个字段指定设备的主、副编号，第三个字段指定设备的主、副编号</p></li>
+<li><p>blkio.io_merged：只读文件。IOs请求合并到属于该cgroup的总数。进一步划分操作类型——读或写，同步或异步</p></li>
+<li><p>blkio.io_queued：只读文件。在任何给定时刻为该cgroup排队的请求总数。进一步划分操作类型——读或写，同步或异步</p></li>
+<li><p>blkio.avg_queue_size：只读文件。只有当CONFIG_BFQ_CGROUP_DEBUGE=y时，才启用调试辅助功能。该cgroup存在的整数时间内该cgroup的平均队列大小。每当此cgroup的一个队列获得一个时间片时，就会获取队列大小样本</p></li>
+<li><p>blkio.group_wait_time：只读文件。CONFIG_BFQ_CGROUP_DEBUGE=y时，才启用调试辅助功能。这是cgroup从忙起（即从0到1个排队请求）为它的一个队列获取时间片需要等待的时间。这与io_wait_time不同，io_wait_time是该cgroup中每个IO在调度程序队列中等待所花费的时间的累计总和。单位是ns，如果在cgroup处理等待状态时读取该值，则stat将只报告直到最后一次获取时间片为止累积的group_wait_time，而不包括当前增量</p></li>
+<li><p>blkio.empty_time：只读文件。CONFIG_BFQ_CGROUP_DEBUGE=y时，才启用调试辅助功能。这是一个cgroup在没有被服务的情况下没有任何挂起的请求的时间，也就是说，它不包括cgroup的某个队列的空闲时间。单位是ns，如果在cgroup处于空状态时读取该值，则stat将只报告截至上次有待处理请求为止累积的empty_time，而不包括当前增量</p></li>
+<li><p>blkio.idle_time：只读文件。CONFIG_BFQ_CGROUP_DEBUGE=y时，才启用调试辅助功能。这是IO调度器为给定的cgroup等待一个比其他队列/cgroup的现有请求更好的请求所花费的时间。单位时ns，如果在cgroup处于空闲状态读取此值，则stat将只报告截至最后一个空闲时间段累积的idle_time，而不包括当前增量</p></li>
+<li><p>blkio.dequeue：只读文件。CONFIG_BFQ_CGROUP_DEBUGE=y时，才启用调试辅助功能。这提供了关于一个cgroup从设备的服务树中退出队列的次数的统计信息。前两个字段指定设备的主号和副号，第三个字段指定cgroup从特定设备退出队列的次数</p></li>
+<li><p>blkio.*_recursive：只读文件，各种统计的递归版本，这些文件显示的信息与他们的非递归对应项相同，但包括来自所有子cgroups的统计信息</p></li>
+</ul>
+<h3 id="cpu子系统">cpu子系统</h3>
+<p><strong>概述：</strong>
+主要是限制cgroup对CPU的使用，三种控制策略，权重比例设置、周期使用时间上限和RT调度策略。</p>
+<p><strong>按权重比例设定CPU的分配：</strong></p>
+<ul>
+<li>cpu.shares：读写文件。CPU比重分配，通过一个整数的数值调节cgroup所占用的CPU时间。例如，有两个cgroup（C1和C2），其中C1的cpu.shares设定为100，另一个设定为200，那么C2所使用的cpu时间将是C1所用时间的2倍</li>
+</ul>
+<p><strong>设定CPU使用周期使用时间上限：</strong></p>
+<ul>
+<li>cpu.cfs_period_us：读写文件。规定CPU的时间周期（微秒），最大值是1s，最小值是1000微妙。例如，如果在一个单CPU的系统内，要保证一个cgroup内的任务在1s的CPU周期内占用0.2s的CPU时间，可以通过设置cpu.cfs_quota_us为200000和cpu.cfs_period_us为1000000</li>
+<li>cpu.cfs_quota_us：读写文件。在单位时间内（即cpu.cfs_period_us设定值）可用的CPU最大时间（单位是微秒）。cpu.cfs_quota_us值可以大于cpu.cfs_period_us的值，例如在一个双CPU的系统内，想要一个cgroup内的进程充分地利用2个CPU，可以设定cpu.cfs_quota_us为200000及cpu.cfs_period_us为100000</li>
+<li>cpu.stat：只读文件。统计信息包含：
+<ul>
+<li>nr_periods：经历了几个cfs_period_us周期</li>
+<li>nr_throttled：task被限制的次数</li>
+<li>throtled_time：表示task被限制的总时长</li>
+</ul></li>
+</ul>
+<p><strong>RT调度策略下的配置：</strong>实时调度策略与公平调度策略中的按周期分配时间的方法类似，也是在周期内分配一个固定的运行时间</p>
+<ul>
+<li>cpu.rt_period_us：以微妙为单位在某个时间段中cgroup对CPU资源访问重新分配的频率。如果某个cgroup中的任务应该每5s有4s可访问CPU资源，则请将rt_runtime_us设定4000000，并将rt_period_us设定为5000000</li>
+<li>cpu.rt_runtime_us：以微妙为单位指定某个时间段中cgroup中的任务对CPU资源的最长连续访问时间，建立这个限制是为了防止一个cgroup中的任务独占CPU时间。注意：父cgroup中的rt_runtime_us一定要大于等于子cgroup中的rt_runtime_us，不让会报参数错误的错误信息。</li>
+</ul>
+<h3 id="cpuacct子系统">cpuacct子系统</h3>
+<p><strong>概述：</strong>
+显示cgroup中任务所使用的CPU资源，其中包括子群组任务，报告有两大类：</p>
+<ul>
+<li>usage：统计cgroup中进程使用CPU的时间，单位为纳秒</li>
+<li>stat：统计cgroup中进程使用CPU的时间，单位为USER_HZ</li>
+</ul>
+<p><strong>需要开启的内核配置:</strong></p>
+<ul>
+<li>CONFIG_CGROUP_CPUACCT</li>
+</ul>
+<p><strong>接口文件：</strong></p>
+<ul>
+<li>cpuacct.usage：只读文件。记录该cgroup中所有进程的CPU使用总时间，以纳秒为单位</li>
+<li>cpuacct.usage_percpu：只读文件。记录该cgroup中所有进程在每个CPU上的使用时间，以纳秒为单位</li>
+<li>cpuacct.usage_user：只读文件。报告一个cgroup中所有任务使用用户态CPU的总时间，以纳秒为单位</li>
+<li>cpuacct.usage_percpu_user：只读文件。报告一个cgroup中所有任务在每个CPU上使用用户态CPU的时间，以纳秒为单位</li>
+<li>cpuacct.usage_sys：只读文件。报告一个cgroup中所有任务在CPU上使用内核态CPU的时间，以纳秒为单位</li>
+<li>cpuacct.usage_percpu_sys：只读文件。报告一个cgroup中所有任务在每个CPU上使用内核态CPU的时间</li>
+<li>cpuacct.usage_all：只读文件。详细输出文件cpuacct.usage_percpu_user和cpuacct.usage_percpu_sys的内容</li>
+<li>cpuacct.stat：只读文件。报告cgroup的所有任务使用的用户和内核CPU时间，单位为USER_HZ</li>
+</ul>
+<h3 id="cpuset子系统">cpuset子系统</h3>
+<p><strong>概述：</strong> 为一组进程分配指定的CPU和<a
+href="#%20NUMA架构">NUAM节点</a></p>
+<p><strong>以下规则适用每个cgroup：</strong></p>
+<ul>
+<li>它的 CPU 和<a
+href="#%20NUMA架构">NUAM节点</a>必须是其父级的子集。</li>
+<li>除非其父级被标记为exclusive，否则它不能被标记为exclusive。</li>
+<li>如果其 CPU 或内存是独占的，则它们可能不会与任何兄弟cgroup重叠</li>
+<li>必须指定当前cgroup的cpuset.mems和cpuset.cpus，才能将进程移入当前cgroup</li>
+</ul>
+<p><strong>CPU相关的接口文件：</strong></p>
+<ul>
+<li>cpuset.cpus: 读写文件。允许cgroup中的进程使用的CPU列表。如0-2,
+16代表0，1，2，16这4个CPU</li>
+<li>cpuset.effective_cpus:
+只读文件。显示了当前cgroup中实际可用于分配给进程的CPU核心列表，它考虑了上级cgroup的限制和当前cgroup的cpuset.cpus配置，从而提供了一个最终的、实际可用的CPU核心集合</li>
+<li>cpuset.cpu_exclusive:
+读写文件。cgroup是否独占cpuset.cpus中分配的cpu。默认值为0，表示共享；1表示独占。如果设置为1，其他cgroup内的cpuset.cpus值不能包含有该cpuset.cpus内的值</li>
+<li>cpuset.sched_load_balance:
+读写文件。cgroup的cpu压力是否会被平均到cpuset中的多个cpu上。默认值1，启用负载均衡；0表示禁用。注意：如果任意上级cgroup中启用负载均衡，则在cgroup中设定这个标签没有任何效果，因为已经在较高一级cgroup中处理了负载均衡。因此，要在cgroup中禁用负载平衡，还要在每个上级cgroup中禁用负载平衡。</li>
+<li>cpuset.sched_relax_domain_level：包含-1到小正数间的整数，它代表内核应该尝试平衡负载的CPU宽度范围，如果禁用了cpuset.sched_load_balance，则该值毫无意义。</li>
+</ul>
+<p>cpuset.sched_relax_domain_level值：</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-1</td>
+<td>为负载平衡使用系统默认值</td>
+</tr>
+<tr>
+<td>0</td>
+<td>不执行直接负载平衡；负载平衡只是阶段性的</td>
+</tr>
+<tr>
+<td>1</td>
+<td>在同一核中的跨线程直接负载平衡</td>
+</tr>
+<tr>
+<td>2</td>
+<td>在同一软件包中的跨线程直接负载平衡</td>
+</tr>
+<tr>
+<td>3</td>
+<td>在同一节点或刀片中的跨线程直接负载平衡</td>
+</tr>
+<tr>
+<td>4</td>
+<td>在不使用NUMA架构中跨多个CPU的直接负载平衡</td>
+</tr>
+<tr>
+<td>5</td>
+<td>在使用NUMA架构中跨多个CPU的直接负载平衡</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Memory相关的接口文件：</strong></p>
+<ul>
+<li><p>cpuset.mems:
+读写文件。允许cgroup中的进程使用的内存节点列表。如0-2,
+16代表0,1,2,16这4个可用节点。</p></li>
+<li><p>cpuset.effective_mems:
+只读文件。显示当前cgroup中实际可用于分配给进程的内存节点列表，同样考虑了上级cgroup的限制和当前cgrouop的cpuset.mems配置</p></li>
+<li><p>cpuset.mem_exclusive:
+读写文件。是否独占memory。默认值0表示共享，1表示独占。如果设置为1，其他cgroup内的cpuset.mems值不能包含有该cpuset.mems内的值</p></li>
+<li><p>cpuset.memory_migrate:
+读写文件。用来指定当cpuset.mems中的值更改时是否应该将内存中的页迁移到新节点。默认情况下是0表示禁止内存迁移，且页就保留在原来分配的节点中，即使在cpuset.mems中现已不再指定这个节点。如果设置为1，则该系统会将页迁移到由cpuset.mems指定的新参数中的内存节点中。</p></li>
+<li><p>cpuset.memory_spread_page:
+读写文件。如果被设置了，将该cpuset中进程上下文是申请的page
+cache平均分布到cpuset中的各个节点中。默认值是0表示不启用。设置为1表示启用</p></li>
+<li><p>cpuset.mem_hardwall：主要用于控制内存分配的行为，开启该选项后，内存只能从指定的节点中分配，而不能从其他节点获取。默认情况下为0，即不启用</p></li>
+<li><p>cpuset.memory_pressure_enabled：包含指定系统是否应该计算这个cgroup中进程所生成的内存压力的标签（0或1）。计算出的值输出到cpuset.memory_pressure，且代表进程试图释放使用中内存的比例，报告为尝试每秒再生内存的整数值再乘1000【这个文件只在cpuset根目录中出现，cpuset下的cgroup组中是没有这个文件的】【这个内存压力是回收内存的速度，也就是在进程用完内存之后，回收进程内存的速度】</p></li>
+<li><p>cpuset.memory_spread_page：如果被设置了，将该cpuset中进程上下文是申请的page
+cache平均分布到cpuset中的各个节点中（I/O磁盘读写会用到page
+cache）</p></li>
+<li><p>cpuset.memory_spread_slab：如果被设置了，将该cpuset中进程上下文申请的slab对象平均分配到cpuset的各个节点中（缓存文件I/O，也就是目录和inode会用到slab）【经过测试，这个标识符好像被弃用了】</p></li>
+<li><p>cpuset.memory_pressure：包含运行在这个cpuset中产生的平均内存压力的只读文件。启用cpuset.memory_perssure_enabled时，这个伪文件中的值会自动更新，否则伪文件包含的值为0</p></li>
+</ul>
+<h3 id="devices子系统">devices子系统</h3>
+<p><strong>概述：</strong>
+来跟踪和执行对设备文件的打开和关闭限制。设备cgroup为每个cgroup关联一个设备接入白名单，白名单有四个字段：</p>
+<ul>
+<li>type：a(all), c(char), b(block)</li>
+<li>主设备号</li>
+<li>副设备号</li>
+<li>访问权限(r ,w, m(mknod))</li>
+</ul>
+<p><strong>需要开启的内核配置：</strong></p>
+<ul>
+<li>CONFIG_CGROUP_DEVICE</li>
+</ul>
+<p><strong>层次结构：</strong>设备组通过确保子cgroup永远不会拥有比其父cgroup更多的访问权限来维护层次结构。每次将条目写入cgroup的devices.deny文件时，它的所有子cgroup都会从白名单中删除该条目，并且所有本地设置的白名单条目都会被重新评估。如果某个本地设置的白名单条目提供了比父cgroup更多的访问权限，它将从白名单中删除</p>
+<p><strong>接口文件：</strong></p>
+<ul>
+<li>devices.allow：允许访问的设备。文件包含4个字段：type（设备类型），major（主设备号），minor（次设备号），access（访问方式）
+<ul>
+<li>type：a——适用所有设备，包括字符设备和块设备；b——块设备；c——字符设备</li>
+<li>major/minor：9:* *:* 8:1</li>
+<li>access：r——读，w——写，m——创建不存在的设备</li>
+</ul></li>
+<li>devices.deny：禁止访问的设备，格式如devices.allow</li>
+<li>devices.list：显示目前允许被访问的设备列表</li>
+</ul>
+<p><strong>示例1：</strong></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"> A<br>/ \<br>   B<br></code></pre></td></tr></table></figure>
+<table>
+
+<thead>
+<tr>
+<th>group</th>
+<th>whitelist</th>
+<th>denied devices</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>all the rest</td>
+<td>"b 8:* rwm", "c 116:1 rw"</td>
+</tr>
+<tr>
+<td>B</td>
+<td>"c 1:3 rwm", "c 116:2 rwm", "b 3:* rwm"</td>
+<td>all the rest</td>
+</tr>
+</tbody>
+</table>
+<p>将c 116:* r写入A组的禁用设备</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;c 116:* r&quot;</span> &gt; A/devices.deny<br></code></pre></td></tr></table></figure>
+<p>它将向下传播，在重新验证B的条目后，白名单条目"c 116:2
+rwm"将被删除</p>
+<table>
+<thead>
+<tr>
+<th>group</th>
+<th>whitelist</th>
+<th>denied devices</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>all the rest</td>
+<td>"b 8:* rwm", "c 116:* rw"</td>
+</tr>
+<tr>
+<td>B</td>
+<td>"c 1:3 rwm", "b 3:* rwm"</td>
+<td>all the rest</td>
+</tr>
+</tbody>
+</table>
+<p>如果父cgroup不允许访问某设备，那子cgroup也没有权限访问</p>
+<p><strong>示例2：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"> A<br>/ \<br>   B<br></code></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>group</th>
+<th>whitelist</th>
+<th>denied devices</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>"c *:3 rwm", "c 1:5 r"</td>
+<td>all the rest</td>
+</tr>
+<tr>
+<td>B</td>
+<td>"c 1:3 rwm", "c 1:5 r"</td>
+<td>all the rest</td>
+</tr>
+</tbody>
+</table>
+<p>可以在B中添加新的条目：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;c 2:3 rwm&quot;</span> &gt;B/devices.allow<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;c 50:3 r&quot;</span> &gt;B/devices.allow<br></code></pre></td></tr></table></figure>
+<h3 id="freezer子系统">freezer子系统</h3>
+<p><strong>概述：</strong> 可以启动和停止cgroup中的进程</p>
+<p><strong>需要开启的内核配置：</strong></p>
+<ul>
+<li>CONFIG_CGROUP_FREEZER</li>
+</ul>
+<p><strong>接口文件：</strong></p>
+<ul>
+<li>freezer.state: 读写文件
+<ul>
+<li>cgroup的三种状态
+<ul>
+<li>FROZEN：挂起该cgroup中的任务</li>
+<li>FREEZING：该系统正在挂起该cgroup中的任务</li>
+<li>THAWED：已经恢复该cgroup中的任务</li>
+</ul></li>
+<li>当被读取时，返回该group的有效状态（也就是上面三种状态）。这是自己和父cgroup状态的结合。如果有FREEZING，则cgroup的状态为FREEZING</li>
+<li>当属于cgroup及其子cgroup所有任务被冻结时，cgroup转换为FROZEN。注意，当一个新任务被添加到cgroup或它的子cgroup中，cgroup会从FROZEN状态恢复到FREZING状态，直到新任务被冻结</li>
+<li>写入时，设置cgroup的self-state。允许两个值：FROZEN和THAWED。如果写了FROZEN，则cgroup和它的所有子cgroup一起进入FROZEN状态</li>
+<li>如果写入THAWED，则cgroup的self-state更改为THAWED。注意，如果父cgroup状态仍处于FROZEN，则有效状态可能不会被更改为THAWED。如果cgroup的有效状态变为THAWED，则由于cgroup而冻结的所有子cgroup将离开FROZEN状态</li>
+</ul></li>
+<li>freezer.self_freezing:
+只读文件。显示self-state。如果是0，则为THAWED状态；否则为1。如果最后一次写入了FORZEN，这个值为1</li>
+<li>freezer.parent_freezing:
+只读文件。显示parent-state。如果cgroup的父cgroup不是FROZEN，则为0；否则为1</li>
+</ul>
+<p><strong>注意事项：</strong></p>
+<ul>
+<li>挂起进程时，会连同子进程一同挂起</li>
+<li>不能将进程移动到处于FROZEN状态的cgroup中</li>
+<li>只有FROZEN状态和THAWED状态可以被写进freezer.state中，FREEZING状态则不能，只能读取它</li>
+<li>root cgroup是不可冻结的</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> /sys/fs/cgroup/freezer<br>mount -t cgroup -ofreezer freezer /sys/fs/cgroup/freezer<br><span class="hljs-built_in">mkdir</span> /sys/fs/cgroup/freezer/0<br><span class="hljs-built_in">echo</span> <span class="hljs-variable">$some_pid</span> &gt; /sys/fs/cgroup/freezer/0/tasks<br></code></pre></td></tr></table></figure>
+<p>获取子系统的状态：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /sys/fs/cgroup/freezer/0/freezer.state<br>output: THAWED<br></code></pre></td></tr></table></figure>
+<p>冻结子系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> FROZEN &gt; /sys/fs/cgroup/freezer/0/freezer.state<br><span class="hljs-built_in">cat</span> /sys/fs/cgroup/freezer/0/freezer.state<br>output: FREEZING<br><span class="hljs-built_in">cat</span> /sys/fs/cgroup/freezer/0/freezer.state<br>output: FROZEN<br></code></pre></td></tr></table></figure>
+<p>解冻子系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> THAWED &gt; /sys/fs/cgroup/freezer/0/freezer.state<br><span class="hljs-built_in">cat</span> /sys/fs/cgroup/freezer/0/freezer.state<br>output: THAWED<br></code></pre></td></tr></table></figure>
+<p><strong>linux kernel文档原文：</strong></p>
+<ul>
+<li><p>对于批处理作业管理系统来说，cgroup
+freeze是非常有用的，它可以启动和停止任务集，以便根据系统管理员的需要调度机器的资源。这种类型的程序通常用于HPC集群，以调度对整个集群的访问。cgroup
+freezer使用cgroups来描述处理作业管理系统要启动/停止的任务集。它还提供了启动和停止组成作业的任务的方法。</p></li>
+<li><p>freezer对于检查点运行中的任务组也很有用。freezer允许检查点代码通过尝试强制cgroup中的任务进入静止状态来获得任务的一致映像。一旦任务处于静止状态，另一个任务就可以walk
+/proc或调用内核接口来收集关于静止状态的任务的信息。如果发生可恢复的错误，可以稍后重新启动检查点任务。这还允许通过将收集到的信息复制到另一个节点并重新启动任务，在集群中的节点之间迁移检查点任务。</p></li>
+<li><p>SIGSTOP和SIGCONT序列并不总是足以停止和恢复用户空间中的任务，这两个信号都可以从我们希望冻结的任务中观察到，虽然SIGSTOP不能被捕获、阻塞或忽略，但可以通过等待或跟踪父任务来查看它。SIGCONT尤其不合适，因为它可能被任务捕获。任何旨在监视SIGSTOP和SIGCONT的程序都可能被试图使用SIGSTOP和SIGCONT来停止和恢复任务而破坏。我们可以用嵌套的bash
+shell来演示这个问题：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ <span class="hljs-built_in">echo</span> $$<br>16644<br>$ bash<br>$ <span class="hljs-built_in">echo</span> $$<br>16690<br><br>From a second, unrelated bash shell:<br>$ <span class="hljs-built_in">kill</span> -SIGSTOP 16690<br>$ <span class="hljs-built_in">kill</span> -SIGCONT 16690<br><br>&lt;at this point 16690 exits and causes 16644 to <span class="hljs-built_in">exit</span> too&gt;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="hugetlb子系统">hugetlb子系统</h3>
+<p><strong>概述：</strong>
+允许限制cgroup的hugepage使用量和hugepage预留。</p>
+<p><strong>需要的内核配置：</strong></p>
+<ul>
+<li>CONFIG_CGROUP_HUGETLB</li>
+<li>CONFIG_HUGETLB_PAGE</li>
+<li>CONFIG_HUGETLBFS</li>
+</ul>
+<p><strong>hugepage使用量接口文件：</strong></p>
+<ul>
+<li>hugetlb.2MB.limit_in_bytes:
+读写文件。设置hugepage大小为2MB的hugepage使用量限制</li>
+<li>hugetlb.1GB.limit_in_bytes:
+读写文件。设置hugepage大小为1GB的hugepage使用量限制</li>
+<li>hugetlb.2MB.max_usage_in_bytes:
+只读文件。显示hugepage大小为2MB最大hugepages使用记录</li>
+<li>hugetlb.1GB.max_usage_in_bytes:
+只读文件。显示hugepage大小为1GB最大hugepages使用记录</li>
+<li>hugetlb.2MB.usage_in_bytes:
+只读文件。显示hugepages大小为2MB的hugepage的当前使用量</li>
+<li>hugetlb.1GB.usage_in_bytes:
+只读文件。显示hugepages大小为1GB的hugepage的当前使用量</li>
+<li>hugetlb.2MB.failcnt:
+只读文件。显示hugepage大小为2MB由于hugepage使用限制导致的分配失败</li>
+<li>hugetlb.1GB.failcnt:
+只读文件。显示hugepage大小为1GB由于hugepage使用限制导致的分配失败</li>
+</ul>
+<p><strong>hugepage预留接口文件：</strong></p>
+<p><strong>接口文件:</strong></p>
+<ul>
+<li>hugetlb.2MB.rsvd.limit_in_bytes:
+读写文件。设置hugepage大小为2MB的hugepage预留限制</li>
+<li>hugetlb.1GB.rsvd.limit_in_bytes:
+读写文件。设置hugepage大小为1GB的hugepage预留限制</li>
+<li>hugetlb.2MB.rsvd.max_usage_in_bytes:
+只读文件。显示hugepage大小为2MB最大hugepages预留记录</li>
+<li>hugetlb.1GB.rsvd.max_usage_in_bytes:
+只读文件。显示hugepage大小为1GB最大hugepages预留记录</li>
+<li>hugetlb.2MB.rsvd.usage_in_bytes:
+只读文件。显示hugepages大小为2MB的hugepage的当前预留量</li>
+<li>hugetlb.1GB.rsvd.usage_in_bytes:
+只读文件。显示hugepages大小为1GB的hugepage的当前预留量</li>
+<li>hugetlb.2MB.rsvd.failcnt:
+只读文件。显示hugepage大小为2MB由于hugepage预留限制导致的分配失败</li>
+<li>hugetlb.1GB.rsvd.failcnt:
+只读文件。显示hugepage大小为1GB由于hugepage预留限制导致的分配失败</li>
+</ul>
+<p><strong>查看hugepage使用情况：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /proc/meminfo | grep Huge<br></code></pre></td></tr></table></figure>
+<p><strong>修改系统中hugepage大小：</strong></p>
+<p>在<code>/etc/default/grub</code>中增加<code>default_hugepagesz=1G hugepagesz=1G</code>配置，然后更新grub配置</p>
+<p>然后更新配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> update-grab <span class="hljs-comment"># ubuntu22</span><br><span class="hljs-built_in">sudo</span> grub2-mkconfig -o /boot/grub2/grub.cfg <span class="hljs-comment"># opencloudos 8.8/9.2/Stream 23</span><br></code></pre></td></tr></table></figure>
+<p>最后重启系统即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">reboot<br></code></pre></td></tr></table></figure>
+<h3 id="memory子系统">memory子系统</h3>
+<p><strong>概述：</strong> 限制cgroup所能使用的内存上限</p>
+<p><strong>需要的内核配置：</strong></p>
+<ul>
+<li>CONFIG_MEMCG</li>
+<li>CONFIG_SWAP</li>
+</ul>
+<p><strong>接口文件：</strong></p>
+<ul>
+<li><p>memory.usage_in_bytes:
+只读文件。显示当前内存使用情况，单位为字节</p></li>
+<li><p>memory.memsw.usage_in_bytes:
+只读文件。显示当前内存+交换的使用情况，单位为字节</p></li>
+<li><p>memory.max_uasge_in_bytes:
+只读文件。显示记录的最大内存使用量，单位为字节</p></li>
+<li><p>memory.memsw.max_usage_in_bytes:
+只读文件。显示记录的最大内存+交换使用量，单位为字节</p></li>
+<li><p>memory.failcnt:
+只读文件。显示内存达到memory.limit_in_bytes设定的限制值的次数</p></li>
+<li><p>memory.memsw.failcnt:
+只读文件。显示内存+swap空间限制达到在memory.memsw.limit_in_bytes设定的值的次数</p></li>
+<li><p>memory.limit_in_bytes:
+读写文件。设定最大的内存使用量（包括文件缓存），可以加单位(k/K, m/M,
+g/G)不加单位默认为bytes。不能限制root
+cgroup。写入-1删除现有的限制</p></li>
+<li><p>memory.soft_limit_in_bytes:
+读写文件。和memory.limit_in_bytes的差异是，这个限制并不会阻止进程使用超过限额的内存，只是在系统内存不足时，会优先回收超过限额的进程占用的内存，使之向限定值靠拢。该值应小于memory.limit_in_bytes设定值【在有CONFIG_PREEMPT_RT系统中不可用】</p></li>
+<li><p>memory.memsw.limit_in_bytes:
+读写文件。设定最大的内存+swap的用量之和。可以加单位(k/K, m/M,
+g/G)不加单位默认为bytes。不能限制根cgroup。写入-1删除现有的限制</p></li>
+<li><p>memory.force_empty:
+只写文件。当写入0时，清空该group的所有内存页。该选项只有在当前group没有tasks才可以使用。删除cgroup前请使用memory.force_empty以避免将不再使用的页面缓存移动到它的上级cgroup中</p></li>
+<li><p>memory.swappiness:
+读写文件。将内核倾向设定为换出这个cgroup中任务所使用的进程内存，而不是从页缓冲中再生页面。这也是在/proc/sys/vm/swappiness中设定的使用同一方法为整个系统设定的内核倾向。默认值为60，低于这个值会降低内核换出进程内存的倾向，将其设定为0则完成不会为cgroup中的任务换出进程内存。高于这个值将提高内核换出进程内存的倾向，等于100时内核将开始换出作为这个cgroup中进程的地址空间的一部分页面。不能更改以下群组的swappniess：根cgroup，它使用在/proc/sys/vm/swappiness中设定的swappiness。</p></li>
+<li><p>cgroup.event_control:
+只写文件。event_fd()的接口【在有CONFIG_PREEMPT_RT系统中不可用】</p></li>
+<li><p>memory.pressure_level:
+读写文件。设置内存压力通知。压力级别通知用于监控内存分配成本；基于压力，应用程序可以实现不同的内存资源管理策略。</p>
+<ul>
+<li><p>压力等级定义：</p>
+<ul>
+<li>low
+level：意味着系统正在为新的分配回收内存。监视此回收活动可能有助于维护缓存级别。收到通知后，程序（通常是"Activity
+Manger"）可能会分析vmstat并提前采取行动</li>
+<li>medium
+level：意味着系统正经历中等内存压力，系统可能正在进行交换、分页出活动文件缓存等。在此事件发生后，应用程序可能决定进一步分析vmstat/zoneinfo/memcg或内部内存使用统计数据，并释放任何可以轻松重构或从磁盘重新读取的资源</li>
+<li>critical
+level：意味着系统处于主动抖动状态，即将内存不足(OOM)，甚至内核内的OOM
+killer即将触发。应用程序应该尽其所能帮助系统。咨询vmstat或其他统计信息可能为时已晚，因此建议立即采取行动</li>
+</ul></li>
+<li><p>三种事件传播方式：</p>
+<ul>
+<li>default：事件向上传播，直到事件被处理。比如有A-&gt;B-&gt;C，现在C承受一些压力，在ABC上设置了事件监听器，则只有C会收到通知。如果只在AB上设置了事件监听器，则只有B会受到通知</li>
+<li>hierarchy：事件总是向上传播到根节点。类似default模式，但是这个模式无论每个级别是否有事件监听器，传播都会继续进行，直到到达根节点</li>
+<li>local：事件只在注册通知的memcg中遇到内存压力时接收通知。在上面的例子中，如果C组注册了本地通知，则该组将受到通知，并且改组经历内存压力。但是，如果B注册了本地通知，则无论C组是否有事件监听器，B组都将不会受到通知</li>
+</ul></li>
+<li><p>级别和事件通知模式由逗号分隔的字符串指定。例如："low,
+hierarchy"</p></li>
+<li><p>要注册通知，应用程序必须：</p>
+<ul>
+<li>使用eventfd(2)创建一个eventfd</li>
+<li>打开memory.pressure_level</li>
+<li>将字符串写入cgroup.event_control，字符串格式如"<event_fd> &lt;fd of
+memory.pressure_level&gt; &lt;level[, mode]&gt;"</li>
+</ul></li>
+<li><p>当内存压力达到特定级别或更高时，将通过eventfd通知应用程序。并不能直接读写memory.pressure</p></li>
+<li><p>测试示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /sys/fs/cgroup/memory/<br><span class="hljs-built_in">mkdir</span> foo<br><span class="hljs-built_in">cd</span> foo<br>cgroup_event_listener memory.pressure_level critical,hierarchy &amp;<br><span class="hljs-built_in">echo</span> 50M &gt; memory.limit_in_bytes<br><span class="hljs-built_in">echo</span> 50M &gt; memory.memsw.limit_in_bytes<br><span class="hljs-built_in">echo</span> $$ &gt; tasks<br>stress-ng --vm 1 --vm-bytes 51M --vm-keep -t 1s<br></code></pre></td></tr></table></figure>
+<p>cgroup_event_listener是一个工具，完成了上面说的应用程序必须要进行的步骤，源码地址：<a
+target="_blank" rel="noopener" href="https://github.com/torvalds/linux/blob/master/samples/cgroup/cgroup_event_listener.c">linux/samples/cgroup/cgroup_event_listener.c
+at master · torvalds/linux
+(github.com)</a>。参数1是memory.pressure路径，参数2是压力级别和事件通知模式。上面的测试预期输出：memory.pressure_level
+critical,hierarchy:
+crossed，表示该cgroup内存压力达到或超过指定的critical级别，意味着内存压力测试成功触发了memory.pressure_level事件。</p></li>
+</ul></li>
+<li><p>memory.oom_control: 读写文件。当进程出现Out of
+Memory时，是否进行kill操作。默认值0，表示kill；设置为1时，进程将进入睡眠状态，等待内存充足时被唤醒</p>
+<ul>
+<li>oom_kill_disable：当设置为0时，表示在这个cgroup内存不足时，OOM
+killer是启用的，可以杀死大量占用内存的进程来释放内存；当值为1时，表示禁用OOM
+killer，即使内存不足也不会自动杀死进程</li>
+<li>under_oom：当值为0时，表示当前没有OOM条件发生在这个cgroup中；当值为1时，表示这个cgroup目前正处于oom状态，即系统已经检测到内存不足的情况，并可能正在尝试杀死一些进程来释放内存</li>
+<li>oom_kill：这个字段显示了由于OOM条件而被杀死的进程数量。每次OOM
+killer杀死cgroup中的一个进程时，这个计数器就会增加</li>
+</ul></li>
+<li><p>memory.stat：报告大范围内存统计，如下表所述</p>
+<table>
+
+<thead>
+<tr>
+<th>统计</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cache</td>
+<td>页缓存，包括tmpfs，单位为字节</td>
+</tr>
+<tr>
+<td>rss</td>
+<td>匿名和swap缓存，不包括tmpfs，单位为字节</td>
+</tr>
+<tr>
+<td>mapped_file</td>
+<td>memory-mapped映射的文件大小，包括tmpfs，单位为字节</td>
+</tr>
+<tr>
+<td>pgpgin</td>
+<td>存入内存中的页数</td>
+</tr>
+<tr>
+<td>pgpgout</td>
+<td>从内存中读出的页数</td>
+</tr>
+<tr>
+<td>swap</td>
+<td>swap用量， 单位为字节</td>
+</tr>
+<tr>
+<td>active_anon</td>
+<td>在活跃的最近最少使用(LRU)列表中的匿名和swap缓存，包括tmpfs，单位为字节</td>
+</tr>
+<tr>
+<td>inactive_anon</td>
+<td>不活跃的LRU列表和swap缓存，包括tmpfs，单位为字节</td>
+</tr>
+<tr>
+<td>active_file</td>
+<td>活跃的LRU列表中的file-backed内存，以字节为单位</td>
+</tr>
+<tr>
+<td>inactive_file</td>
+<td>不活跃LRU列表中的file-backed内存，以字节为单位</td>
+</tr>
+<tr>
+<td>unevictable</td>
+<td>无法再生的内存，以字节为单位</td>
+</tr>
+<tr>
+<td>hierarchical_memory_limit</td>
+<td>包含memory cgroup的层级的内存限制，单位为字节</td>
+</tr>
+<tr>
+<td>hierarchical_memsw_limit</td>
+<td>包含memory cgroup的层级的内存加swap限制，单位为字节</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>另外：除了hierarchical_memory_limit和hierarchical_memsw_limit，其他都有一个对应的total前缀，表示该cgroup及其所有子cgroup的全部统计</li>
+<li>各个统计数据之间的关系：
+<ul>
+<li>active_anon + inactive_anon = 匿名内存 + tmpfs文件缓存 +
+swap缓存，因此active_anon + inactive_anon
+不等于rss，因为rss不包含tmpfs</li>
+<li>active_file + inactive_file = 缓存 - tmpfs大小</li>
+</ul></li>
+</ul></li>
+<li><p>memory.numa_stat：显示每个numa节点的内存使用数量</p></li>
+<li><p>memory.kmem.usage_in_bytes：显示当前内核内存分配</p></li>
+<li><p>memory.kmem.max_usage_in_bytes：显示记录的最大内核内存使用情况</p></li>
+<li><p>memory.kmem.failcnt：限制内核内存使用达到限制的次数</p></li>
+<li><p>memory.kmem.tcp.limit_in_bytes：设置TCP硬限制</p></li>
+<li><p>memory.kmem.tcp.usage_in_bytes：显示当前的TCP但内存分配</p></li>
+<li><p>memory.kmem.tcp.failcnt：显示TCP的数量，但内存使用达到限制</p></li>
+<li><p>memory.kmem.tcp.max_usage_in_bytes：显示记录的最大TCP但内存使用情况</p></li>
+</ul>
+<h3 id="net_cls子系统">net_cls子系统</h3>
+<p><strong>概述：</strong>使用等级标识符(classid)标记网络数据包，可允许linux流量控制程序(traffic
+controller,
+tc)识别从具体cgroup中生成的数据包，为来自不同cgroup的报文分配不同的优先级</p>
+<p><strong>需要开启的内核配置：</strong></p>
+<ul>
+<li>CONFIG_CGROUP_NET_CLASSID</li>
+</ul>
+<p><strong>接口文件：</strong></p>
+<ul>
+<li><p>net_cls.classid:
+读写文件。包含一个说明流量控制句柄的十六进制的值，初始值为0。。这些句柄的格式为0xAAAABBBB，其中AAAA是十六进制主设备号，BBBB是十六进制副设备号。</p></li>
+<li><p>net_pero.ifpriomap：配置网卡的优先级映射</p></li>
+<li><p>net_prio.priodx：显示当前cgroup的优先级索引</p></li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> /sys/fs/cgroup/net_cls<br>mount -t cgroup -onet_cls net_cls /sys/fs/cgroup/net_cls<br><span class="hljs-built_in">mkdir</span> /sys/fs/cgroup/net_cls/0<br><span class="hljs-comment"># 设置10:1的句柄</span><br><span class="hljs-built_in">echo</span> 0x100001 &gt; net_cls.classid<br></code></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> net_cls.classid<br>output: 1048577<br></code></pre></td></tr></table></figure>
+<p>配置tc：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">tc qdisc add dev lo root handle 10: htb<br><span class="hljs-comment"># 创建新</span><br>tc class add dev lo parent 10: classid 10:1 htb rate 5mbit<br></code></pre></td></tr></table></figure>
+<p>创建过滤器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">tc filter add dev lo parent 10: protocol ip prio 10 handle 1: cgroup<br></code></pre></td></tr></table></figure>
+<p>删除规则：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">tc qdisc del dev lo root<br></code></pre></td></tr></table></figure>
+<p>查看类具体情况：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">tc -s class show dev ens33<br></code></pre></td></tr></table></figure>
+<h3 id="net_prio子系统">net_prio子系统</h3>
+<p><strong>概述：</strong>允许设置各种应用程序产生的网络流量的优先级</p>
+<p><strong>接口文件：</strong></p>
+<ul>
+<li><p>net_prio.ifpriomap:
+读写文件。该文件包含分配给来自该组进程的流量的优先级映射。这些流量从不同的接口流出系统。它包含一个形式为&lt;ifname
+priority&gt;的元组列表。可以通过使用相同的元组格式将字符串回显到文件中来修改文件内容。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;eth0 5&quot;</span> &gt; /sys/fs/cgroups/net_prio/iscsi/net_prio.ifpriomap<br></code></pre></td></tr></table></figure>
+<ul>
+<li>该命令将强制从属于iscsi net_prio
+group的进程发出，从eth0接口出接口的任何流量将所述流量的优先级设置为5。父cgroup也会有一个可写的net_prio.ifpriomap文件，用于设置系统默认优先级</li>
+<li>优先级是在将帧排队到qdisc之前设置的</li>
+<li>net_prio的一种用法是与mqprio
+qdisc一起使用，允许将应用程序流量引导到基于硬件/驱动程序的流量类。然后可以由管理员或其他网络协议管理这些映射</li>
+</ul></li>
+<li><p>net_prio.proidx：只读文件。它包含一个唯一的整数值，内核使用它作为cgroup的内部表示</p></li>
+</ul>
+<h3 id="perf_event子系统">perf_event子系统</h3>
+<p><strong>概述：</strong>
+该层级中的所有cgroup可以使用perf工具对这些进程和线程监控，没有可供调节的参数</p>
+<h3 id="pids子系统">pids子系统</h3>
+<p><strong>概述：</strong>
+允许cgroup在达到一定限制后阻止任何新任务被fork()或clone()</p>
+<p><strong>需要开启的内核配置：</strong></p>
+<ul>
+<li>CONFIG_CGROUP_PIDS</li>
+</ul>
+<p><strong>接口文件:</strong></p>
+<ul>
+<li>pids.max: 读写文件。设置最大任务数，不能在root
+cgroup中使用。默认值是max</li>
+<li>pids.current:
+只读文件。目前cgroup运行的任务数，pids.current有可鞥大于pids.max，通过设置pids.max小于pids.current实现，但是不可能通过fork和clone实现</li>
+<li>pids.events: 只读文件。包含事件计数器：
+<ul>
+<li>max: 由于自身或父cgroup达到限制，cgroup 中 fork 失败的次数</li>
+</ul></li>
+</ul>
+<h3 id="misc子系统">misc子系统</h3>
+<p><strong>概述：</strong> misc控制器提供了资源限制和跟踪机制</p>
+<p><strong>需要开启的内核配置：</strong></p>
+<p>CONFIG_CGROUP_MISC</p>
+<p><strong>接口文件：</strong></p>
+<ul>
+<li><p>misc.capacity：只读文件。显示了平台上可用的各种标量资源及其数量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> misc.capacity<br>output: <br>res_a 50<br>res_b 10<br></code></pre></td></tr></table></figure></li>
+<li><p>misc.current：只读文件。显示了cgroup及其子cgroup中资源的当前使用情况</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> misc.current<br>res_a 3<br>res_b 0<br></code></pre></td></tr></table></figure></li>
+<li><p>misc.max：读写文件。非根cgroup存在；允许最大限度地使用cgroup及其子cgroup中的资源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> misc.max<br>output:<br>res_a max<br>res_b 4<br></code></pre></td></tr></table></figure>
+<p>Limit can be set by</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> res_a 1 &gt; misc.max<br><span class="hljs-built_in">echo</span> res_a max &gt; misc.max<br></code></pre></td></tr></table></figure></li>
+<li><p>misc.event：只读文件。定义了以下条目。除非另有指定，否则此文件中的值更改将生成文件修改事件，该文件中的所有字段都是分层的</p>
+<ul>
+<li>max：cgroup的资源使用超过最大边界的次数</li>
+</ul></li>
+</ul>
+<p><strong>迁移和所有权：</strong>
+一个杂项的标量资源被分配给第一个使用它的cgroup，并一直分配给该cgroup，直到该资源被释放。将进程迁移到不同的cgroup不会将费用迁移到进程已移动的目标cgroup</p>
+<h2 id="cgroup-v2">Cgroup V2</h2>
+<h3 id="基础操作">基础操作</h3>
+<h4 id="组织进程和线程">组织进程和线程</h4>
+<p><strong>进程：</strong></p>
+<p>最初，只存在所有进程所属的根cgroup。子cgroup可以通过创建子目录来创建：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> <span class="hljs-variable">$CGROUP_NAME</span><br></code></pre></td></tr></table></figure>
+<p>一个给定的cgroup可以有多个子cgroup形成树形结构。每个cgroup都有一个可读写的接口文件"cgroup.procs"。读取时，它每行列出属于cgroup的所有进程的PID。PID不是有序的，如果进程被移动到另一个cgroup，然后返回，或者PID在读取时被回收，同一个PID可能会出现不止一次</p>
+<p>通过将进程的PID写入目标cgroup的cgroup.procs，可以将进程迁移到cgroup中。一个write(2)掉哦那个只能迁移一个进程，如果一个进程由多个线程组成，写入任何线程的PID偶会迁移该进程的所有线程</p>
+<p>当一个进程派生一个子进程时，新进程在操作时出生在该分支进程所属的cgroup中。退出后，进程与退出时所属的cgroup保持关联，直到它被回收。但是，
+cgroup.procs不会出现僵尸进程，因此不能移动到另一个cgroup</p>
+<p>没有任何子进程或活动进程的cgroup可以通过删除目录来销毁。请注意，没有任何子进程且只与僵尸进程相关联的cgroup被认为是空的，可以删除</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">rmdir</span> <span class="hljs-variable">$CGROUP_NAME</span><br></code></pre></td></tr></table></figure>
+<p>/proc/$PID/cgroup列出了进程的cgroup成员。如果系统中使用的是cgroup
+v1，则该文件可能包含多行，每个层次一个。cgroup v2的条目格式是"$PATH"</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /proc/<span class="hljs-variable">$PID</span>/cgroup<br>output:<br>0::/test-cgroup/test-cgroup-nested<br></code></pre></td></tr></table></figure>
+<p>如果进程变成僵尸进程，并且它所关联的cgroup随后被删除。“(deleted)”被附加到路径中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /proc/<span class="hljs-variable">$PID</span>/cgroup<br>output:<br>0::/test-cgroup/test-cgroup-nested(deletd)<br></code></pre></td></tr></table></figure>
+<p><strong>线程：</strong></p>
+<p>cgroup
+v2支持控制器子集的线程粒度，以支持需要在进程线程之间进行分配资源分配的用例。默认情况下，进程的所有线程都属于同一个cgroup，该cgroup还充当资源域，用于承载不特定于进程或线程的资源小号。线程模式允许线程分布在子树中，同时仍为它们维护公共资源域</p>
+<p>支持线程模式的控制器被称为线程控制器，不支持线程模式的控制器被称为域控制器</p>
+<p>将cgroup标记为线程化会使其作为线程化cgroup加入其父级的资源域。父级可能是另一个线程化cgroup，其资源域在层次结构上更靠上。线程化子树的根，即最近的非线程化祖先，可互换地称为线程域或线程根，并充当整个子树的资源域</p>
+<p>在线程子树内部，进程的线程可以放在不同的cgroup中，并且不受内部进程约束——无论非叶cgroup中是否是有线程，都可以在非叶cgroup上启用线程控制器</p>
+<p>由于线程域cgroup承载子树的所有域资源消耗，因此无论其中是否有进程，它都被视为具有内部资源消耗，并且不能包含未线程化的已填充子cgroup。由于根cgroup不受任何内部进程约束，因此它既可以充当线程域，也可以充当域cgroup的父级</p>
+<p>cgroup当前的运行模式或类型在cgroup.type中显示，该文件表明该cgroup是普通域、作为线程子树的域的域还是线程cgroup</p>
+<p>在创建时，cgroup始终是域cgroup，可以通过将"threaded"写入cgroup.type文件来实现线程化，操作是单向的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> threaded &gt; cgroup.types<br></code></pre></td></tr></table></figure>
+<p>一旦线程化，cgroup就不能再次称为域。要启用线程模式，必须满足以下条件：</p>
+<ul>
+<li>因为cgroup将加入父级的资源域。父级必须是有效(线程)域或线程cgroup</li>
+<li>当父域为非线程域时，它不得启用任何域控制器或填充任何子域。根域不受此要求限制</li>
+</ul>
+<p>从拓扑角度来看，cgroup可能处于无效状态，请考虑以下拓扑：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">A (threaded domain) - B (threaded) - C (domain, just created)<br></code></pre></td></tr></table></figure>
+<p>C创建为域，但未连接到可托管子域的父域。C无法使用直到它变成线程cgroup。在这些情况下，cgroup.type文件将报告"domain
+(invalid)"。由于拓扑无效而失败的操作使用EOPNOTSUPP作为errno</p>
+<p>当域cgroup的某个子cgroup变成线程化或"cgroup.subtree_control"文件中启用线程控制器且cgroup中有进程时，域cgroup将变成线程化域。当条件清除时，线程化域变为普通域</p>
+<p>读取时，"cgroup.threads"包含cgroup中所有线程的线程ID列表。除了操作是针对每个线程而不是每个进程之外，"cgroup.threads"具有相同的格式，并且行为方式与"cgroup.procs"相同。虽然可以在任何cgroup中写入"cgroup.threads"，因为它只能在同一个线程域内移动线程，但其操作仅限于每个线程子树内</p>
+<p>线程域cgroup充当整个子树的资源域，虽然线程可以分散在子树，但所有进程都被视为位于线程域cgroup中，线程域cgroup中的cgroup.procs包含子树所有进程的PID，在子树中无法读取。但是，cgroup.procs可以从子树中的任何位置写入，以将匹配进程的所有线程迁移到cgroup</p>
+<p>线程子树中只能启动线程控制器。在线程子树中启用线程控制器时，它仅考虑和控制与cgroup及其后代中的线程相关的资源消耗。所有不与特定线程绑定的消耗都属于线程域cgroup</p>
+<p>由于线程子树不受任何内部进程约束的约束，线程控制器必须处理非叶cgroup及其子cgroup中的线程之间的竞争，每个线程控制器都定义了如何处理此类竞争</p>
+<p>目前，以下控制器是线程化的，可以在线程cgroup中启用：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs text">- cpu<br>- cpuset<br>- perf_event<br>- pids<br></code></pre></td></tr></table></figure>
+<h4 id="populated-通知">populated 通知</h4>
+<p>每个非根cgroup都有一个cgroup.events文件，其中包含polutated，指示cgroup的子层次结构中是否有活动进程。如果cgroup及其后代中没有活动进程，则其值为0；否则为1。当值更改时，会触发poll和notify事件。例如，这可用于在给定子层次结构的所有进程退出启动清理操作。populated状态更新和通知是递归的。考虑以下子层次结构，其中括号中的数字表示每个cgroup中的进程数：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">A(4) - B(0) - C(1)<br>            \ D(0)<br></code></pre></td></tr></table></figure>
+<p>A、B和C的populated字段将为1，而D为0。在C中的一个进程退出后，B和C的populated字段将翻转为0，并且两个cgroups的cgroup.events文件上都会生成文件修改事件</p>
+<h4 id="cgroup.controllers">cgroup.controllers</h4>
+<p><strong>启用和禁用：</strong></p>
+<p>每个cgroup都有一个cgroup.controllers文件，其中列出了该cgroup可以启用的所有控制器：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> cgroup.controllers<br></code></pre></td></tr></table></figure>
+<p>默认情况下不启用任何控制器，可以通过写入"cgroup.subtree_control"文件来启用和禁用控制器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;+cpu +memory -io&quot;</span> &gt; cgroup.subtree_control<br></code></pre></td></tr></table></figure>
+<p>仅可启用"cgroup.controllers"中列出的控制器，当指定多个上述操作时，它们要么全部成功，要么全部失败。如果对同一个控制器指定了多个操作，则最后一个操作有效</p>
+<p>在cgroup中启用控制器表示将控制目标资源在其直属子级之间的分布。请考虑以下子层次结构，已启用的控制器在括号中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">A(cpu,memory) - B(memory) - C()<br>						  \ D()<br></code></pre></td></tr></table></figure>
+<p>由于A启用了cpu和memory，A将控制向其子进程（本例为B）分配CPU周期和内存。由于B启用了memory但未启用CPU，C和D可以自由竞争CPU周期，但对B可用内存的分配将受到控制</p>
+<p>由于控制器负责调节目标资源向cgroup子节点的分配，因此启用它会在子cgroup中创建控制器的接口文件。在上面的例子中，在B上启用cpu会在C和D中创建以"cpu."为前缀的控制器接口文件。同样，在B上禁用memory会从C和D中删除以"memory."为前缀的控制器接口文件。这意味着控制器接口文件（任何不以cgroup.开头的文件）都归父节点所有，而不是cgroup本身</p>
+<p><strong>自上而下的约束：</strong></p>
+<p>资源自上而下分配，并且只有当资源已从父级分配给cgroup时，cgroup才能进一步分配资源。这意味着所有非根"cgroup.subtree_control"文件只能包含在父级"cgroup.subtree_control"文件中启用的控制器。</p>
+<p><strong>无内部进程约束：</strong></p>
+<p>非根cgroup只有在没有自己的进程时才能将域资源分配给其子cgroup，换句话说，只有不包含任何进程的域cgroup才能在其"cgroup.subtree_control"文件中启用域控制器</p>
+<p>这可以保证当域控制器查看已启用它的层次结构部分时，进程始终只位于叶子上。这排除了子cgroup与父cgroup的内部进程竞争的情况</p>
+<p>根cgroup不受此限制。根包含进程和匿名资源消耗，这些资源消耗不能与任何其他cgroup关联，并且需要大多数控制器的特殊处理。如何管理根cgroup中的资源消耗取决于每个控制器</p>
+<p>注意：如果cgroup的cgroup.subtree_control中没有启用控制器，则限制不会起作用。这很重要，否则就无法创建已polutated
+cgroup的子项。要控制cgroup的资源分配，cgroup必须创建子项并将其所有基础南横转移到子项，然后才能在其"cgroup.subtree_control"文件中启用控制器</p>
+<h3 id="委派">委派</h3>
+<p><strong>委派模型：</strong></p>
+<p>cgroup可以通过两种方式委派。首先，通过向用户授予目录及其cgroup.procs，cgroup.threads和cgroup.subtree_control文件的写入权限，委派给权限较低的用户。其次，如果设置了nsdelegate挂载选项，则在创建命名空间时自动委派给cgroup命名空间</p>
+<p>由于给定目录中的资源控制接口文件控制父级资源的分配，因此不应允许委托人写入这些文件
+。对于第一种方法，这是通过不授予对这些文件的访问权限来实现的。对于第二种方法，内核拒绝从命名空间内部写入命名空间根目录上除cgroup.procs和cgroup.subtree_control之外的所有文件</p>
+<p>两种委派类型的最终结果是相同的。一旦委派，用户可以在目录下建立子层次结构，根据需要组织其中的进程，并进一步分配从父级获得的资源。所有资源控制器的控制和其他设置都是分层的，无论委派的子层次结构中发生上面，都无法逃脱父级施加的资源限制。</p>
+<p>目前，cgrou对委派子层次结构中的cgroup数量或嵌套深度没有任何限制。但是，将来可能会明确限制</p>
+<p><strong>委派控制：</strong></p>
+<p>委派子层次结构被包含在某种意义上，则被委派者不能将进程移入或移出子层次结构</p>
+<p>对于授权给较低权限用户的委派，这是通过要求具有非root
+euid的进程满足以下条件来将目标进程迁移到cgroup中，方法是将其PID写入cgroup.procs文件</p>
+<ul>
+<li>写入者必须具有cgroup.procs文件的写权限</li>
+<li>写入者必须对源和目标cgroups的共同祖先的cgroup.procs文件具有写入权限</li>
+</ul>
+<p>上述两个约束确保了虽然被委派者可以在委派的子层次结构中自由迁移流程，但不能从子层次结构外部拉入或推出。</p>
+<p>举例来说，假设cgroup
+C0和C1已委派给用户U0，该用户在C0下创建了C00、C01，在C1下创建了C10，如下所示，且C0和C1下的所有进程都属于U0：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">~~~~~~~~~~~~~ - C0 - C00<br>~ cgroup    ~      \ C01<br>~ hierarchy ~<br>~~~~~~~~~~~~~ - C1 - C10<br></code></pre></td></tr></table></figure>
+<p>假设U0想要将当前位于C10中的进程的PID写入C00/cgroup.procs。U0具有该文件的写入访问权限；但是源cgroup
+C10 和目标cgroup
+C00的共同祖先位于委派点之上，U0不具有其cgroup.procs的文件写访问权限，因此将使用-EACCESS拒绝该写入</p>
+<p>对于命名空间的委托，遏制是通过要求源cgroup和目标cgroup都可从尝试迁移的进程的命名空间的访问来实现的。如果其中一个不可访问，则迁移将被拒绝并返回-ENOENT</p>
+<h3 id="指南">指南</h3>
+<p><strong>组织一次并控制：</strong></p>
+<p>跨cgroup迁移进程是一项相对昂贵的操作，并且内存等有状态资源不会随进程一起移动。这是一个明确的设计决策，因为在同步成本方面，迁移和各种热路径之间通常存在固有的权衡</p>
+<p>因此，不建议频繁地跨cgroup迁移进程以应用不同的资源限制。启动时应根据系统的逻辑和资源结构将工作负载分配给cgroup，可以通过接口文件更改控制器配置来动态调整资源分配</p>
+<p><strong>避免名称冲突：</strong></p>
+<p>cgroup及其子cgroup的接口文件占用同一目录，因此可能会创建与接口文件冲突的子cgroup</p>
+<p>所有cgroup的核心接口文件都以"cgroup."作为前缀，每个控制器的接口文件都以控制器名称和点作为前缀。控制器的名称由小写字母和"_"组成，但从不以"_"开头，因此可以将其作为前缀字符以比避免冲突。此外，接口文件名不会以通常用于对工作负载进行分类的术语（例如作业、服务、切片、单元或工作负载）开头或结尾</p>
+<h3 id="资源分配模型">资源分配模型</h3>
+<p><strong>权重：</strong></p>
+<p>父母的资源分配方式是将所有活跃子女的权重相加，并为每个子女分配与其权重与总和之比相匹配的分数。由于只有当前可以使用资源的子女参与分配，因此这是节省工作的。由于其动态特性，此模型通常用于无状态资源</p>
+<p>所有权重都在[1,
+10000]范围内，默认值为100。这允许在足够细的粒度下在两个方向上进行对称乘性偏差，同时保持在直观范围内。</p>
+<p>值要权重在范围内，所有配置组合都是有效的，没有理由拒绝配置更改或流程迁移</p>
+<p>cpu.weight按比例将CPU周期分配给活跃子进程，
+就是这种类型的一个例子</p>
+<p><strong>限制：</strong></p>
+<p>子进程最多只能消耗配置的资源量。限制可能会过大——子进程的总限制可能会超过父进程的资源量</p>
+<p>限制在范围[0 max]内，默认为max</p>
+<p>由于限制可能被过度承诺，所有配置组合都是有效的，没有理由拒绝配置更改或流程迁移</p>
+<p>io.max限制cgroup在IO设备上可以消耗的最大BPS或IOPS，是此类型的一个示例</p>
+<p><strong>保护措施：</strong></p>
+<p>只要cgroup的所有祖先的使用量都低于其保护级别，则cgroup受到的保护量最高可达配置的资源量。保护可以硬性保证，也可以是尽力而为的软性边界。保护也可以过度承诺，在这种情况下，只有父级可用的资源在子级中受到保护</p>
+<p>保护范围是[0, max]，默认为0，即无操作</p>
+<p>由于保护措施可能被过度承诺，所有配置组合都是有效的，没有理由拒绝配置更改或流程迁移</p>
+<p>memory.low实现尽力内存保护</p>
+<p><strong>分配：</strong></p>
+<p>一个cgroup被专门分配一定数量的有效资源，分配不能过度承诺——子组的分配总和不能超过父组的可用资源量</p>
+<p>分配范围是[0, max]，默认为0，表示没有资源</p>
+<p>由于分配不能过度承诺，因此某些配置组合无效，应予以拒绝。此外，如果资源对于流程的执行是必需的，则流程迁移可能会被拒绝</p>
+<p>cpu.rt.max硬分配实时切片就是此类型的一个例子</p>
+<h3 id="约定">约定</h3>
+<ul>
+<li><p>单个功能的设置应包含在单个文件中</p></li>
+<li><p>根cgroup应免于资源控制，因此不应该具有资源控制接口文件</p></li>
+<li><p>默认时间单位是微妙。如果使用其他单位，则必须提供明确的单位后缀</p></li>
+<li><p>每单位数量的零件应使用百分比小数，且小数部分至少为两位数</p></li>
+<li><p>如果控制器实现基于权重的资源分配，其接口文件应命名为权重，范围为[1,
+10000]，默认值为100，选择这些值是为了在两个方向上允许足够且对称的偏差，同时保持直观性</p></li>
+<li><p>如果控制器实现了绝对资源保证或限制，则接口文件应分别命名为min和max。如果控制器实现了尽力资源保证或限制，则接口文件应分别命名为low和high。在上述四个文件的，应使用特殊标记max来表示读写向上无穷大</p></li>
+<li><p>如果设置具有可配置的默认值和键入的特定覆盖，则默认条目应以default键入，并作为文件中的第一个条目出现。可以通过写入"defaul
+&amp;VAL" 或
+"$VAL"来更新默认值。当写入以更新特定覆盖时，可以使用"defaul"值来指示删除覆盖。读取时，不得出现以"default"作为值的覆盖条目</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> cgroup-example-interface-file<br>output:<br>default 150<br>8:0 300<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;default 125&quot;</span> &gt; cgroup-example-interface-file<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;8:16 170&quot;</span> &gt; cgroup-example-interface-file<br><span class="hljs-built_in">cat</span> cgroup-example-interface-file<br>output:<br>default 125<br>8:16 170<br></code></pre></td></tr></table></figure></li>
+<li><p>对于频率不是很高的事件，应创建一个接口文件events，列出事件键值对。每当发生可通知的事件时，应在文件上生成文件修改事件</p></li>
+</ul>
+<h3 id="已弃用的-v1-核心功能">已弃用的 v1 核心功能</h3>
+<ul>
+<li>不支持包括命名层次在内的多重层次。</li>
+<li>不支持所有 v1 挂载选项。</li>
+<li>“tasks”文件被删除，并且“cgroup.procs”未排序。</li>
+<li>“cgroup.clone_children” 已被删除。</li>
+<li>/proc/cgroups 对于 v2
+来说毫无意义。请改用根目录中的“cgroup.controllers”文件。</li>
+</ul>
+<h3 id="核心接口文件">核心接口文件</h3>
+<p>所有cgroup核心接口文件都以"cgroup"为前缀</p>
+<h4 id="cgroup.type">cgroup.type</h4>
+<p>存在于非root cgroup上的读写单值文件</p>
+<p>读取时，表示该cgroup当前的类型，可以是下列值之一：</p>
+<ul>
+<li>domain：正常有效的域cgroup</li>
+<li>domain threaded：作为线程子树根的线程域cgroup</li>
+<li>domain
+invalid：处于无效状态的cgroup，无法填充或启用控制器，可能允许其成为线程cgroup</li>
+<li>threaded：线程cgroup，是线程子树的成员</li>
+</ul>
+<p>通过将threaded写入此文件，可以将cgroup转变为线程cgroup</p>
+<h4 id="cgroup.procs">cgroup.procs</h4>
+<p>所有cgroup上都存在的读写换行分隔值文件</p>
+<p>读取时，它会列出属于该cgroup的所有进程的PID，每行一个。PID不是按顺序排序的，如果进程被移动到另一个cgroup后又移回来，或者读取时PID被回收，则同一个PID可能会出现多次</p>
+<p>可以写入PID，以将与PID关联的进程迁移到cgroup。写入者应满足以下所有条件：</p>
+<ul>
+<li>它必须对cgroup.procs文件具有写权限</li>
+<li>它必须对源和目标cgroups
+的共同祖先的cgroup.procs文件具有写访问权限</li>
+</ul>
+<p>当委派子层次结构时，应与包含目录一起授予对此文件的写访问权限</p>
+<p>在线程cgroup中的，
+由于所有进程都属于线程根，因此读取此文件失败并出现EOPNOTSUPP。支持写入并将进程的每个线程移至cgroup</p>
+<h4 id="cgroup.threads">cgroup.threads</h4>
+<p>所有cgroup上都存在的读写换行分隔值文件</p>
+<p>读取时，它会以每行一个的方式列出属于该cgroup的所有线程的TID。TID是无序的，如果线程被移动到另一个cgroup然后又移回，或者读取时TID被回收，则同一个TID可能回出现多次</p>
+<p>可以写入TID，以将与TID关联的线程迁移到cgroup，写入者应满足以下所有条件：</p>
+<ul>
+<li>它必须对cgroup.threads文件具有写权限</li>
+<li>线程当前所在的cgroup必须与目标cgroup位于同一资源域中</li>
+<li>它必须对源和目标cgroups共同祖先的cgroup.procs文件具有写访问权限</li>
+</ul>
+<h4 id="cgroup.controllers-1">cgroup.controllers</h4>
+<p>所有cgroup上都存在的只读空格分隔值文件</p>
+<p>它显示了cgroup可用的所有控制器的空格分隔值列表。控制器没有排序</p>
+<h4 id="cgroup.subtree_control">cgroup.subtree_control</h4>
+<p>所有cgroup上都存在的可读写空格分隔值文件。初始为空</p>
+<p>读取时，它会显示以空格分割的控制器列表，这些控制器被启用来控制从cgroup到其子组的资源分配</p>
+<p>可以写入以空格分隔的带有+或-前缀的控制器列表来启用或禁用控制器。带有+前缀的控制器名称将启用该控制器，带有-前缀的控制器名称将禁用该控制器。如果控制器在列表中出现多次，则最后一个有效。当指定多个启用和禁用操作时，要么全部成功，要么全部失败</p>
+<h4 id="cgroup.event">cgroup.event</h4>
+<p>存在于非root
+cgroup上的只读平键文件。定义了以下条目。除非另有说明，否则此文件中的值更改会生成文件修改事件</p>
+<ul>
+<li>populated：如果cgroup或其他后代包含任何活动进程，则为1；否则为0</li>
+<li>frozen：如果cgroup被冻结，则为1；否则为0</li>
+</ul>
+<h4 id="cgroup.max.descendants">cgroup.max.descendants</h4>
+<p>读写单值文件。默认值为"max"</p>
+<p>允许的最大后代cgroup数量。如果实际后代数量相等或更大，则在层次结构中创建新cgroup的尝试将失败</p>
+<h4 id="cgroup.max.deep">cgroup.max.deep</h4>
+<p>读写单值文件。默认值为max</p>
+<p>当前cgroup下允许的最大下降深度。如果实际下降深度等于或大于该值，则尝试创建新的子cgroup将失败</p>
+<h4 id="cgroup.stat">cgroup.stat</h4>
+<p>具有以下条目的只读平键文件：</p>
+<ul>
+<li>nr_descendants：可见后代cgroup的总数</li>
+<li>nr_dying_descendants：濒临消亡的后代cgroup总数。cgroup在被用户删除后将处于濒临消亡状态。cgroup将在一段未定义的时间内（可能取决于系统负载）保持濒临消亡状态，然后才会被彻底销毁。任何情况下，进程都不能进入正在垂死的cgroup，正在垂死的cgroup也无法复活。正在消亡的cgroup所消耗的系统资源不得超过其删除cgroup时所允许的限制</li>
+</ul>
+<h4 id="cgroup.freeze">cgroup.freeze</h4>
+<p>存在于非root cgroup中的读写单值文件。允许的值为0和1。默认值为0</p>
+<p>将1写入文件会导致cgroup及其所有后代cgroup被冻结。这意味着所有附属进程都将停止，直到cgroup明确解冻后才会运行。cgroup的冻结可能需要一些时间；此操作完成后，cgroup.events控制文件中的frozen值将更新为1，并发出相应的通知</p>
+<p>cgroup可以通过其自身设置或任何祖先cgroup的设置进行解冻。如果任何祖先cgroup被解冻，则cgroup将保持冻结状态</p>
+<p>冻结cgroup中的进程可以通过致命信号终止。它们还可以进入和离开冻结cgroup；要么通过用户的明确移动，要么冻结cgroup与fork()竞争。如果将进程移动到冻结cgroup，它将停止，如果将进程移出冻结cgroup，它将变为运行状态</p>
+<p>cgroup的冻结状态不会影响任何cgroup树操作；可以删除冻结的cgroup，也可以创建新的子cgroup</p>
+<h4 id="cgroup.kill">cgroup.kill</h4>
+<p>存在于非root cgroup中的只写单值文件。唯一允许的值是1</p>
+<p>将1写入文件会导致cgroup及其所有后代cgroup被终止。这意味着受影响的cgroup树种的所有进程都将通过SIGKILL终止</p>
+<p>终止cgroup树将适当地处理并发分叉并防止迁移</p>
+<p>在线程cgroup中，由于终止cgroup是一个进程定向操作，即，它会影响整个线程组，因此写入此文件会因EOPNOTSUPP而失败</p>
+<h4 id="cgroup.pressure">cgroup.pressure</h4>
+<p>允许值为0和1的读写单值文件。默认值为1</p>
+<p>向文件写入0将禁用cgroup PSI记。向文件写入1将重新启用cgroup PSI。</p>
+<p>此控制属性不是分层的，因此在cgroup中禁用或启用PSI不会影响后代中的PSI，并且不需要通过来自root
+cgroup传递启用</p>
+<h4 id="irq.pressure">irq.pressure</h4>
+<p>读写嵌套键文件</p>
+<p>显示IRQ/SOFTIRQ的压力失速信息。有关详细信息，请参阅：https://www.kernel.org/doc/html/latest/accounting/psi.html#psi</p>
+<h3 id="控制器接口文件">控制器接口文件</h3>
+<h4 id="cpu">CPU</h4>
+<p><strong>警告：</strong>
+cgroup2尚不支持实时进程的控制。对于启用了CONFIG_RT_GROUP_SCHED选项以对实时进程进行组调度的内核，只有当所有RT进程都在根cgroup中时，才能启用cpu控制器。如果禁用了CONFIG_RT_GROUP_SCHED，则此限制不适用。请注意，系统管理软件可能已在系统启动过程中将RT进程放入非root
+cgroup，并且可能需要将这些进程移动到root
+cgroup，然后才能使用启用了CONFIG_RT_GROUP_SCHED的内核启用cpu控制器</p>
+<p><strong>注意：</strong> 所有时间长度均以微妙为单位</p>
+<p><strong>cpu.stat：</strong></p>
+<p>只读平键文件。无论控制器是否启用，此文件都存在</p>
+<p>它始终报告以下三个统计数据：</p>
+<ul>
+<li>usage_usec：CPU使用时间</li>
+<li>user_usec：CPU用户态时间</li>
+<li>system_usec：CPU内核态时间</li>
+</ul>
+<p>当控制器启用时，还有以下五个统计数据：</p>
+<ul>
+<li>nr_periods：调度周期的总数</li>
+<li>nr_throttled：进程被限制(throttled)的次数</li>
+<li>throttled_usec：进程被限制的总时间</li>
+<li>nr_bursts：发生的burst事件的次数。burst事件是指在短时间内CPU使用率突然增加的情况</li>
+<li>burst_usec：burst事件的总时间</li>
+</ul>
+<p><strong>cpu.weight：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为100</p>
+<p>对于非空闲组(cpu.idle = 0)，权重在范围内[1, 10000]</p>
+<p>如果cgroup已配置为SCHED_IDLE(cpu.idle = 1)，则权重将显示为0</p>
+<p><strong>cpu.weight.nice：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为0</p>
+<p>nice值的范围是[-20, 19]</p>
+<p>此接口文件是cpu.weight的替代接口，允许使用
+nice(2)使用的相同值读取和设置权重。由于nice值的范围较小，粒度较粗，因此读取的值是当前权重的最接近近似值</p>
+<p>nice(2)是一个系统调用，用于设置进程的优先级，优先级决定了进程在系统资源（特别是CPU时间）分配中的优先顺序。nice值的范围通常是从-20到19，值越小表示越高优先级</p>
+<p><strong>cpu.max：</strong></p>
+<p>存在于非root cgroup上的读写双值文件。默认值为" max 100000"</p>
+<p>最大带宽限制。其格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-variable">$MAX</span> <span class="hljs-variable">$PERIOD</span><br></code></pre></td></tr></table></figure>
+<p>表示该组在每个$PERIOD期间最多可以消费$MAX。$MAX中的max表示没有限制，如果只写一个数字，则更新$MAX</p>
+<p><strong>cpu.max.burst：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为0</p>
+<p>burst范围在[0, $MAX]内</p>
+<p><strong>cpu.pressure：</strong></p>
+<p>读写嵌套键文件</p>
+<p>显示CPU的压力失速信息。有关详细信息，请参阅：https://www.kernel.org/doc/html/latest/accounting/psi.html#psi</p>
+<p><strong>cpu.uclamp.min：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为0，即不提高利用率</p>
+<p>所请求的最低利用率（保护）以百分比的有理数表示，例如12,34表示12.34%</p>
+<p>此接口允许读取和设置类似于sched_setattr(2)的最小利用率限制值。此最小利用率值用于限制特定任务的最小利用率限制</p>
+<p>请求的最小利用率(保护)始终受最大利用率(限制)的当前值限制，即cpu.uclamp.max</p>
+<p><strong>cpu.uclamp.max：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为max</p>
+<p>请求的最大利用率（限制）以百分比有理数表示，例如98.76表示98.76%</p>
+<p>此接口允许读取和设置类似于sched_setatrt(2)的最大利用率限制值，此最大利用率值用于限制特定任务的最大利用率限制</p>
+<p><strong>cpu.idle：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为0</p>
+<p>这是cgroup中每个任务的SCHD_IDLE调度策略的模拟。将此值设置为1将使cgroup的调度策略成为SCHED_IDLE。cgroup中的线程将保留其自己的相对优先级，但cgroup本身将被视为相对于其他同类而言优先级非常低</p>
+<h4 id="memory">memory</h4>
+<p>memory控制器调节内存的分配。内存是有效状态的，并实现限制和保护模型。由于内存使用和回收压力相互交织，以及内存的状态特性，分配模型相对复杂</p>
+<p>虽然并非完全无懈可击，但特定cgroup的所有主要内存使用情况都会得到跟踪，以便可以合理地计算和控制总内存消耗。目前，会跟踪以下类型的内存使用情况：</p>
+<ul>
+<li>Userland memory：页面缓存和匿名内存</li>
+<li>Kernel data structures：dentry和inode</li>
+<li>TCP套接字缓存区</li>
+</ul>
+<p>为了覆盖范围更广，上述列表将来可能会扩大</p>
+<p>所有内存量均以字节为单位。如果写入的值为与PAGE_SIZE对齐，则读回该值可能会向上舍入为最接近的PAGE_SIZE倍数</p>
+<p><strong>memory.current：</strong></p>
+<p>存在于非root cgroup上的只读单值文件</p>
+<p>该cgroup及其后代当前正在使用的内存总量</p>
+<p><strong>memory.min：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为0</p>
+<p>硬内存保护。如果cgroup的内存使用量在其有效最小边界内，则在任何情况下都不会回收该cgroup的内存。如果没有可用的不受保护的可回收内存，则会调用OOM终止程序。如果超过出有效最小边界(或有效低边界，如果有效低边界更高)，则会按超额比例回收页面，从而减少超额较小的回收压力</p>
+<p>有效最小边界受到所有祖先cgroup的memory.min值限制。如果存在memory,min过量使用（子cgroup或cgroup需要的受保护内存多于父cgroup允许的内存），则每个子cgroup将获得父cgroup的保护部分，该部分保护与其实际内存使用量低于memory.min的比例成正比</p>
+<p>不鼓励在此保护下放置超过通常可用的内存，并且可能会导致持续的OOM</p>
+<p>如果memory cgroup中没有进程， 则会忽略其memory.min</p>
+<p><strong>memory.low：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为"0"</p>
+<p>尽力保护内存，如果cgroup的内存使用量在其有效低边界内，则除非未受保护的cgroup中没有可回收内存，否则不会回收该cgroup的内存。如果超出有效低边界（或有效最小边界，如果有效最小边界更高），则会根据超额部分按比例回收页面，从而减少超额部分的回收压力</p>
+<p>有效低边界受所有祖先cgroup的memory.low值限制。如果存在memory.low过度使用（字cgroup或cgorup需要的受保护内存多于父cgroup允许的内存），则每个子cgroup将获得与其实际内存使用量（低于memory.low）成比例的父cgroup保护部分</p>
+<p>不鼓励在此保护下放置超过通常可用的内存</p>
+<p><strong>memory.high：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为max</p>
+<p>内存使用限制，如果cgroup的使用量超出上限，则cgroup的进程将受到限制，并承受巨大的回收压力</p>
+<p>超过上限不会调用OOM终止程序，在极端情况下可能会突破限制。在外部进程监控受限cgroup以缓解沉重的回收压力的情况下，应使用上限</p>
+<p><strong>memory.max：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为max</p>
+<p>内存使用硬限制。这是限制cgroup内存使用的主要机制。如果cgroup的内存使用量达到此限制且无法降低，则会在cgroup中调用OOM
+killer。在某些情况下， 使用量可能会暂时超过限制</p>
+<p>在默认配置下，常规0阶分配总是会成功。调用者可以以不同的方式重试它们，以-ENOMEM的形式返回到用户空间，或者在磁盘预读等情况下默默忽略</p>
+<p><strong>memory.reclaim：</strong></p>
+<p>所有cgroup都存在的只写嵌套键文件</p>
+<p>这是一个在目标cgroup中触发内存回收的简单接口</p>
+<p>此文件接受单个键，即要回收的字节数，目前不支持嵌套键</p>
+<p>例子：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;1G&quot;</span> &gt; memory.reclaim<br></code></pre></td></tr></table></figure>
+<p>稍后可以使用嵌套键扩展接口以配置回收行为。例如，指定要回收的内存类型（匿名、文件等）</p>
+<p>注意：内核可能会从目标cgroup中过度或不足地回收。如果回收的字节数少于指定的数量，则返回-EAGAIN</p>
+<p>注意：主动回收（由此接口触发）并不意味着指示内存cgroup上的内存压力。因此，在这种i情况下，通常不会执行由内存回收触发的套接字内存平衡。这意味着网络层不会根据由memory.reclaim引起的回收进行调整</p>
+<p><strong>memory.peak：</strong></p>
+<p>存在于非root cgroup上的只读单值文件</p>
+<p>自cgroup创建以来，记录的cgroup及其后代的最大内存使用量</p>
+<p><strong>memory.oom.group：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为0</p>
+<p>确定OOM终止程序是否应将cgroup视为不可分割的工作负载。如果设置，则属于该cgroup或其后代（如果内存cgroup不是叶cgroup）的所有任务都会一起终止或根本不终止。这可用于避免部分终止以保证工作负载的完整性</p>
+<p>具有OOM保护（oom_score_adj设置为-1000）的任务被视为异常，并且永远不会被终止</p>
+<p>如果在cgroup中调用OOM终止程序，它将不会终止该cgroup之外的任何任务，无论祖先cgroup的memory.oom,group值如何</p>
+<p><strong>memory.events：</strong></p>
+<p>存在于非root
+cgroup上的只读平键文件。定义了以下条目。除非另有说明，否则此文件中的值更改会生成文件修改事件。</p>
+<p>注意：此文件中的所有字段都是分层的，文件修改事件可能由于层次结构下方的事件而生成。有关cgroup级别的本地事件，请参阅memory.events.local</p>
+<ul>
+<li>low：尽管cgroup的使用率低于低限，但由于内存压力过大而被回收的次数。这通常表示低限已过度使用</li>
+<li>high：由于超出高内存边界，cgroup的进程被限制并路由以执行直接内存回收的次数。对于内存使用量受高限（而非全局内存压力）限制的cgroup，此事件的发生是意料之中的</li>
+<li>max：cgroup的内存使用量即将超过最大边界的次数。如果直接回收无法降低内存使用量，则cgroup会进入oom状态</li>
+<li>oom：cgroup内存使用量达到限制且分配即将失败的次数。如果不将oom
+killer视为一个选项（例如高阶分配失败或要求调用者不要重试），则不会引发此事件。</li>
+<li>oom_kill：属于此cgroup的被任何类型的OOM终止程序终止的进程数（记录的是==尝试杀死==的进程数量，而不是实际被杀死的进程数量）</li>
+<li>oom_group_kill：发生组oom的次数</li>
+</ul>
+<p><strong>memory.events.local：</strong></p>
+<p>与memory.events类似，但文件中的字段是cgroup本地的，即不是分层的。在此文件上生成的文件修改仅反映本地事件</p>
+<p><strong>memory.stat：</strong></p>
+<p>存在于非root cgroup上的只读平键文件</p>
+<p>这将cgroup的内存占用分解为不同类型的内存、特定于类型的详细信息以及有关内存管理系统的状态和过去事件的其他信息</p>
+<p>所有内存量均以字节为单位</p>
+<p>条目按顺序排列，便于阅读，新条目可以显示在中间。不要依赖保持在固定位置的项目，使用键来查找特定值</p>
+<p>如果条目没有每个节点的计数器（或者没有显示在memory.numa_stat中）。使用npn(non-per-node)作为标记，表示它不会显示在memory.numa_stat中</p>
+<ul>
+<li>anon：匿名映射（如brk()、sbrk()和mmap(MAP_ANONYMOUS)）中使用的内存量</li>
+<li>file：用于缓存文件系统数据的内存量，包括tmpfs和共享内存</li>
+<li>kernel(npn)：内核总内存总量，包括(kernel_stack、pagatables、percpu、vmalloc、slab)以及其他内核内存用例</li>
+<li>kernerl_stack：分配给内核栈的内存量</li>
+<li>pagetables：为页表分配的内存量</li>
+<li>sec_pagetables：为辅助页表分配的内存量，目前包括x86和arm64的KVM页表分配以及IOMMU页表</li>
+<li>percpu(npn)：用于存储每个cpu内核数据结构的内存量</li>
+<li>sock(npn)：网络传播缓冲区使用的内存量</li>
+<li>vmalloc(npn)：用于vmap支持内存的内存量</li>
+<li>shmem：由交换支持的缓存文件系统数据量，例如tmpfs、shm段、共享匿名mmap()</li>
+<li>zswap：zswap压缩后端消耗的内存量</li>
+<li>zswapped：换出zswap的应用程序内存量</li>
+<li>file_mapped：使用mmap()映射的缓存文件系统数据量</li>
+<li>file_dirty：已修改但尚未写回磁盘的缓存文件系统数据量</li>
+<li>file_writeback：已修改且当前正在写回磁盘的缓存文件系统数据量</li>
+<li>swapcached：内存中缓存的交换空间量，
+交换缓存会考虑内存和交换空间的使用情况</li>
+<li>anon_thp：透明hugepage支持的匿名映射中的内存量</li>
+<li>file_thp：透明hugepage支持的缓存文件系统数据量</li>
+<li>shmem_thp：透明hugepage支持吃的shm、tmpgs和共享匿名mmap()的数量</li>
+<li>inactive_anon，active_anon，inactive_file，active_file，
+unevictable：页面回收算法使用的内部内存管理列表上的内存量（交换支持和文件系统支持）。由于这些代表内部列表状态（例如，shmem页面位于匿名内存管理列表上），inactive_foo
++
+active_foo可能不等于foo计数器的值，因为foo计数器是基于类型的，不是基于列表的</li>
+<li>slab_reclaimable：可能被回收的slab的一部分，例如dentry和inode</li>
+<li>slab_unreclaimable：由于内存压力，部分slab无法被回收</li>
+<li>slab(npn)：用于存储内核数据结构的内存量</li>
+<li>workingset_refault_anon：先前驱动的匿名页面的错误数</li>
+<li>workingset_refault_file：先前逐出的文件页面的错误数</li>
+<li>workingset_activate_anon：立即激活的匿名页面的数量</li>
+<li>workingset_activate_file：立即激活的默认文件页面数</li>
+<li>workingset_restore_anon：在回收之前被检测为活动工作集的已恢复匿名页面的数量</li>
+<li>workingset_restore_file：在回收之前被检测为活动工作集的已还原文件页面的数量</li>
+<li>wokingset_noderecalim：影子节点被回收的次数</li>
+<li>pgscan(npn)：扫描页面的数量（在非活动LRU列表中）</li>
+<li>pgsteal(npn)：回收页面数量</li>
+<li>pgscan_kswapd(npn)：按kswapd扫描的页面数量（在非活动LRU列表中）</li>
+<li>pgscan_direct(npn)：直接扫描的页面数量（在非活动LRU列表中）</li>
+<li>pgscan_khugepaged(npn)：按khugepage扫描的页面数量（在非活动LRU列表中）</li>
+<li>pgsteal_kswapd(npn)：按kswapd计算的回收页面数量</li>
+<li>pgsteal_direct(npn)：直接回收的页面数量</li>
+<li>pgsteal_khugepaged(npn)：按khugepage计算的回收页面数量</li>
+<li>pgfault(npn)：发生的页面错误总数</li>
+<li>pgmajfault(npn)：发生的主要页面错误的数量</li>
+<li>pgrefill(npn)：扫描页面的数量（在非活动LRU列表中）</li>
+<li>pgactivate(npn)：移动到活动LRU列表的页面数量</li>
+<li>pgdeactivate(npn)：移动到非活动LRU列表的页面数量</li>
+<li>pglazyfree(npn)：在内存压力下延迟释放的页面数量</li>
+<li>pglazyfreed(npn)：回收无惰性页面的数量</li>
+<li>zswpin：从zswap移动到内存中的页面数</li>
+<li>zswpout：从内存移动到zswap的页面数</li>
+<li>zswpwb：从zswap写入到swap的页面数</li>
+<li>thp_fault_alloc
+(npn)：为满足页面错误而分配的透明hugepage数。当CONFIG_TRANSPARENT_HUGEPAGE未设置时，此计数器不存在</li>
+<li>thp_collapse_alloc
+(npn)：为允许折叠现有页面范围而分配的透明hugepage数。当CONFIG_TRANSPARENT_HUGEPAGE未设置时，此计数器不存在</li>
+<li>thp_swpout (npn)：透明hugepage的数量，在一块交换而不分裂</li>
+<li>thp_swpout_fallback
+(npn)：在交换之前被分割的透明hugepage的数量。通常是一因为没有巨大的页面分配一些连续的交换空间</li>
+</ul>
+<p><strong>memory.numa_stat：</strong></p>
+<p>存在于非root cgroup上的只读嵌套键文件</p>
+<p>这会将cgroup的内存占用分解未不同类型的内存、特定于类型的详细信息以及有关内存管理系统状态的每个节点的其他信息</p>
+<p>这对于提供memcg中的NUMA位置信息的可见性非常有用，因为允许从任何物理节点分配页面。其中一个用例是通过将这些信息与应用程序的CPU分配相结合来评估应用程序性能</p>
+<p>所有内存量均以字节为单位</p>
+<p>memory.numa_stat的输出格式为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">type N0=&lt;bytes in node 0&gt; N1=&lt;bytes in node 1&gt; ...<br></code></pre></td></tr></table></figure>
+<p><strong>memory.swap.current：</strong></p>
+<p>存在于非root cgroup上的只读单值文件</p>
+<p>该cgroup及其后代当前正在使用的交换总量</p>
+<p><strong>memory.swap.high：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为max</p>
+<p>交换使用限制，如果cgroup的交换使用量超出此限制。则其所有进一步的分配都将受到限制，以允许用户空间实施自定义的内存不足程序</p>
+<p>此限制标志着cgroup的不可逆转点。它并非设置用于管理工作负载在正常运行期间进行的交换量。与memory.swap.max相比，后者进制交换量超过设定值，但只要其他内存可以回收，cgroup就可以不受阻碍地继续运行</p>
+<p><strong>memory.swap.peak：</strong></p>
+<p>存在于非root cgroup上的只读单值文件</p>
+<p>自cgroup创建以来，记录的cgroup及其后代的最大交换使用情况</p>
+<p><strong>memory.swap.max：</strong></p>
+<p>存在于非root cgroup上的读写单值文件，默认值为max</p>
+<p>交换使用硬限制。如果cgroup的交换使用量达到此限制，则不会将cgroup的匿名内存换出</p>
+<p><strong>memory.swap.events：</strong></p>
+<p>存在于非root
+cgroup上的只读平键文件。定义了以下条目。除非另有说明，否则此文件中的值更改会生成文件修改事件</p>
+<ul>
+<li>high：cgroup的交换使用量超出高阈值的次数</li>
+<li>max：cgroup的交换使用量即将超出最大边界且交换分配失败的次数</li>
+<li>fail：由于系统范围内的交换空间用尽或最大限制而导致交换分配失败的次数</li>
+</ul>
+<p>当在当前使用率下减少时，现有的交换条目将逐渐被回收，并且交换使用率可能在较长时间内保持高于限制，着减少了对工作负载和内存管理的影响</p>
+<p><strong>memory.zswap.current：</strong></p>
+<p>存在于非root cgroup上只读单值文件</p>
+<p>zswap压缩后端消耗的内存总量</p>
+<p><strong>memory.zswap.max：</strong></p>
+<p>存在于非root cgroup上的读写单值文件。默认值为max</p>
+<p>zswap使用硬限制。如果cgroup的zswap池达到此限制，它将拒绝在现有条目故障恢复或写入磁盘之前接受任何存储</p>
+<p><strong>memory.zswap.writeback：</strong></p>
+<p>可读写的单值文件。默认值为1。root
+cgroup的初始值为1，当创建新的cgroup时，它会继承其父级的当前值。</p>
+<p>当设置为0时，所有交换设备的尝试都被禁用。这包括zswap写回和由于zswap存储失败而进行的交换。如果zswap存储失败重复曾发生（例如，如果页面不可压缩），用户可以在禁用写回后观察到回收效率低下（因为相同的页面可能会一次又一次被拒绝）</p>
+<p>注意：这与设置memory.swap.max为0有细微的差别，因为它仍然允许页面写入zswap池</p>
+<p><strong>memory.pressure：</strong></p>
+<p>只读的嵌套键文件</p>
+<p>显示内存的压力失速信息。详情看：https://www.kernel.org/doc/html/latest/accounting/psi.html#psi</p>
+<p><strong>使用指南：</strong></p>
+<p>memory.high是控制内存使用的主要机制。在上限上过度承诺（上限总和 &gt;
+可用内存）并让全局内存压力根据使用情况分配内存是一种可行的策略</p>
+<p>由于违反高限制不会触发OOM
+killer但会限制有问题的cgroup，因此管理代理有充足的机会监控并采取适当的措施，例如授予更多的内存或终止工作负载</p>
+<p>确定cgroup是否有足够的内存并非易事，因为内存使用情况并不能表明工作负载是否可以从更多内存中受益。例如，将从网络接收的数据写入文件的工作负载可以使用所有可用内存，但也可以使用少量内存运行。内存压力的衡量标准（由于内存不足、工作负载受到的影响有多大）对于确定工作负载是否需要更多内存是必要的；不幸的是，内存压力监控机制尚未实现</p>
+<p><strong>内存所有权：</strong></p>
+<p>内存区域由实例化它的 cgroup 占用，并保持由该 cgroup
+占用的状态，直到该区域被释放。将进程迁移到其他 cgroup 不会将其在前一个
+cgroup 中实例化的内存使用量移动到新 cgroup。</p>
+<p>一个内存区域可能被属于不同 cgroup 的进程使用。该区域将归属于哪个
+cgroup
+尚不确定；但是，随着时间的推移，该内存区域很可能会归属于具有足够内存余量的
+cgroup，以避免高回收压力。</p>
+<p>如果一个 cgroup 清除了大量的内存，而这些内存预计会被其他 cgroup
+重复访问，那么使用 POSIX_FADV_DONTNEED
+放弃受影响文件的内存区域的所有权以确保正确的内存所有权可能是有意义的。</p>
+<h4 id="io">IO</h4>
+<p>io控制器控制io资源的分配。此控制器可实现基于权重和绝对带宽或IOPS限制的分配；但是，只有使用cfq-iosched时才可以使用基于权重的分配，并且这两种方案都不适用于blk-mq设备</p>
+<p><strong>io.stat：</strong></p>
+<p>只读的嵌套键文件</p>
+<p>行由$MAJ:$MIN设备编号键控，且无序。定义了以下嵌套键：</p>
+<table>
+<thead>
+<tr>
+<th>rbytes</th>
+<th>读取的字节数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wbytes</td>
+<td>写入的字节数</td>
+</tr>
+<tr>
+<td>rios</td>
+<td>读取IO数量</td>
+</tr>
+<tr>
+<td>wios</td>
+<td>写IO次数</td>
+</tr>
+<tr>
+<td>dbytes</td>
+<td>丢弃的字节数</td>
+</tr>
+<tr>
+<td>dios</td>
+<td>丢弃IO数</td>
+</tr>
+</tbody>
+</table>
+<p><strong>io.cost.qos：</strong></p>
+<p>仅存在于root cgroup上的读写嵌套键文件</p>
+<p>此文件配置基于IO成本模型的控制器(CONFIG_BLK_CGROUP_IOCOST)的服务质量，该控制器当前实施"io.weight"比例控制。行由$MAX:$MIN设备编号键控，且无序。给定设备的行在io.cost.qos或io.cost.model上首次写入设备时填充。定义了
+以下嵌套键：</p>
+<table>
+<thead>
+<tr>
+<th>enable</th>
+<th>是否开启blk-iocost控制器</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ctrl</td>
+<td>"auto"或"user"</td>
+</tr>
+<tr>
+<td>rpct</td>
+<td>读取延迟百分位数[0, 100]</td>
+</tr>
+<tr>
+<td>rlat</td>
+<td>读取延迟阈值</td>
+</tr>
+<tr>
+<td>wpct</td>
+<td>写入延迟百分位数[0, 100]</td>
+</tr>
+<tr>
+<td>wlat</td>
+<td>写入延迟阈值</td>
+</tr>
+<tr>
+<td>min</td>
+<td>最小速率调整比例[1, 10000]</td>
+</tr>
+<tr>
+<td>max</td>
+<td>最大缩放百=[1, 10000]</td>
+</tr>
+</tbody>
+</table>
+<p>该控制器默认是禁用的，
+可以通过enable设置为1来启用它。"rcpt"和"wpct"参数默认是0，控制器使用内部设备饱和状态在max和min之间调整整体IO速率</p>
+<p>当需要更好地控制质量时，可以配置延迟QoS参数。例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">8:16 enable=1 ctrl=auto rpct=95.00 rlat=75000 wpct=95.00 wlat=150000 min=50.00 max=150.0<br></code></pre></td></tr></table></figure>
+<p>显示在sdb上，控制器已启用，如果读取完成延迟的第95个百分位数高于75毫秒或写入150毫秒，则将认为设备已饱和，并相应地将整体IO发出率调整为50%到150%之间</p>
+<p>饱和点越低，延迟QoS越好，但代价是总带宽。max和min之间允许的调整范围越窄，IO行为越符合成本模型。注意：IO发出基本速率可能远离100%，盲目设置min和max可能会导致设备容量或控制质量的显著损失。min和max对于调节表现出广泛临时行为变化的设备很有用——例如，ssd以线路速度接受写入一段时间，然后完全停止数秒</p>
+<p>当“ctrl”为“auto”时，参数由内核控制，可能会自动更改。将“ctrl”设置为“user”或设置任何百分位数和延迟参数都会将其置于“user”模式并禁用自动更改。可以通过将“ctrl”设置为“auto”来恢复自动模式。</p>
+<p><strong>io.cost.model：</strong></p>
+<p>仅存在于root cgroup 上的读写嵌套键文件。</p>
+<p>此文件配置基于 IO 成本模型的控制器 (CONFIG_BLK_CGROUP_IOCOST)
+的成本模型，该控制器当前实施“io.weight”比例控制。行由 $MAJ:$MIN
+设备编号作为键，且无序。给定设备的行在“io.cost.qos”或“io.cost.model”上首次写入设备时填充。定义了以下嵌套键：</p>
+<table>
+<thead>
+<tr>
+<th>ctrl</th>
+<th>“auto” or “user”</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>model</td>
+<td>使用的成本模型 - “linear”</td>
+</tr>
+</tbody>
+</table>
+<p>当“ctrl”为“auto”时，内核可以动态更改所有参数。当“ctrl”设置为“user”或写入任何其他参数时，“ctrl”变为“user”，自动更改将被禁用。</p>
+<p>当“模型”为“线性”时，定义以下模型参数：</p>
+<table>
+<thead>
+<tr>
+<th>[r|w]bps</th>
+<th>最大连续 IO 吞吐量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[r|w]seqiops</td>
+<td>每秒最大 4k 顺序 IO</td>
+</tr>
+<tr>
+<td>[r|w]randiops</td>
+<td>每秒最大 4k 随机 IO</td>
+</tr>
+</tbody>
+</table>
+<p>从上文可以看出，内置线性模型确定了顺序和随机 IO 的基本成本以及 IO
+大小的成本系数。虽然简单，但该模型可以令人满意地覆盖大多数常见设备类别。</p>
+<p>IO 成本模型不一定绝对准确，并且会根据设备行为动态缩放。</p>
+<p>如果需要，可以使用 tools/cgroup/iocost_coef_gen.py
+来生成特定于设备的系数。</p>
+<p><strong>io.weight：</strong></p>
+<p>存在于非 root cgroup 上的读写平键文件。默认值为“default 100”。</p>
+<p>第一行是应用于设备的默认权重，没有特定的覆盖。其余的覆盖由 $MAJ:$MIN
+设备编号键入且无序。权重在 [1, 10000] 范围内，指定 cgroup
+相对于其同级可以使用的相对 IO 时间量。</p>
+<p>可以通过写入“default
+$WEIGHT”或简单的“​$WEIGHT”来更新默认权重。可以通过写入“$MAJ:$MIN
+​$WEIGHT”来设置覆盖，并通过写入“​$MAJ:$MIN default”来取消设置。</p>
+<p>注意：需要先在root
+cgroup启用特定设备的io.cost.qos，才能将设备填充到io.weight，例如：</p>
+<p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ehco <span class="hljs-string">&quot;8:0 enabled=1 ctrl=auto&quot;</span> &gt; io.cost.qos<br></code></pre></td></tr></table></figure></p>
+<p><strong>io.max：</strong></p>
+<p>存在于非 root cgroup 上的读写嵌套键文件。</p>
+<p>基于 BPS 和 IOPS 的 IO 限制。行由 $MAJ:$MIN
+设备编号键控且无序。定义了以下嵌套键:</p>
+<table>
+<thead>
+<tr>
+<th>rbps</th>
+<th>每秒最大读取字节数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wbps</td>
+<td>每秒最大写入字节数</td>
+</tr>
+<tr>
+<td>riops</td>
+<td>每秒最大读取 IO 操作数</td>
+</tr>
+<tr>
+<td>wiops</td>
+<td>每秒最大写入 IO 操作数</td>
+</tr>
+</tbody>
+</table>
+<p>写入时，可以以任意顺序指定任意数量的嵌套键值对。可以指定“max”作为值来删除特定限制。如果多次指定相同的键，则结果不确定。</p>
+<p>在每个 IO 方向上测量 BPS 和 IOPS，如果达到限制，IO
+会延迟。允许临时突发。</p>
+<p>将读取限制设置为 2M BPS，并将写入限制设置为 120 IOPS，设备为
+8:16：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;8:16 rbps=2097152 wiops=120&quot;</span> &gt; io.max<br></code></pre></td></tr></table></figure>
+<p>可以通过写入以下内容来消除写入 IOPS 限制：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;8:16 wiops=max&quot;</span> &gt; io.max<br></code></pre></td></tr></table></figure>
+<p><strong>io.pressure：</strong></p>
+<p>只读的嵌套键文件。</p>
+<p>显示 IO 的压力失速信息。有关详细信息，请参阅 <a
+target="_blank" rel="noopener" href="https://www.kernel.org/doc/html/latest/accounting/psi.html#psi">Documentation/accounting/psi.rst</a>。</p>
+<p><strong>写回：</strong></p>
+<p>页面缓存通过缓冲写入和共享 mmap
+被弄脏，并通过写回机制异步写入到后备文件系统。写回位于内存和 IO
+域之间，通过平衡弄脏和写入 IO 来调节脏内存的比例。</p>
+<p>io 控制器与内存控制器一起实现对页面缓存写回 IO
+的控制。内存控制器定义计算和维护脏内存比率的内存域，io
+控制器定义写出内存域脏页的 io 域。系统范围和每个 cgroup
+的脏内存状态都会被检查，并强制执行两者中限制性更强的那个。</p>
+<p>cgroup 写回需要底层文件系统的明确支持。目前，cgroup 写回已在
+ext2、ext4、btrfs、f2fs 和 xfs 上实现。在其他文件系统上，所有写回 IO
+都归属于根 cgroup。</p>
+<p>内存和写回管理存在固有差异，这会影响跟踪 cgroup
+所有权的方式。内存按页跟踪，而写回按 inode 跟踪。为了进行写回，将 inode
+分配给 cgroup，并且从 inode 写入脏页的所有 IO 请求都归属于该
+cgroup。</p>
+<p>由于内存的 cgroup 所有权是按页跟踪的，因此可能存在与 inode 所关联的
+cgroup
+不同的页面。这些页面称为外部页面。写回会不断跟踪外部页面，如果某个外部
+cgroup 在一段时间内成为多数，则会将 inode 的所有权切换为该 cgroup。</p>
+<p>虽然此模型足以满足大多数用例，即即使主写入 cgroup
+随时间发生变化，给定的 inode 也主要被单个 cgroup 弄脏，但多个 cgroup
+同时写入单个 inode 的用例无法得到很好的支持。在这种情况下，很大一部分 IO
+可能会被错误地归因。由于内存控制器在第一次使用时分配页面所有权，并且在页面释放之前不会更新它，即使写回严格遵循页面所有权，多个
+cgroup 弄脏重叠区域也不会按预期工作。建议避免这种使用模式。</p>
+<p>影响写回行为的 sysctl 旋钮应用于 cgroup 写回，如下所示：</p>
+<ul>
+<li>vm.dirty_background_ratio，vm.dirty_ratio：这些比率同样适用于 cgroup
+写回，其中可用内存量受内存控制器和系统范围的干净内存所施加的限制。</li>
+<li>vm.dirty_background_bytes，vm.dirty_bytes：对于 cgroup
+写回，这是根据总可用内存的比例计算的，并且以与vm.dirty[_background]_ratio
+相同的方式应用。</li>
+</ul>
+<p><strong>IO延迟：</strong></p>
+<p>这是用于 IO 工作负载保护的 cgroup v2
+控制器。您为组提供一个延迟目标，如果平均延迟超过该目标，控制器将限制任何延迟目标低于受保护工作负载的对等体。</p>
+<p>这些限制仅适用于层次结构中的同级级别。这意味着在下图中，只有组 A、B
+和 C 会相互影响，组 D 和 F 会相互影响。组 G 不会影响任何人：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">          [root]<br>  /          |            \<br>  A          B            C<br> /  \        |<br>D    F       G<br></code></pre></td></tr></table></figure>
+<p>因此，配置此设置的理想方法是在 A、B 和 C 组中设置
+io.latency。通常，您不希望设置低于设备支持的延迟的值。通过实验找到最适合您的工作负载的值。从高于设备预期延迟开始，观察
+io.stat 中工作负载组的 avg_lat 值，以了解正常运行期间看到的延迟。使用
+avg_lat 值作为实际设置的基础，设置为比 io.stat 中的值高 10-15%。</p>
+<p><strong>IO延迟节流如何工作：</strong></p>
+<p>io.latency
+是节省工作量的；因此，只要每个人都达到其延迟目标，控制器就不会做任何事情。一旦某个组开始未达到其目标，它就会开始限制任何目标比其更高的对等组。这种限制有两种形式：</p>
+<ul>
+<li>Queue depth throttling：这是允许一个组拥有的未完成 IO
+数量。我们将相对较快地进行限制，从无限制开始，一直到每次 1 个 IO。</li>
+<li>Artificial delay induction：某些类型的 IO
+无法节流，否则可能会对更高优先级的组产生不利影响。这包括交换和元数据
+IO。这些类型的 IO
+可以正常发生，但它们会被“收取”到原始组的费用。如果原始组受到节流，您将看到
+io.stat 中的 use_delay 和 delay
+字段增加。延迟值是添加到此组中运行的任何进程的微秒数。由于如果发生大量交换或元数据
+IO，这个数字可能会变得非常大，因此我们将单个延迟事件限制为每次 1
+秒。</li>
+</ul>
+<p>一旦受害组再次开始满足其延迟目标，它将开始解除之前被限制的任何对等组的限制。如果受害组只是停止执行
+IO，全局计数器将适当解除限制。</p>
+<p><strong>IO延迟接口文件：</strong></p>
+<ul>
+<li>io.latency：这采用与其他控制器类似的格式。“MAJOR:MINOR
+target=&lt;目标时间（微秒）&gt;”</li>
+<li>io.stat：如果启用了控制器，除了正常的统计数据之外，您还将在 io.stat
+中看到额外的统计数据。
+<ul>
+<li>depth：这是该组的当前队列深度。</li>
+<li>avg_lat：这是一个指数移动平均数，衰减率为
+1/exp，受采样间隔限制。衰减率间隔可以通过将 io.stat 中的 win 值乘以基于
+win 值的相应采样数来计算。</li>
+<li>win：采样窗口大小（以毫秒为单位）。这是评估事件之间的最短持续时间。窗口只会随着
+IO 活动而流逝。空闲期会延长最近的窗口。</li>
+</ul></li>
+</ul>
+<p><strong>IO优先级：</strong></p>
+<p>单个属性控制 I/O 优先级 cgroup 策略的行为，即 io.prio.class
+属性。该属性接受以下值：</p>
+<ul>
+<li>no-change：请勿修改 I/O 优先级类。</li>
+<li>promote-to-rt：对于具有非 RT I/O 优先级类的请求，将其更改为
+RT。同时将这些请求的优先级更改为 4。不要修改优先级类为 RT 的请求的 I/O
+优先级。</li>
+<li>restrict-to-be：对于没有 I/O 优先级类别或 I/O 优先级类别为 RT
+的请求，将其更改为 BE。同时将这些请求的优先级更改为
+0。不要修改优先级类别为 IDLE 的请求的 I/O 优先级类别。</li>
+<li>idle：将所有请求的 I/O 优先级类别更改为最低的 I/O 优先级类别
+IDLE。</li>
+<li>none-to-rt：已弃用。只是promote-to-rt的别名</li>
+</ul>
+<p>以下数值与 I/O 优先级策略相关：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">no-change</th>
+<th>0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">promote-to-rt</td>
+<td>1</td>
+</tr>
+<tr>
+<td style="text-align: left;">restrict-to-be</td>
+<td>2</td>
+</tr>
+<tr>
+<td style="text-align: left;">idle</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>每个 I/O 优先级对应的数值如下：</p>
+<table>
+<thead>
+<tr>
+<th>IOPRIO_CLASS_NONE</th>
+<th>0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IOPRIO_CLASS_RT（实时）</td>
+<td>1</td>
+</tr>
+<tr>
+<td>IOPRIO_CLASS_BE（尽力而为）</td>
+<td>2</td>
+</tr>
+<tr>
+<td>IOPRIO_CLASS_IDLE</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>设置请求的 I/O 优先级的算法如下：</p>
+<ul>
+<li>若I/O优先级类别策略为promote-to-rt，则将请求I/O优先级类别更改为IOPRIO_CLASS_RT，并将请求I/O优先级更改为4。</li>
+<li>如果 I/O 优先级类别策略不是promote-to-rt，则将 I/O
+优先级类别策略转换为数字，然后将请求 I/O 优先级类别更改为 I/O
+优先级类别策略编号和数值 I/O 优先级类别中的最大值。</li>
+</ul>
+<h4 id="pid">PID</h4>
+<p>进程号控制器用于允许 cgroup 在达到指定的限制后停止对任何新任务进行
+fork() 或 clone()。</p>
+<p>cgroup
+中的任务数量可能会以其他控制器无法阻止的方式耗尽，因此需要自己的控制器。例如，fork
+炸弹很可能在达到内存限制之前耗尽任务数量。</p>
+<p>请注意，此控制器中使用的 PID 指的是内核使用的 TID（进程 ID）。</p>
+<p><strong>pids.max：</strong></p>
+<p>存在于非 root cgroup
+上的读写单值文件。默认值为“max”。进程数量的硬性限制。</p>
+<p><strong>pids.current：</strong></p>
+<p>存在于非 root cgroup 上的只读单值文件。cgroup
+及其后代中当前的进程数。</p>
+<p><strong>pids.peak：</strong></p>
+<p>存在于非 root cgroup 上的只读单值文件。该 cgroup
+及其后代进程数曾达到的最大值。</p>
+<p><strong>pids.events：</strong></p>
+<p>存在于非 root cgroup
+上的只读平键文件。除非另有说明，否则此文件中的值更改会生成文件修改事件。定义了以下条目：</p>
+<ul>
+<li>max：cgroup 的总进程数达到 pids.max 限制的次数（另请参阅
+pids_localevents）。</li>
+</ul>
+<p><strong>pids.events.local：</strong></p>
+<p>与 pids.events 类似，但文件中的字段是 cgroup
+本地的，即不是分层的。在此文件上生成的文件修改事件仅反映本地事件。</p>
+<p>组织操作不受 cgroup 策略的阻止，因此 pids.current &gt; pids.max
+是可能的。这可以通过将限制设置为小于 pids.current 或将足够多的进程附加到
+cgroup 以使 pids.current 大于 pids.max 来实现。但是，不可能通过 fork()
+或 clone() 违反 cgroup PID 策略。如果创建新进程会导致违反 cgroup
+策略，则这些将返回 -EAGAIN。</p>
+<h4 id="cpuset">cpuset</h4>
+<p>“cpuset”控制器提供了一种机制，用于将任务的 CPU
+和内存节点放置限制为仅任务当前 cgroup 中的 cpuset
+接口文件中指定的资源。这在大型 NUMA
+系统中尤其有用，在这些系统中，将作业放置在适当大小的系统子集上，并仔细放置处理器和内存以减少跨节点内存访问和争用，可以提高整体系统性能。</p>
+<p>“cpuset” 控制器是分层的。这意味着控制器不能使用其父级中不允许的 CPU
+或内存节点。</p>
+<p><strong>cpuset.cpus：</strong></p>
+<p>存在于非 root cpuset 启用的 cgroup 上的读写多值文件。</p>
+<p>它列出了此 cgroup 内的任务所请求的 CPU。但实际授予的 CPU
+列表受其父级施加的限制，可能与请求的 CPU 不同。</p>
+<p>CPU 编号是用逗号分隔的数字或范围。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> cpuset.cpus<br>output: 0-4,6,8-10<br></code></pre></td></tr></table></figure>
+<p>空值表示 cgroup 使用与具有非空“cpuset.cpus”的最近的 cgroup
+祖先相同的设置，如果未找到任何可用 CPU，则使用所有可用的 CPU。</p>
+<p>“cpuset.cpus” 的值保持不变直到下次更新，不会受到任何 CPU
+热插拔事件的影响。</p>
+<p><strong>cpuset.cpus.effective：</strong></p>
+<p>所有启用 cpuset 的 cgroup 上都存在的只读多值文件。</p>
+<p>它列出了此 cgroup 的父级实际授予其的在线 CPU。这些 CPU 允许由当前
+cgroup 中的任务使用。</p>
+<p>如果“cpuset.cpus”为空，“cpuset.cpus.effective”文件将显示父 cgroup
+中可供此 cgroup 使用的所有
+CPU。否则，它应该是“cpuset.cpus”的子集，除非“cpuset.cpus”中列出的 CPU
+均无法授予。在这种情况下，它将被视为空的“cpuset.cpus”。</p>
+<p>其值会受到CPU热插拔事件的影响。</p>
+<p><strong>cpuset.mems：</strong></p>
+<p>存在于非 root cpuset 启用的 cgroup 上的读写多值文件。</p>
+<p>它列出了此 cgroup
+内的任务所请求的内存节点。但实际授予的内存节点列表受其父级施加的限制，可能与请求的内存节点不同。</p>
+<p>内存节点号是用逗号分隔的数字或范围。例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> cpuset.mems<br>output: <br>0-1,3<br></code></pre></td></tr></table></figure>
+<p>空值表示 cgroup 使用与最近的 cgroup
+祖先相同的设置，并且具有非空的“cpuset.mems”或所有可用的内存节点（如果未找到任何内存节点）。</p>
+<p>“cpuset.mems”
+的值保持不变直到下次更新，不会受到任何内存节点热插拔事件的影响。</p>
+<p>如果“cpuset.mems”当前正在使用指定节点之外的内存，则将 cgroup
+内的任务的内存迁移到指定节点。</p>
+<p>这种内存迁移是有代价的。迁移可能不完整，可能会遗留一些内存页。因此，建议在将新任务生成到
+cpuset
+之前正确设置“cpuset.mems”。即使需要使用活动任务更改“cpuset.mems”，也不应该频繁进行。</p>
+<p><strong>cpuset.mems.effective：</strong></p>
+<p>所有启用 cpuset 的 cgroup 上都存在的只读多值文件。</p>
+<p>它列出了此 cgroup
+的父级实际授予其的在线内存节点。这些内存节点允许由当前 cgroup
+内的任务使用。</p>
+<p>如果“cpuset.mems”为空，则显示父 cgroup 中可供此 cgroup
+使用的所有内存节点。否则，它应该是“cpuset.mems”的子集，除非“cpuset.mems”中列出的任何内存节点都无法授予。在这种情况下，它将被视为空的“cpuset.mems”。</p>
+<p>其值会受到内存节点热插拔事件的影响。</p>
+<p><strong>cpuset.cpus.exclusive：</strong></p>
+<p>存在于非 root cpuset 启用的 cgroup 上的读写多值文件。</p>
+<p>它列出了允许用于创建新 cpuset 分区的所有独占 CPU。除非 cgroup
+成为有效的分区根，否则不会使用它的值。有关 cpuset
+分区的描述，请参阅下面的“cpuset.cpus.partition”部分。</p>
+<p>当 cgroup 成为分区根时，分配给该分区的实际独占 CPU
+列在“cpuset.cpus.exclusive.effective”中，它可能与“cpuset.cpus.exclusive”不同。如果之前已设置“cpuset.cpus.exclusive”，则“cpuset.cpus.exclusive.effective”始终是其子集。</p>
+<p>用户可以手动将其设置为不同于“cpuset.cpus”的值。设置时的一个限制是，CPU
+列表必须相对于其同级 cgroup
+的“cpuset.cpus.exclusive”具有排他性。如果未设置同级 cgroup
+的“cpuset.cpus.exclusive”，则其“cpuset.cpus”值（如果已设置）不能是其子集，以便在独占
+CPU 被拿走时至少留有一个 CPU 可用。</p>
+<p>对于父 cgroup，其任何一个独占 CPU 只能分配给最多一个子
+cgroup。不允许两个或多个子 cgroup 中出现独占
+CPU（独占性规则）。违反独占性规则的值将被拒绝并出现写入错误。</p>
+<p>根 cgroup 是分区根，其所有可用 CPU 都位于其独有的 CPU 集中。</p>
+<p><strong>cpuset.cpus.exclusive.effective：</strong></p>
+<p>所有启用非 root cpuset 的 cgroup 上都存在的只读多值文件。</p>
+<p>此文件显示可用于创建分区根的有效独占 CPU 集。如果其父级不是根
+cgroup，则此文件的内容将始终是其父级的“cpuset.cpus.exclusive.effective”的子集。如果已设置，它也将是“cpuset.cpus.exclusive”的子集。如果未设置“cpuset.cpus.exclusive”，则在形成本地分区时，它将被视为具有“cpuset.cpus”的隐式值。</p>
+<p><strong>cpuset.cpus.isolated：</strong></p>
+<p>一个只读且仅有 root cgroup 的多个值文件。</p>
+<p>该文件显示现有隔离分区中使用的所有隔离 CPU
+的集合。如果未创建隔离分区，则该文件为空。</p>
+<p><strong>cpuset.cpus.partition：</strong></p>
+<p>文档说明：</p>
+<p>存在于启用非 root cpuset 的 cgroup 上的读写单值文件。此标志归父
+cgroup 所有，不可委托。</p>
+<p>写入时它仅接受以下输入值：</p>
+<table>
+<thead>
+<tr>
+<th>member</th>
+<th>分区的非根成员</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>root</td>
+<td>分区根</td>
+</tr>
+<tr>
+<td>isolated</td>
+<td>无负载平衡的分区根</td>
+</tr>
+</tbody>
+</table>
+<p>cpuset 分区是启用了 cpuset 的 cgroup
+的集合，其中分区根位于层次结构的顶部，其后代（除了那些本身就是独立分区根的
+cgroup 及其后代）位于层次结构的顶部。分区对分配给它的一组独占 CPU
+具有独占访问权限。该分区之外的其他 cgroup 不能使用该组中的任何 CPU。</p>
+<p>有两种类型的分区 - 本地分区和远程分区。本地分区的父 cgroup
+也是有效的分区根。远程分区的父 cgroup
+本身不是有效的分区根。对于创建本地分区，写入“cpuset.cpus.exclusive”是可选的，因为其“cpuset.cpus.exclusive”文件将假定一个隐式值，如果未设置，则该值与“cpuset.cpus”相同。对于创建远程分区，必须在目标分区根之前将正确的“cpuset.cpus.exclusive”值写入
+cgroup 层次结构。</p>
+<p>目前不支持在本地分区下创建远程分区，远程分区根的所有祖先（根 cgroup
+除外）均不能成为分区根。</p>
+<p>根 cgroup 始终是分区根，其状态无法更改。所有其他非根 cgroup
+都以“成员”身份开始。</p>
+<p>当设置为“root”时，当前 cgroup 是新分区或调度域的根。独占 CPU
+集由其“cpuset.cpus.exclusive.effective”的值决定。</p>
+<p>当设置为“isolated”时，该分区中的 CPU
+将处于隔离状态，不会从调度程序进行任何负载平衡，也不会被排除在未绑定的工作队列之外。放置在具有多个
+CPU 的此类分区中的任务应谨慎分配并绑定到每个单独的
+CPU，以实现最佳性能。</p>
+<p>分区根（“根”或“隔离”）可能处于两种状态之一 -
+有效或无效。无效分区根处于降级状态，其中可能保留一些状态信息，但行为更像“成员”。</p>
+<p>允许“成员”、“根”和“隔离”之间的所有可能的状态转换。</p>
+<p>读取时，“cpuset.cpus.partition”文件可以显示以下值：</p>
+<table>
+<thead>
+<tr>
+<th>member</th>
+<th>分区的非根成员</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>root</td>
+<td>分区根</td>
+</tr>
+<tr>
+<td>isolated</td>
+<td>无负载平衡的分区根</td>
+</tr>
+<tr>
+<td>root invalid (<reason>)</td>
+<td>分区根目录无效</td>
+</tr>
+<tr>
+<td>isolated invalid (<reason>)</td>
+<td>隔离分区根无效</td>
+</tr>
+</tbody>
+</table>
+<p>如果分区根无效，则会在括号内包含有关分区无效原因的描述性字符串。</p>
+<p>为了使本地分区根有效，必须满足以下条件。</p>
+<ol type="1">
+<li>父 cgroup 是有效的分区根。</li>
+<li>“cpuset.cpus.exclusive.effective”文件不能为空，尽管它可能包含离线
+CPU。</li>
+<li>除非没有与此分区关联的任务，“cpuset.cpus.effective”不能为空。</li>
+</ol>
+<p>为了使远程分区根有效，必须满足除第一个条件之外的所有上述条件。</p>
+<p>热插拔等外部事件或“cpuset.cpus”或“cpuset.cpus.exclusive”的更改可能会导致有效分区根变为无效，反之亦然。请注意，无法将任务移动到“cpuset.cpus.effective”为空的
+cgroup。</p>
+<p>有效的非根父分区可以在没有关联任务的情况下将其所有 CPU
+分配给其子本地分区。</p>
+<p>将有效分区根更改为“成员”时必须小心谨慎，因为其所有子本地分区（如果存在）都将变为无效，从而导致在这些子分区中运行的任务中断。如果将其父分区切换回具有“cpuset.cpus”或“cpuset.cpus.exclusive”中正确值的分区根，则可以恢复这些停用的分区。</p>
+<p>每当“cpuset.cpus.partition”的状态发生变化时，就会触发 poll 和 inotify
+事件。这包括写入“cpuset.cpus.partition”、CPU
+热插拔或修改分区有效性状态的其他更改所导致的更改。这将允许用户空间代理监视“cpuset.cpus.partition”的意外更改，而无需进行连续轮询。</p>
+<p>用户可以使用“isolcpus”内核启动命令行选项，在启动时将某些 CPU
+预先配置为隔离状态，并禁用负载平衡。如果要将这些 CPU
+放入分区，则必须在隔离分区中使用它们。</p>
+<p>具体解释：</p>
+<p>这个文件可以被设置为root或member，主要功能是用来设置当前的cgroup是不是作为一个独立的scheduling
+domain进行调度。这个功能其实就是可以理解为，在root模式下，所有分配给当前cgroup的cpu都是独占这些cpu的，而member模式则可以在多个cgroup之间共享这些cpu。设置为root将使当前cgroup使用的cpu从上级cgroup的cpuset.cpus.effective列表中拿走。（即上一级不能使用这个被独占的CPU了）。设置为root后，如果这个cgroup有下一级的cgroup，这个cgroup也将不能再切换回member状态。在这种模式下，上一级的cgroup不可以把自己所有的cpu都分配给其下一级的cgroup，其自身至少给自己留一个cpu</p>
+<p>设置为root需要当前cgroup符合以下条件：</p>
+<ul>
+<li>cpuset.cpus中设置不为空且设置的cpu
+list中的cpu都是独立的。就是说这些cpu不会共享给其他平级cgroup</li>
+<li>上一级cgroup是partion root配置</li>
+<li>当前cgroup的cpuset.cpus作为集合是上一级cgroup的cpuset.cpus.effective集合的子集</li>
+<li>下一级cgroup没有启用cpuset资源隔离</li>
+</ul>
+<h4 id="device">device</h4>
+<p>设备控制器管理对设备文件的访问。它包括创建新设备文件（使用
+mknod）以及访问现有设备文件。</p>
+<p>Cgroup v2 设备控制器没有接口文件，是在 cgroup BPF
+之上实现的。为了控制对设备文件的访问，用户可以创建
+BPF_PROG_TYPE_CGROUP_DEVICE 类型的 bpf 程序，并使用 BPF_CGROUP_DEVICE
+标志将它们附加到 cgroup。在尝试访问设备文件时，将执行相应的 BPF
+程序，并且根据返回值，尝试将成功或失败并显示 -EPERM。</p>
+<p>BPF_PROG_TYPE_CGROUP_DEVICE 程序接受指向 bpf_cgroup_dev_ctx
+结构的指针，该结构描述了设备访问尝试：访问类型（mknod/read/write）和设备（类型、主编号和次编号）。如果程序返回
+0，则尝试失败并出现 -EPERM，否则尝试成功。</p>
+<p>可以在内核源代码树中的 tools/testing/selftests/bpf/progs/dev_cgroup.c
+中找到 BPF_PROG_TYPE_CGROUP_DEVICE 程序的示例。</p>
+<p>“rdma”控制器调节RDMA资源的分配和核算。</p>
+<p><strong>rdma.max</strong></p>
+<p>除 root 之外的所有 cgroup 中都存在的读写嵌套键文件，用于描述 RDMA/IB
+设备当前配置的资源限制。</p>
+<p>行按设备名称键入且无序。每行包含空格分隔的资源名称及其可分配的配置限制。</p>
+<p>定义了以下嵌套键：</p>
+<table>
+<thead>
+<tr>
+<th>hca_handle</th>
+<th>最大 HCA 句柄数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>hca_object</td>
+<td>HCA 对象的最大数量</td>
+</tr>
+</tbody>
+</table>
+<p>以下是 mlx4 和 ocrdma 设备的示例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">mlx4_0 hca_handle=2 hca_object=2000<br>ocrdma1 hca_handle=3 hca_object=max<br></code></pre></td></tr></table></figure>
+<p><strong>rdma.current：</strong></p>
+<p>描述当前资源使用情况的只读文件。除 root 外，所有 cgroup
+均有此文件。</p>
+<p>以下是 mlx4 和 ocrdma 设备的示例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">mlx4_0 hca_handle=1 hca_object=20<br>ocrdma1 hca_handle=1 hca_object=23<br></code></pre></td></tr></table></figure>
+<h4 id="hugetlb">hugetlb</h4>
+<p>HugeTLB 控制器允许限制每个控制组的 HugeTLB
+使用情况，并在页面错误期间强制执行控制器限制。</p>
+<p><strong>hugetlb.2MB.max: </strong></p>
+<p>读写文件。设置hugepage大小为2MB的hugepage使用量限制</p>
+<p><strong>hugetlb.1GB.max: </strong></p>
+<p>读写文件。设置hugepage大小为1GB的hugepage使用量限制</p>
+<p><strong>hugetlb.2MB.current: </strong></p>
+<p>只读文件。显示hugepages大小为2MB的hugepage的当前使用量</p>
+<p><strong>hugetlb.1GB.current: </strong></p>
+<p>只读文件。显示hugepages大小为1GB的hugepage的当前使用量</p>
+<p><strong>hugetlb.2MB.rsvd.max: </strong></p>
+<p>读写文件。设置hugepage大小为2MB的hugepage预留限制</p>
+<p><strong>hugetlb.1GB.rsvd.max: </strong></p>
+<p>读写文件。设置hugepage大小为1GB的hugepage预留限制</p>
+<p><strong>hugetlb.2MB.rsvd.current: </strong></p>
+<p>只读文件。显示hugepages大小为2MB的hugepage的当前预留量</p>
+<p><strong>hugetlb.1GB.rsvd.current: </strong></p>
+<p>只读文件。显示hugepages大小为1GB的hugepage的当前预留量</p>
+<p><strong>hugetlb..2MB.events: </strong></p>
+<p>存在于非 root cgroup 上的只读平键文件，包含以下字段：</p>
+<ul>
+<li>max：由于 HugeTLB 限制导致分配失败的次数</li>
+</ul>
+<p><strong>hugetlb.1GB.events: </strong></p>
+<p>存在于非 root cgroup 上的只读平键文件，包含以下字段：</p>
+<ul>
+<li>max：由于 HugeTLB 限制导致分配失败的次数</li>
+</ul>
+<p><strong>hugetlb.<巨大页面大小>.events.local：</strong></p>
+<p>与 hugetlb.&lt;hugepagesize&gt;.events 类似，但文件中的字段是 cgroup
+本地的，即不是分层的。在此文件上生成的文件修改事件仅反映本地事件。</p>
+<p><strong>hugetlb.<巨大页面大小>.numa_stat：</strong></p>
+<p>与memory.numa_stat类似，它显示此cgroup中&lt;hugepagesize&gt;的hugetlb页面的numa信息。仅包含正在使用的hugetlb页面。每个节点的值以字节为单位。</p>
+<h4 id="misc">MISC</h4>
+<p>杂项 cgroup 为无法像其他 cgroup
+资源一样抽象的标量资源提供资源限制和跟踪机制。控制器由
+CONFIG_CGROUP_MISC 配置选项启用。</p>
+<p>可以通过 include/linux/misc_cgroup.h 文件中的 enum misc_res_type{}
+将资源添加到控制器，并通过 kernel/cgroup/misc.c 文件中的 misc_res_name[]
+将相应名称添加到控制器。资源提供者必须在使用资源之前通过调用
+misc_cg_set_capacity() 设置其容量。</p>
+<p>一旦设置了容量，就可以使用charge和uncharge API 来更新资源使用情况。与
+misc 控制器交互的所有 API 都位于 include/linux/misc_cgroup.h 中。</p>
+<p><strong>misc.capacity：</strong></p>
+<p>仅在根 cgroup
+中显示的只读平键文件。它显示平台上可用的各种标量资源及其数量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> misc.capacity<br>output:<br>res_a 50<br>res_b 10<br></code></pre></td></tr></table></figure>
+<p><strong>misc.current：</strong></p>
+<p>所有 cgroup 中显示的只读平面键控文件。它显示 cgroup
+及其子组中资源的当前使用情况：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> misc.current<br>output: <br>res_a 3<br>res_b 0<br></code></pre></td></tr></table></figure>
+<p><strong>misc.max：</strong></p>
+<p>所有 cgroup 中显示的只读平面键控文件。它显示 cgroup
+及其子组中资源的历史最大使用量:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> misc.max<br>output: <br>res_a max<br>res_b 4<br></code></pre></td></tr></table></figure>
+<p>可以通过以下方式设置限制：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> res_a 1 &gt; misc.max<br></code></pre></td></tr></table></figure>
+<p>可以通过以下方式将限制设置为最大值：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> res_a max &gt; misc.max<br></code></pre></td></tr></table></figure>
+<p>可以将限制设置得高于 misc.capacity 文件中的容量值。</p>
+<p><strong>misc.events：</strong></p>
+<p>存在于非 root cgroup
+上的只读平键文件。定义了以下条目。除非另有说明，否则此文件中的值更改会生成文件修改事件。此文件中的所有字段都是分层的。</p>
+<ul>
+<li>max：cgroup 的资源使用量即将超出最大边界的次数</li>
+</ul>
+<p><strong>misc.events.local：</strong></p>
+<p>与 misc.events 类似，但文件中的字段是 cgroup
+本地的，即非层次化的。在此文件上生成的文件修改事件仅反映本地事件。</p>
+<p>杂项标量资源将由最先使用该资源的 cgroup 负责，并且会一直由该 cgroup
+负责，直到该资源被释放。将进程迁移到其他 cgroup
+不会将资源转移到进程移动的目标 cgroup。</p>
+<h1 id="术语">术语</h1>
+<h2 id="cpu-1">CPU</h2>
+<h3 id="numa架构">NUMA架构</h3>
+<p><strong>概述：</strong>
+NUMA这是一种内存设计架构，全称是非一致性内存访问(Non-Uniform Memory
+Access)。与传统的一致性访问内存（UMA）不同，在NUMA中，每个处理器都有自己专属的本地内存，也可以访问其他处理器的内存，但是访问本地内存比访问其他处理器的内存快。</p>
+<p><strong>核心概念：</strong></p>
+<ul>
+<li><p>NUMA节点：每个处理器都有直接连接本地内存节点；一个或多个处理器和它们的本地内存节点可以构成一个NUMA节点；NUMA节点间通过高速互通（如QPI、Infinity
+Fabric等）相连 <img src="/2024/12/05/Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241204222738678.png" srcset="/img/loading.gif" lazyload class=""></p></li>
+<li><p>内存亲和性：处理器对内存访问的倾向性，尽量使用本地内存，以减少访问延迟；处理器访问本地内存和远程内存（其他NUMA节点的内存）的延迟不同，这就是非一致性内存访问架构</p></li>
+</ul>
+<p><strong>优点：</strong></p>
+<ul>
+<li>性能优化：
+<ul>
+<li>处理器访问本地内存的速度更快</li>
+<li>减少了内存访问的瓶颈，特别是在内存密集型应用中</li>
+</ul></li>
+<li>扩展性：NUMA架构允许系统通过增加更多的NUMA节点来扩展，适合大型多处理器系统。</li>
+</ul>
+<h2 id="内存">内存</h2>
+<h3 id="page-cache">Page Cache</h3>
+<p><strong>概述：</strong> page
+caches是操作系统上用于缓存磁盘数据的内存区域，这样后续访问相同数据时可以直接从内存读取，而不必再次进行磁盘IO，从而提高系统性能。</p>
+<p><strong>工作原理：</strong></p>
+<ul>
+<li>缓存读取操作：从磁盘读取数据时，会缓存到page
+cache，如果下次访问相同数据块直接从内存读取。</li>
+<li>延迟写入操作：
+<ul>
+<li>首先将数据写入page cache，并标记为dirty
+page，表示这些page需要同步到磁盘</li>
+<li>OS会在适当的时候将这些dirty
+pages写回磁盘（比如系统闲置时或者内存压力较大时）</li>
+</ul></li>
+<li>内存管理：
+<ul>
+<li>内存不足时，OS会释放掉部分page cache（maybe LRU算法）</li>
+<li>在重新被需要时，这些page会被加载到page cache中</li>
+</ul></li>
+</ul>
+<p><strong>如何查看page cache(linux系统)：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">free -h<br></code></pre></td></tr></table></figure>
+<img src="/2024/12/05/Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241204224644047.png" srcset="/img/loading.gif" lazyload class="">
+<p><code>buff/cache</code>就是page cache</p>
+<h3 id="slab">Slab</h3>
+<p><strong>概述：</strong>
+是一种内存管理机制，主要用于在内核中高效地管理小块内存的分配和释放。Slab分配器的设计目标是通过减少内存碎片，加速内存分配和释放的过程，以及缓存对象来提高系统性能。</p>
+<p><strong>核心概念：</strong></p>
+<ul>
+<li>cache：是slab分配器的核心结构，cache中包含了特定类型object的多个slab</li>
+<li>slab：是由多个连续内存页组成的内存块，每个slab包含了多个相同类型object的内存空间；slab的状态可以是full、partial、free</li>
+<li>object：是分配给内核的内存单位，slab分配器的目标是高效地分配和释放这些object
+<img src="/2024/12/05/Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241204231838014.png" srcset="/img/loading.gif" lazyload class=""></li>
+</ul>
+<p><strong>工作流程：</strong></p>
+<ol type="1">
+<li>初始化cache：系统启动时或需要某种类型的object时，内核会初始化一个对应类型的cache</li>
+<li>分配object：当内核需要分配一个object时，slab分配器会从对应类型的cache的partial
+slab中找到一个空闲的object；如果没有，就去free
+slab找；如果还是没有，slab分配器就会给该cache分配一个新的slab</li>
+<li>释放object：当内核释放一个object时，slab分配器会将这个object标记为free，并将其所在的slab的状态更新。</li>
+</ol>
+<p><strong>优点：</strong></p>
+<ul>
+<li>减少内存碎片：slab分配器在分配和释放相同大小对象时，会尽量重用内存，减少了内存碎片</li>
+<li>提高分配效率：slab分配器在分配和释放内存时使用预分配的slab，速度非常快</li>
+<li>对象初始化：object可以在cache中保持初始化状态，使得后续分配更加高效</li>
+</ul>
+<h3 id="swap">swap</h3>
+<p><strong>概述：</strong>
+swap是一种扩展内存容量的机制。它允许OS将内存中不活跃的页面（内存中的数据块）移动到预先设置的swap空间中，这个空间可以是硬盘上的一个特定分区或一个文件。swap是处理内存不足的一种有用方法，但由于硬盘的访问速度远低于RAM，使用swap会降低系统性能</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>内存管理：当RAM使用接近上限时，swap可以提供额外的虚拟内存，帮助管理内存压力</li>
+<li>灵活性：可以动态调整swap空间大小</li>
+<li>性能影响：访问速度低于RAM，过度依赖会降低系统性能</li>
+</ul>
+<p><strong>使用场景：</strong></p>
+<ul>
+<li>内存不足时的缓冲</li>
+<li>休眠：在休眠模式下，OS会将当前内存保存到swap空间，然后关闭电源，当OS唤醒时，再从swap空间恢复数据。</li>
+</ul>
+<p><strong>启动或关闭系统上的交换空间：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">swapoff -a <span class="hljs-comment"># 关闭</span><br>swapon -a <span class="hljs-comment"># 开启 一开一关就可以清空缓存</span><br><span class="hljs-built_in">cat</span> /proc/swaps <span class="hljs-comment"># 查看系统是否开启了交换空间</span><br>swapon --show <span class="hljs-comment"># 查看系统是否开启了交换空间</span><br></code></pre></td></tr></table></figure>
+<h2 id="内存回收">内存回收</h2>
+<p><strong>概述：</strong>
+一个在系统内存变得紧张时释放内存的过程，涉及多个组件和策略。</p>
+<p><strong>页面回收机制：</strong>
+linux使用分页内存管理，当系统需要更多内存时，页面回收机制会尝试回收未使用或最少使用的页面。</p>
+<ul>
+<li>活跃/非活跃列表：linux将内存页面分为活跃和非活跃两个列表，经常访问的页面被认为是活跃的，而不常访问的页面会被移动到非活跃列表</li>
+<li>页面回收：当内存紧张时，系统首先回收非活跃列表中的页面，这些页面可能被直接回收，或者写回磁盘，然后回收</li>
+</ul>
+<p><strong>OOM
+Killer：</strong>当linux系统极度缺乏内存，无法通过常规页面回收机制获得足够内存时，OOM
+Killer会被出发。OOM Killer会选择并终止占用大量内存的进程来释放内存</p>
+<p><strong>cgroup
+内存限制：</strong>可以为cgroup设置内存限制，当进程组尝试使用超过限制的内存时，它们的一些进程可能会被终止，以保持内存使用在限制之下</p>
+<h2 id="磁盘">磁盘</h2>
+<h3 id="scsi硬盘设备">SCSI硬盘设备</h3>
+<p><strong>概述：</strong> SCSI(Small Computer System
+Interface)是一种用于计算机硬盘和其他设备的接口标准。SCSI接口支持硬盘，扫描仪，打印机等多种类型的外围设备。（通常<code>sda</code>是linux上第一个SCSI硬盘设备）</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>高性能：高数据传输速率和低CPU占用率</li>
+<li>多设备支持：通过一个SCSI接口可以连接多个设备</li>
+<li>灵活性和可扩展性：SCSI系统支持宽广设备类型和大量设备的连接</li>
+<li>兼容性：支持多种类型和大小的设备</li>
+</ul>
+<h3 id="块设备">块设备</h3>
+<p><strong>常见的块设备：</strong></p>
+<ul>
+<li>sda：是第一个SCSI硬盘设备，在现代linux系统中，SATA和USB存储设备也被视为SCSI设备，因此它们的设备名以sda、sdb等开头</li>
+<li>sr0：这通常代表第一个SCSI光驱设备，比如CD-ROM或DVD-ROM驱动器</li>
+<li>dm-0，dm-1：这些是设备映射设备，常用于LVM（逻辑卷管理）、加密磁盘或提供软件RAID功能</li>
+<li>loop0, loop1,
+...：这些是循环设备，用于将文件映射为块设备，这在挂载ISO文件，创建虚拟文件系统等场景中非常有用</li>
+<li>nbd0, nbd1,
+...这些是网络块设备，允许系统通过网络访问块设备，就像它们直接连接到本地系统一样</li>
+</ul>
+<p><strong>sda和vda：</strong></p>
+<ul>
+<li>sda：
+<ul>
+<li>物理硬盘：sda通常代表系统中的第一个SCSI或SATA硬盘。</li>
+<li>直接访问：sda通常用于直接访问物理硬盘，这意味着操作系统直接与硬件通信，没有虚拟化层</li>
+</ul></li>
+<li>vda：
+<ul>
+<li>虚拟硬盘：vda代表的是虚拟环境中的第一个虚拟磁盘设备，这种命名通常出现在使用KVM、QEMU或其他虚拟化技术的环境中</li>
+<li>优化性能：虚拟磁盘可以针对虚拟化环境进行优化，提高性能和灵活性</li>
+</ul></li>
+</ul>
+<h2 id="文件系统">文件系统</h2>
+<h3 id="tmpfs">tmpfs</h3>
+<p><strong>概述：</strong>
+是linux中的一种临时文件系统，它使用内存或swap来存储文件和目录。因为数据存储在RAM中，使得tmpfs非常适合临时数据的存储。（比如系统启动过程中的临时文件，或者应用程序需要频繁读写的临时数据）</p>
+<p><strong>主要特性：</strong></p>
+<ul>
+<li>速度快：访问速度快于磁盘</li>
+<li>灵活性：可以动态调整大小</li>
+<li>数据易失性：重启系统或卸载tmpfs后，存储在其中的数据会丢失</li>
+</ul>
+<p><strong>使用场景：</strong></p>
+<ul>
+<li>/tmp目录：许多linux发行版使用tmpfs挂载/tmp目录，以提高临时文件处理的速度</li>
+<li>缓存和会话数据：web服务器和数据库可以使用tmpfs来存储缓存数据，提高访问速度</li>
+<li>编译过程中的临时文件：编译大型软件项目时，使用tmpfs可以减少磁盘IO，加快编译速度</li>
+</ul>
+<p><strong>挂载tmpfs：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> -p /mnt/tmp<br>mount -t tmpfs -o size=1G tmpfs /mnt/tmp<br></code></pre></td></tr></table></figure>
+<p>查看是否挂载成功：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -h /mnt/tmp<br></code></pre></td></tr></table></figure>
+<img src="/2024/12/05/Cgroup%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20241204234432124.png" srcset="/img/loading.gif" lazyload class="">
+<p>卸载tmpfs：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">umount /mnt/tmp<br></code></pre></td></tr></table></figure>
+<p><strong>系统启动自动挂载tmpfs：</strong></p>
+<p>在<code>/etc/fstab</code>文件中添加一行配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">tmpfs /mnt/tmp tmpfs defaults,size=1G 0 0<br></code></pre></td></tr></table></figure>
+<h2 id="网络">网络</h2>
+<h3 id="qos">QoS</h3>
+<h4 id="简介-1">简介</h4>
+<p><strong>概述：</strong>
+是一种控制网络资源使用的机制，以确保关键业务或流量类型
+(如视频、语音通话)获得必要的带宽和延迟要求，从而提高网络的整体性能和用户体验。QoS通过对网络流量进行分类、排队、调度和流量整形等机制，实现对不同类型流量的差别化处理。linux使用了tc来进行流量控制。</p>
+<p><strong>核心概念：</strong></p>
+<ul>
+<li>流量识别与分类：
+<ul>
+<li>流量识别是QoS的第一步，通过检查数据包的头部信息(如源/目的IP地址，端口号，协议类型等)来识别流量类型</li>
+<li>分类是根据识别的结果，将流量分入不同的类别或队列。每个类别可以根据其服务质量需求进行不同的处理</li>
+</ul></li>
+<li>流量标记：涉及数据包的头部信息，以反应其QoS优先级。例如，在IP数据包中，可以使用DSCP(differentiated
+Services Code Point)字段来标记优先级</li>
+<li>排队：排队策略决定了不同类型的流量如何被存储和转发。不同的排队策略，如FIFO、优先队列、循环队列等，可以根据流量的优先级和需求进行选择</li>
+<li>拥塞避免：当网络出现拥塞时，拥塞避免机制通过丢弃一些数据包来减轻网络负载，常见的算法有TCP的拥塞控制算法，RED等</li>
+<li>流量整形：通过控制数据流的发送速率来调整流量的传输，以符合网络策略或避免网络拥塞。它通常通过延迟额外的数据包实现</li>
+<li>流量调度：决定了不同流量队列中的数据包何时以及以何种顺序被发送。调度算法，如加权公平队列，低延迟队列等。确保高优先级的流量获得快速处理</li>
+<li>带宽管理：涉及分配网络资源，确保关键应用和服务获得足够的带宽。这通常涉及带宽上限和保证来实现</li>
+</ul>
+<p><strong>协议栈的QoS主要由三部分组成：</strong>qdisc(队列规则，queueing
+discipline)，class控制策略， filter根据filter划入具体的控制策略</p>
+<p>一般流程是这样，当一个qdisc被入队的时候，会循环匹配其中的filter，如果匹配到了的话，就会将packet入队到对应的class当中，大部分情况下被class的所有者代表的qdisc入队。一些没有匹配的packet会进入默认的class</p>
+<h4 id="队列规则">队列规则</h4>
+<h4 id="pfifo">pfifo</h4>
+<p>默认的qdisc就是pfifo，实现在net/sched/sch_prio.c</p>
+<p>设置有三个优先级的队列，从高到低分别是：</p>
+<ul>
+<li>0 interactive</li>
+<li>1 best effort</li>
+<li>2 bulk</li>
+</ul>
+<p>先消费0队列在消费1队列，最后消费2队列</p>
+<p>实现依赖如下结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">prio_sched_data</span> &#123;</span><br>	<span class="hljs-type">int</span> bands;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">tcf_proto</span> __<span class="hljs-title">rcu</span> *<span class="hljs-title">filter_list</span>;</span><br>	u8  prio2band[TC_PRIO_MAX+<span class="hljs-number">1</span>];<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Qdisc</span> *<span class="hljs-title">queues</span>[<span class="hljs-title">TCQ_PRIO_BANDS</span>];</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>bands一般是3个，代表三个不同优先级的队列，然后filter_list是他的过滤器列表，最后prio2band就是ToS
+To Queue的映射中linux priority 到
+band的部分，queues保存的是三个fifo的qdisc，也就是三个队列</p>
+<p>pfifo
+enqueue的时候会调用prio_classify根据skb-&gt;priority来选择队列进行入队，dequeue的时候则round
+robin每次依次从优先级高到低取出一个packet</p>
+<h4 id="htbhierarchical-token-bucket">HTB(Hierarchical Token
+Bucket)</h4>
+<p>HTB是一个层级令牌桶的qdsic，而且能加入class</p>
+<h4 id="使用">使用</h4>
+<p>qdisc 参数：parent major:minor或者root</p>
+<p>一个qdisc是根节点就是root，否则其他的情况指定parent。其中major:minor是class的handle
+id，每个class都要指定一个id用于标识</p>
+<p>handle major: ，这个语法有点奇怪，是可选的，如果 qdisc
+下面还要分类（多个 class)，则需要指定这个 hanlde。对于
+root，通常是”1:”</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># handle是一组用户指定的标识符，格式为major:minor</span><br><span class="hljs-comment"># 如果是一条queueing discipline, minor需要一直为0，即不写</span><br>tc qdisc add dev eth0 root handle 1: htb<br><span class="hljs-comment"># 具体作用：在eth0网卡上添加一个根队列规则</span><br><span class="hljs-comment"># qdisc：表示要添加一个新的队列规则</span><br><span class="hljs-comment"># dev：指定网络设备名称</span><br><span class="hljs-comment"># root：表示这个队列规则被添加到设备的根位置。在TC中，每个设备都有一个队列规则的层次结构</span><br><span class="hljs-comment"># handle 1:：为这个队列规则指定一个句柄，句柄用于后续操作中引用这个规则</span><br><span class="hljs-comment"># htb：是一种队列规则算法。允许对不同的流量进行分层控制，为每个类比额分配不同的带宽</span><br><br><span class="hljs-comment"># classis指明该class handle的唯一ID，minor需要是非零值</span><br>tc class add dev eth0 parent 1:1 classid 1:6 htb rate 256kbit ceil 512kbit<br><span class="hljs-comment"># 具体作用：在之前配置的队列规则下添加一个新的类</span><br><span class="hljs-comment"># class：表示要添加一个类</span><br><span class="hljs-comment"># parent：指定这个类的父类，挂载在1:1下，而不是直接挂载在根队列规则下</span><br><span class="hljs-comment"># classid：为这个新类指定一个类ID</span><br><span class="hljs-comment"># rate：指定这个类的保证带宽</span><br><span class="hljs-comment"># ceil：指定这个类的最大带宽</span><br><br><span class="hljs-comment"># 新建一个带宽为100kbps的root class，其classid为1:1</span><br>tc class add dev eth0 parent 1: classid 1:1 htb rate 100kbps ceil 100kbps<br><span class="hljs-comment"># parent：直接挂载在根队列规则下</span><br><span class="hljs-comment"># 接着建立两个子class，指定其parent为1:1，ceil用来限制子类最大的带宽</span><br>tc class add dev eth0 parent 1:1 classid 1:10 htb rate 40kbps ceil 100kbps<br>tc class add dev eth0 parent 1:1 classid 1:11 htb rate 60kbps ceil 100kbps<br><span class="hljs-comment"># 随后建立filter指定哪些类型的packet进入哪个class</span><br>tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip src 1.2.3.4 match ip dport 80 0xffff flowid 1:10<br><span class="hljs-comment"># 具体作用：添加一个过滤器，用于匹配特定IP流量并将其分配到指定的类</span><br><span class="hljs-comment"># protocol ip：指定过滤器应用于IP协议的数据包</span><br><span class="hljs-comment"># parent 1:0：指定过滤器的父级队列规则，表示根队列规则</span><br><span class="hljs-comment"># prio 1：指定过滤器的优先级为1，数值越低，优先级越高</span><br><span class="hljs-comment"># u32：使用u32过滤器，这是一个通用、功能强大的过滤器</span><br><span class="hljs-comment"># match ip src 1.2.3.4：匹配源IP地址为1.2.3.4的数据包</span><br><span class="hljs-comment"># match ip dport 80 0xffff：匹配目标端口为80的数据包，0xffff是掩码，表示完全匹配</span><br><span class="hljs-comment"># flowid 1:10：指定匹配的数据包将被分配到类ID为1:10的类</span><br>tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip src 1.2.3.4 flowid 1:11<br><span class="hljs-comment"># 最后为这些class添加queuing disciplines</span><br>tc qdisc add dev eth0 parent 1:10 handle 20: pfifo <span class="hljs-built_in">limit</span> 5<br>tc qdisc add dev eth0 parent 1:11 handle 30: sfq perturb 10<br></code></pre></td></tr></table></figure>
+<h2 id="设备">设备</h2>
+<h3 id="misc设备">misc设备</h3>
+<p><strong>概述：</strong>通常指代miscellaneous(杂项)设备。它们是一类特殊的字符设备，主要用于子系统中不容易归类到其他设备类别的小设备。'misc'设备由'misc'子系统管理，这个子系统简化了创建和管理这些杂项设备的过程</p>
+<p><strong>特点和管理：</strong></p>
+<ul>
+<li>字符设备：misc设备通常是字符设备，这意味着它们处理数据的方式是按字符（而不是块）来操作</li>
+<li>子系统管理：通过misc子系统，可以简化创建和管理这些设备的步骤</li>
+<li>共享主设备号：所有misc设备共享一个主设备号，但每个设备都有自己独立的次设备号</li>
+<li>设备注册：设备驱动程序通过调用'misc_register'函数注册一个misc设备</li>
+</ul>
+<p><strong>常见的misc设备：</strong></p>
+<ul>
+<li>/dev/urandom和/dev/random
+<ul>
+<li>提供伪随机数和真随机数生成给</li>
+<li>常用于密码学、密钥生成等随机数的场景</li>
+</ul></li>
+<li>/dev/tty
+<ul>
+<li>代表当前终端设备的别名</li>
+<li>用于进程与当前终端进行交互</li>
+</ul></li>
+<li>/dev/null
+<ul>
+<li>被称为位桶或空设备</li>
+<li>写入数据会被丢弃，读取数据时会返回EOF</li>
+<li>常用于丢弃不需要的数据或测试</li>
+</ul></li>
+<li>/dev/zero
+<ul>
+<li>提供无限量的零字节</li>
+<li>常用于内存初始化或创建空文件</li>
+</ul></li>
+<li>/dev/full
+<ul>
+<li>提供一个总是返回满的设备，写入时返回ENOSPC错误</li>
+<li>常用于测试错误处理</li>
+</ul></li>
+<li>/dev/loopX
+<ul>
+<li>环回设备(Loopback device)</li>
+<li>用于将文件作为块设备使用，常用于创建文件系统映像</li>
+</ul></li>
+<li>/dev/kmsg
+<ul>
+<li>内核消息设备</li>
+<li>用于从用户空间向内核日志发送消息</li>
+</ul></li>
+<li>/dev/hpet：
+<ul>
+<li>高精度时间计数器</li>
+<li>提供高精度的定时功能</li>
+</ul></li>
+<li>/dev/input/mice和/dev/input/mouseX
+<ul>
+<li>提供对连接到系统的鼠标设备的访问</li>
+<li>常用于捕获和处理鼠标输入事件</li>
+</ul></li>
+<li>/dev/watchdog
+<ul>
+<li>看门狗设备</li>
+<li>用于系统监控和恢复，如果系统挂起，未及时重置看门狗计时器，将触发系统重启</li>
+</ul></li>
+</ul>
+<h3 id="rdma">RDMA</h3>
+<p><strong>概述：</strong>Remote Direct Memory Access
+设备是一类允许直接在不同计算机之间传输数据的网络设备，而不需要经过CPU的干预或传统的操作系统网络栈。RDMA的主要目标是提供低延迟、高带宽的数据传输能力，特别适用于高性能计算、分布式存储系统、大规模数据中心以及金融服务等领域</p>
+<p><strong>基本概念：</strong></p>
+<ul>
+<li>RDMA：RDMA是一种技术，允许在不同主机之间直接传输数据，从而绕过传统的网络协议栈，如TCP/IP。通过直接访问远程主机的内存，RDMA能够大幅减少数据传输的延迟，并减轻CPU的负担</li>
+<li>RDMA设备：是一种支持RDMA技术的网络设备，通常是专用的网卡，如InfiniBand适配器、RoCE网卡或iWARP设备。这些设备通常包含硬件加速器，可以直接处理内存传输和网络数据包，而不需要经过操作系统内核的处理</li>
+</ul>
+<p><strong>关键优势：</strong></p>
+<ul>
+<li>低延迟：由于跳过了内核的网络协议栈，并且可以直接在网络设备上处理数据传输，RDMA显著降低了数据传输的延迟</li>
+<li>高带宽：RDMA设备通常支持非常高的网络带宽，适合大规模数据传输任务</li>
+<li>低CPU开销：在传统的网络通信中，数据包的处理需要占用大量CPU资源。而RDMA技术让数据传输直接在网卡上处理，释放了CPU资源</li>
+<li>零拷贝传输：即数据可以从一台机器的内存直接传输到另一台机器的内存，而不需要中间的内存拷贝操作</li>
+</ul>
+<p><strong>工作原理：</strong>通过一组硬件来直接访问远程系统的内存</p>
+<ul>
+<li>Queue
+Pair(QP)：有发送队列和接收队列组成。它们用于处理数据的发送和接收操作</li>
+<li>Memory
+Region(MR)：MR是RDMA设备访问内存区域的方式。内存区域被注册到RDMA设备中，使其能够直接访问这些区域的物理内存</li>
+<li>Completion
+Queue(CQ)：用于通知操作完成的队列。每当一个发送或接收操作完成时，CQ会产生一个完成事件，供应用程序处理</li>
+<li>RDMA Operations：Send/Receive、RDMA Read和RDMA
+Write。Send/Receive类似于传统的消息传递，而RDMA
+Read和Write操作则允许直接从远程内存中读取或写入数据</li>
+</ul>
+<h2 id="内核配置">内核配置</h2>
+<p>如何查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /boot/config-$(<span class="hljs-built_in">uname</span> -r) | grep <span class="hljs-variable">$CONFIG_NAME</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li>CONFIG_NAME：某个具体的内核配置名称</li>
+</ul>
+<p><strong>配置状态：</strong></p>
+<p><strong><code>y</code></strong>：表示该功能已启用，并且是静态编译到内核中的，即直接编译到内核映像内，不会作为模块存在。</p>
+<p><strong><code>m</code></strong>：表示该功能被配置为内核模块（module），也就是该功能会作为一个单独的模块被编译出来，加载时才会启用。</p>
+<p><strong><code>n</code></strong>：表示该功能没有启用，也就是说该功能在内核中被禁用，既不编译到内核，也不作为模块编译。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/linux/" class="print-no-link">#linux</a>
+      
+        <a href="/tags/cgroup/" class="print-no-link">#cgroup</a>
+      
+        <a href="/tags/shell/" class="print-no-link">#shell</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Linux Cgroup学习笔记</div>
+      <div>http://example.com/2024/12/05/Cgroup学习笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年12月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/09/C-%E4%B8%AD%E7%9A%84%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/" title="C++中的智能指针">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">C++中的智能指针</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/02/OpenGL%E9%98%B4%E5%BD%B1%E6%98%A0%E5%B0%84%E6%8A%80%E6%9C%AF%E4%BB%8B%E7%BB%8D/" title="OpenGL阴影映射技术介绍">
+                        <span class="hidden-mobile">OpenGL阴影映射技术介绍</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

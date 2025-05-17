@@ -1,0 +1,2232 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="软件架构期末复习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件架构期末复习笔记">
+<meta property="og:url" content="http://example.com/2024/12/16/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="软件架构期末复习笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+<meta property="article:published_time" content="2024-12-16T08:48:44.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.079Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="软件架构">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+  
+  
+  
+  <title>软件架构期末复习笔记 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="软件架构期末复习笔记"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-12-16 16:48" pubdate>
+          2024年12月16日, 4:48 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          16k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">软件架构期末复习笔记</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="软件架构">软件架构</h1>
+<p><strong>定义：</strong>
+是一个系统的基本组织，由其组件、组件之间的关系以及与环境的关系组成，同时包括设计和演化的原则</p>
+<p><strong>核心概念：</strong></p>
+<ul>
+<li>组件：系统的功能单元，负责特定任务的执行。例如模块、服务、类、库等</li>
+<li>连接器：定义组件之间如何交互的机制，包括数据流、调用协议等。例如HTTP、消息队列、函数调用等</li>
+<li>关系：描述组件之间的依赖或交互方式。例如调用关系、数据共享、事件发布-订阅模式等</li>
+<li>架构风格：一组通用的设计原则和模式，例如分层架构、微服务架构、事件驱动架构等</li>
+<li>质量属性(QA)：系统非功能需求，包括性能、安全性、可扩展性、可维护性等，这些属性对架构设计有重要影响</li>
+<li>视图：软件架构通常以不同的视图来呈现，帮助不同角色（如开发者、运维人员）理解系统。常见的视图有逻辑视图、物理视图、开发视图、运行时视图等</li>
+</ul>
+<p><strong>作用：</strong></p>
+<ul>
+<li>指导开发：提供系统开发的蓝图，明确系统的结构和开发方向</li>
+<li>支持决策：帮助团队衡量QA，如性能和安全之间的平衡</li>
+<li>促进沟通：通过架构视图和文档，促进团队成员之间的沟通和理解</li>
+<li>适应变化：通过合理的设计原则和模式，使系统能适应需求变化和技术演进</li>
+</ul>
+<p><strong>实践：</strong></p>
+<ul>
+<li>需求分析：识别功能性和非功能性需求</li>
+<li>选择架构模式：单体架构、微服务架构</li>
+<li>定义组件和接口：明确系统模块的职责和交互方式</li>
+<li>验证和优化：通过架构评审或原型验证设计是否合理</li>
+</ul>
+<h2 id="三种视图结构">三种视图结构</h2>
+<h3 id="模块结构">模块结构</h3>
+<p><strong>概述：</strong>
+描述系统的静态分解，即系统由哪些模块组成，以及这些模块之间的关系</p>
+<p><strong>核心特点：</strong></p>
+<ul>
+<li><p>关注开发时的静态组织</p></li>
+<li><p>体现模块的职责分配和分层结构</p></li>
+<li><p>主要面向开发者和架构师，帮助理解代码的分解和组织</p></li>
+</ul>
+<p><strong>主要形式：</strong></p>
+<ul>
+<li>分层结构 ：
+<ul>
+<li>系统被分为若干层，每层负责特定功能，并依赖于下层</li>
+<li>示例：表示层（UI） -&gt; 业务逻辑层（BLL） -&gt;
+数据访问层（DAL）</li>
+</ul></li>
+<li>分块结构：
+<ul>
+<li>系统被分解为功能模块，强调模块的职责和边界</li>
+<li>示例：用户模块、订单模块、支付模块</li>
+</ul></li>
+<li>使用结构：
+<ul>
+<li>描述模块之间的依赖关系</li>
+<li>示例：模块A使用模块B的接口</li>
+</ul></li>
+</ul>
+<p><strong>作用：</strong></p>
+<ul>
+<li>确定模块的职责和边界，便于开发分工</li>
+<li>明确模块之间的依赖关系，避免循环依赖</li>
+</ul>
+<h3 id="分配结构">分配结构</h3>
+<p><strong>概述：</strong>
+描述系统的动态部署，即软件模块如何分配到硬件或组织上运行</p>
+<p><strong>核心特点：</strong></p>
+<ul>
+<li>关注系统在实际运行中的部署形态</li>
+<li>面向运维工程师、架构师、强调部署、性能和资源分配</li>
+</ul>
+<p><strong>主要形式：</strong></p>
+<ul>
+<li>部署结构(Deployment Structure)：
+<ul>
+<li>描述模块与物理硬件的映射关系</li>
+<li>示例：Web服务部署在服务器A，数据库部署在服务器B</li>
+</ul></li>
+<li>实施结构(Implementation Structure)：
+<ul>
+<li>关注模块分配到开发团队或代码仓库的组织方式</li>
+<li>示例：模块X分配给团队A，模块Y分配给团队B</li>
+</ul></li>
+<li>工作分配结构(Work Assignment Structure)：
+<ul>
+<li>关注模块与团队或人员的对应关系</li>
+<li>示例：订单服务由团队A开发维护</li>
+</ul></li>
+</ul>
+<p><strong>作用：</strong></p>
+<ul>
+<li>确保资源利用的效率和系统性能</li>
+<li>提供开发、部署和运维的清晰指导</li>
+</ul>
+<h3 id="cc架构">C&amp;C架构</h3>
+<p><strong>概述：</strong>
+描述系统的运行时视角，即组件如何通过连接器交互完成工作</p>
+<p><strong>核心特点：</strong></p>
+<ul>
+<li>关注系统的动态行为和交互模式，面向架构师和性能分析师</li>
+<li>组件是独立功能单元，连接器是组件之间的通信机制</li>
+</ul>
+<p><strong>主要形式：</strong></p>
+<ul>
+<li>通信结构(Communication Structure)：
+<ul>
+<li>描述组件之间的通信模式</li>
+<li>示例：HTTP请求、消息队列、RPC调用</li>
+</ul></li>
+<li>并发结构(Concurrency Structure)：
+<ul>
+<li>关注组件之间的并发交互</li>
+<li>示例：多个线程或进程之间的协作</li>
+</ul></li>
+<li>协作结构(Coordination Structure)：
+<ul>
+<li>描述组件如何协同完成任务</li>
+<li>示例：客户端调用服务端，服务端调用数据库</li>
+</ul></li>
+</ul>
+<p><strong>作用：</strong></p>
+<ul>
+<li>描述系统的运行时行为，指导实现动态交互逻辑</li>
+<li>帮助分析系统的性能、并发性和容错能力</li>
+</ul>
+<h2 id="七类设计决策">七类设计决策</h2>
+<h3 id="技术决策">技术决策</h3>
+<p><strong>概述：</strong>
+选择实现系统的技术栈和工具，包括编程语言、框架、库、数据库、消息队列等</p>
+<p><strong>目的：</strong>
+确保技术选型满足功能和非功能需求，同时考虑团队能力和项目环境</p>
+<p><strong>示例：</strong></p>
+<ul>
+<li>选择JS或TS开发前端</li>
+<li>使用PostgreSQL作为关系型数据库</li>
+<li>引入Kafka作为消息队列处理异步任务</li>
+</ul>
+<h3 id="架构模式决策">架构模式决策</h3>
+<p><strong>概述：</strong>
+决定系统使用的整体架构模式，影响系统的高层结构和模块间交互方式</p>
+<p><strong>目的：</strong> 为系统的组织和分解提供整体指导框架</p>
+<p><strong>常见模式：</strong></p>
+<ul>
+<li>分层架构：将系统分为UI层、业务逻辑层和数据层</li>
+<li>微服务架构：将系统拆分为多个独立服务，按业务模块划分</li>
+<li>事件驱动架构：通过事件队列实现松耦合和异步通信</li>
+</ul>
+<p><strong>示例：</strong></p>
+<ul>
+<li>一个电商系统采用微服务架构来支持模块化和独立扩展</li>
+</ul>
+<h3 id="模块划分决策">模块划分决策</h3>
+<p><strong>概述：</strong>
+决定如何将系统划分为功能模块，以及模块之间的职责和依赖关系</p>
+<p><strong>目的：</strong>
+确保模块化设计，提高系统的可维护性和可扩展性</p>
+<p><strong>示例：</strong></p>
+<ul>
+<li>划分出用户模块、订单模块、支付模块，每个模块独立负责一部分业务逻辑</li>
+<li>采用依赖注入(Dependenccy Injection)管理模块间的依赖</li>
+</ul>
+<h3 id="接口设计决策">接口设计决策</h3>
+<p><strong>概述：</strong>
+决定模块或组件之间的交互接口，包括接口的协议、数据格式和调用方式</p>
+<p><strong>目的：</strong> 确保模块间的通信高效、清晰且符合需求</p>
+<p><strong>示例：</strong></p>
+<ul>
+<li>REST API设计：定义一个/api/orders的POST接口用于创建订单</li>
+<li>使用gRPC协议传输结构化数据，提高通信性能</li>
+<li>确定内部模块使用接口，而外部模块暴露公共API</li>
+</ul>
+<h3 id="数据管理决策">数据管理决策</h3>
+<p><strong>概述：</strong>
+决定如何存储、管理和访问数据，包括数据库选型、分区策略、缓存方案等</p>
+<p><strong>目的：</strong> 保证系统的数据一致性、持久性和高效访问</p>
+<p><strong>示例：</strong></p>
+<ul>
+<li>使用MySQL作为主数据库，redis用于缓存热数据</li>
+<li>对大规模数据库采用分库分表策略</li>
+<li>引入ElasticSearch提供全文检索功能</li>
+</ul>
+<h3 id="非功能需求决策">非功能需求决策</h3>
+<p><strong>概述：</strong>
+围绕系统的QA（性能、可用性、安全性、扩展性等）所作的设计决策</p>
+<p><strong>目的：</strong> 确保系统在功能之外的特性满足需求</p>
+<p><strong>示例：</strong></p>
+<ul>
+<li>为高并发场景设计负载均衡方案</li>
+<li>提供每日备份机制以增强灾难恢复能力</li>
+<li>使用OAuthr2协议确保系统的安全性</li>
+</ul>
+<h3 id="运维部署决策">运维部署决策</h3>
+<p><strong>概述：</strong>
+涉及系统在实际运行环境中的部署方式、监控方案和故障处理策略</p>
+<p><strong>目的：</strong> 提高系统在生产环境中的可用性和可操作性</p>
+<p><strong>示例：</strong></p>
+<ul>
+<li>使用Docker容器化所有服务</li>
+<li>部署Kubernetes集群管理微服务</li>
+<li>设计健康检查和自动重启机制来处理服务故障</li>
+</ul>
+<h2 id="lts">LTS</h2>
+<p><strong>概述：</strong> Long-Term Support
+是一个软件产品或版本提供长期维护和支持的策略，旨在为用户和开发团队提供更稳定的环境和更低的项目风险。</p>
+<h3 id="稳定性和可靠性">稳定性和可靠性</h3>
+<p><strong>作用：</strong></p>
+<ul>
+<li>LTS版本专注于稳定性，通常不会频繁引入重大变化和新特性</li>
+<li>开发团队可以依赖一个稳定的版本，避免频繁的版本迁移带来的不确定性</li>
+</ul>
+<p><strong>降低风险：</strong></p>
+<ul>
+<li>减少由于升级或兼容性问题导致的功能中断</li>
+<li>降低开发过程中不可预测的环境变化风险</li>
+</ul>
+<h3 id="安全性保障">安全性保障</h3>
+<p><strong>作用：</strong></p>
+<ul>
+<li>LTS版本的厂商或社区通常会长期提供安全补丁和漏洞修复</li>
+<li>用户可以确保系统在生命周期内的安全性，即使版本较老</li>
+</ul>
+<p><strong>降低风险：</strong></p>
+<ul>
+<li>避免因不再维护的旧版本导致的安全漏洞</li>
+<li>提供定期安全更新，降低系统收到攻击的可能性</li>
+</ul>
+<h3 id="成本控制">成本控制</h3>
+<p><strong>作用：</strong></p>
+<ul>
+<li>LTS版本减少了频繁升级或迁移的需求，从而降低开发和运维成本</li>
+<li>团队可以专注于功能开发，而非花费大量时间适配新版本</li>
+</ul>
+<p><strong>降低风险：</strong></p>
+<ul>
+<li>避免因频繁升级导致的不必要投入</li>
+<li>减少开发周期内技术债务的积累</li>
+</ul>
+<h3 id="提高开发效率">提高开发效率</h3>
+<p><strong>作用：</strong></p>
+<ul>
+<li>LTS版本提供长期支持，意味着工具链、依赖库和文档会保持一致性</li>
+<li>团队可以专注于产品的核心功能，而非对应工具的环境的频繁变更</li>
+</ul>
+<p><strong>降低风险：</strong></p>
+<ul>
+<li>减少开发团队因频繁学习和适应新技术导致的效率下降</li>
+<li>提高开发流程的一致性和可预测性</li>
+</ul>
+<h3 id="减少技术不确定性">减少技术不确定性</h3>
+<p><strong>作用：</strong></p>
+<ul>
+<li>LTS版本的特性和行为经过充分测试和验证</li>
+<li>减少因使用实验性或不稳定功能导致的不可预测后果</li>
+</ul>
+<p><strong>降低风险：</strong></p>
+<ul>
+<li>避免因新技术选择错误而引发的项目失败</li>
+<li>提供长期验证的技术方案，适合关键任务和大规模项目</li>
+</ul>
+<h3 id="满足合规性和行业标准">满足合规性和行业标准</h3>
+<p><strong>作用：</strong></p>
+<ul>
+<li>LTS版本通常更符合行业合规性要求</li>
+<li>企业用户在选择软件时，LTS版本更易于通过合规审查</li>
+</ul>
+<p><strong>降低风险：</strong></p>
+<ul>
+<li>避免因使用未经过支持的版本导致的法律或合规问题</li>
+<li>确保系统满足长期运行所需的行业标准</li>
+</ul>
+<h2
+id="模式patterns与策略tactics的关系">模式(Patterns)与策略(Tactics)的关系</h2>
+<h3 id="定义与作用">定义与作用</h3>
+<p><strong>模式：</strong></p>
+<ul>
+<li>定义：模式是经过验证的、在特定上下文中解决特定问题的高层设计方案或模板</li>
+<li>作用：提供系统整体结构和模块间交互的通用解决方案</li>
+<li>示例：
+<ul>
+<li>架构模式：如分层架构、微服务架构、事件驱动架构</li>
+<li>设计模式：观察者模式、单例模式、工厂模式</li>
+</ul></li>
+</ul>
+<p><strong>策略：</strong></p>
+<ul>
+<li>定义：策略是实现系统QA的低层次技术方法或设计选择</li>
+<li>作用：通过具体的实现手段优化系统的特定属性</li>
+<li>示例：
+<ul>
+<li>性能策略：缓存数据、使用异步处理</li>
+<li>安全策略：使用加密、身份验证</li>
+</ul></li>
+</ul>
+<h3 id="层次关系">层次关系</h3>
+<p><strong>模式是高层次的，策略是低层次的：</strong></p>
+<ul>
+<li>模式描述了整体设计框架，用于组织系统结构</li>
+<li>策略是在模式中应用的具体方法，用于实现质量目标</li>
+</ul>
+<p><strong>模式包含策略：</strong></p>
+<ul>
+<li>一个模式通常由多个策略组成，这些策略支持模式的实现</li>
+<li>示例：在微服务架构模式中，可能需要使用缓存策略来提高性能，
+或者使用服务注册与发现策略来增强可用性</li>
+</ul>
+<p><strong>策略支持模式的质量目标：</strong></p>
+<ul>
+<li>模式的选择通常受到QA的驱动，而策略的应用则是为了更好地满足这些QA</li>
+</ul>
+<h3 id="设计关系">设计关系</h3>
+<p><strong>模式与策略的设计关系：</strong></p>
+<ul>
+<li>驱动关系：系统的QA需求驱动模式的选择，而模式的实现依赖策略的具体应用</li>
+<li>组合关系：模式之间可以相互组合，一个系统可能同时应用多个模式，每个模式中使用相应的策略来支持QA</li>
+<li>实践关系：在实际项目中，模式提供了整体解决方案，策略在实施过程中细化模式的细节</li>
+</ul>
+<h3 id="举例说明">举例说明</h3>
+<p><strong>分层架构模式：</strong></p>
+<ul>
+<li>模式描述：系统被分为表示层、业务逻辑层和数据访问层，每层负责特定职责</li>
+<li>应用的策略：
+<ul>
+<li>性能策略：在业务逻辑层引入缓存以减少对数据层的请求</li>
+<li>可靠性策略：在表示层使用超时和重试机制应对网络问题</li>
+<li>安全策略：在数据访问层增加数据库连接加密</li>
+</ul></li>
+</ul>
+<p><strong>微服务架构模式：</strong></p>
+<ul>
+<li>模式描述：系统被拆分为多个独立服务，每个服务独立部署、独立运行</li>
+<li>应用的策略：
+<ul>
+<li>性能策略：在每个服务之间引入消息队列以处理高并发</li>
+<li>安全策略：使用OAuth2进行服务间身份验证</li>
+<li>可用性策略：实现断路器模式以防止单点故障</li>
+</ul></li>
+</ul>
+<p><strong>事件驱动架构模式：</strong></p>
+<ul>
+<li>模式描述：系统基于事件通知机制运行，模块通过事件消息通信</li>
+<li>应用的策略：
+<ul>
+<li>性能策略：使用异步事件队列处理大量并发事件</li>
+<li>可靠性策略：引入事件持久化以防止消息丢失</li>
+<li>扩展性策略：使用分布式事件总线支持水平扩展</li>
+</ul></li>
+</ul>
+<h1 id="质量属性qa">质量属性(QA)</h1>
+<h2 id="类型">类型</h2>
+<p><strong>运行时QA：</strong></p>
+<table>
+
+<thead>
+<tr>
+<th>运行时QA</th>
+<th>概念和目标</th>
+<th>示例策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>性能(Performance)</td>
+<td>系统响应速度、吞吐量及资源利用率。目标是满足用户对响应时间或处理能力的期望。</td>
+<td>缓存、负载均衡、异步处理、数据分片</td>
+</tr>
+<tr>
+<td>可用性(Availability)</td>
+<td>系统在指定时间内的正常运行能力，通常以"运行时间的百分比"度量</td>
+<td>冗余(Redundancy)设计、容错机制、健康检查与自动恢复</td>
+</tr>
+<tr>
+<td>安全性(Security)</td>
+<td>保护系统免受未授权访问或攻击，保证数据和系统的机密性、完整性和可用性</td>
+<td>加密、身份验证、访问控制、日志审计</td>
+</tr>
+<tr>
+<td>可靠性(Reliability)</td>
+<td>系统在规定条件下和规定时间内执行成功功能的能力</td>
+<td>冗余设计、重试机制、监控和报警</td>
+</tr>
+<tr>
+<td>可扩展性(Scalability)</td>
+<td>系统在增加负载或资源后，仍然能有效处理任务的能力</td>
+<td>水平扩展(增加节点)、垂直扩展(增强单节点能力)、使用分布式架构</td>
+</tr>
+<tr>
+<td>可用性(Usability)</td>
+<td>系统对最终用户的易用性和可操作性</td>
+<td>友好的用户界面、直观的导航、帮助文档</td>
+</tr>
+</tbody>
+</table>
+<p><strong>非运行时QA：</strong></p>
+<table>
+
+<thead>
+<tr>
+<th>非运行时QA</th>
+<th>概念和目标</th>
+<th>示例策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可维护性(Maintainability)</td>
+<td>系统的可修改性和可调试性，易于修复缺陷和适应需求变化</td>
+<td>模块化设计、清晰的代码规范、自动化测试</td>
+</tr>
+<tr>
+<td>可测试性(Testability)</td>
+<td>测试系统是否符合需求的容易程度，目标是确保问题可以快速发现和定位</td>
+<td>测试驱动开发(TDD)、依赖注入、使用模拟(mock)测试</td>
+</tr>
+<tr>
+<td>可部署性(Deployability)</td>
+<td>系统的快速部署能力，支持灵活升级和版本回退</td>
+<td>容器化部署、蓝绿部署、持续交付</td>
+</tr>
+<tr>
+<td>可移植性(Portability)</td>
+<td>系统在不同硬件或软件环境中运行的能力</td>
+<td>使用平台无关技术、抽象接口层</td>
+</tr>
+<tr>
+<td>可复用性(Resuability)</td>
+<td>系统组件的复用能力，用于节省开发时间和资源</td>
+<td>组件化设计、使用共享库、标准化接口设计</td>
+</tr>
+<tr>
+<td>互操作性(Interoperability)</td>
+<td>系统与其他系统或组件协同工作的能力</td>
+<td>使用开放标准(如RESTful API)、数据格式转换(如JSON与XML)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="概念">概念</h2>
+<p><strong>核心特点：</strong></p>
+<ul>
+<li>非功能需求(NFRs)：QA通常不直接涉及系统的功能，但它们对于系统是否能否满足用户需求至关重要的</li>
+<li>权衡与优先级：不同QA之间可能存在冲突，例如提高性能可能会降低安全性，架构涉及需要根据项目目标进行平衡</li>
+<li>驱动设计决策：QA决定了架构模式、组件划分和系统部署方式</li>
+</ul>
+<p><strong>属性场景(Quality Attributes Scenarios) ：</strong></p>
+<p>为了明确和测试QA，通常使用属性场景来定义其需求和评估标准。一个完整的属性场景包括：</p>
+<ul>
+<li>刺激源：触发系统的外部或内部事件</li>
+<li>刺激：对系统施加的具体操作</li>
+<li>环境：系统在何种状态下发生刺激（如正常负载或高负载）</li>
+<li>响应：系统在刺激下的行为</li>
+<li>响应度量：用于评估响应是否达到期望的指标</li>
+</ul>
+<h2 id="策略">策略</h2>
+<h3 id="通用策略">通用策略</h3>
+<ul>
+<li>模块化设计：通过分离关注点提高可维护性、可测试性和可复用性</li>
+<li>分层架构：支持扩展性、可移植性和安全性</li>
+<li>容错设计：提高可靠性和可用性</li>
+<li>性能优化：如引入缓存、压缩数据、负载均衡等</li>
+</ul>
+<h3 id="具体qa策略">具体QA策略</h3>
+<p><strong>概览：</strong></p>
+<table>
+
+<thead>
+<tr>
+<th>QA</th>
+<th>策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>性能</td>
+<td>使用缓存| CDN | 索引优化 | 减少数据传输量 | 异步处理耗时任务</td>
+</tr>
+<tr>
+<td>安全性</td>
+<td>加强访问控制 | 实现日志记录与审计 | 使用TLS/SSL协议保护传输数据</td>
+</tr>
+<tr>
+<td>可用性</td>
+<td>实现自动恢复机制 | 增加故障转移(Failover) | 使用负载均衡</td>
+</tr>
+<tr>
+<td>可靠性</td>
+<td>数据冗余与备份 | 使用事务来保证数据一致性 | 实现健康检查与监控</td>
+</tr>
+<tr>
+<td>可维护性</td>
+<td>实现代码分层与模块化 | 遵循编码规范 |
+使用自动化工具生成测试和文档</td>
+</tr>
+<tr>
+<td>可扩展性</td>
+<td>引入分布式架构 | 水平扩展(增加服务器) | 垂直扩展(提高硬件性能)</td>
+</tr>
+<tr>
+<td>互操作性</td>
+<td>使用开发协议和标准 | 提供明确的API文档 | 支持多种数据格式的转换</td>
+</tr>
+</tbody>
+</table>
+<h4 id="可用性和相关策略">可用性和相关策略</h4>
+<p><strong>概述：</strong>
+系统在指定时间内保持正常运行并提供服务的能力，通常用”运行时间百分比“来衡量</p>
+<p><strong>目标：</strong></p>
+<ul>
+<li>确保服务不中断</li>
+<li>快速恢复故障</li>
+<li>提供冗余和容错能力</li>
+</ul>
+<p><strong>故障检测：</strong></p>
+<ul>
+<li>健康检查(Health
+Check)：周期性检查服务或组件是否正常工作。比如HTTP健康检查接口<code>/health</code></li>
+<li>心跳机制(Heartbeat
+Mechanism)：服务通过定期发送心跳信号告知其他组件其状态。比如分布式系统中，节点通过心跳确认彼此在线</li>
+<li>监控与日志：实时监控关键性能指标（如响应时间、错误率），并记录日志以便问题排查。工具Prometheus、Grafana</li>
+</ul>
+<p><strong>故障处理：</strong></p>
+<ul>
+<li>自动故障转移(Failover)：在主节点故障时，将流量自动切换到备用节点。使用AWS的弹性负载均衡(ELB)和多区域部署</li>
+<li>数据冗余与备份：通过复制数据或定期备份防止因数据丢失导致系统不可用。比如使用RAID、数据库库复制（MySQL主从复制）</li>
+<li>断路器模式(Circuit Breaker
+Pattern)：在故障频繁时临时停止对问题服务的调用，避免系统过载</li>
+</ul>
+<p><strong>快速恢复：</strong></p>
+<ul>
+<li>重试机制：在失败时自动重试，以应对短暂性故障。比如API调用失败后每隔几秒重试</li>
+<li>自动化恢复：利用容易编排工具（如Kubernetes）自动重新启动失败的服务</li>
+</ul>
+<h4 id="性能和相关的策略">性能和相关的策略</h4>
+<p><strong>概述：</strong>
+衡量系统在不同负载下完成任务的效率，主要涉及响应时间、吞吐量和资源利用率</p>
+<p><strong>目标：</strong></p>
+<ul>
+<li>降低响应时间</li>
+<li>提高系统处理能力（吞吐量）</li>
+<li>合理使用系统资源</li>
+</ul>
+<p><strong>响应时间优化：</strong></p>
+<ul>
+<li>缓存(Caching)：减少重复计算或数据库查询，将常用数据缓存在内存中。比如使用Redis或Memcached</li>
+<li>CDN(内容分发网络)：加速静态内容的分发，减少延迟。比如使用Cloudflare加快网页加载速度</li>
+<li>异步处理：将耗时任务放入后台队列，避免阻塞主线程。比如使用消息队列RabbitMQ/Kafka</li>
+</ul>
+<p><strong>吞吐量提升：</strong></p>
+<ul>
+<li>负载均衡(Load
+Balancing)：将请求分发到多个服务器，避免单点瓶颈。比如Nginx、HAProxy</li>
+<li>数据库分片(Sharding)：将数据分布到多个数据库，提高读写并发性能</li>
+</ul>
+<p><strong>资源优化：</strong></p>
+<ul>
+<li>压缩与最小化：压缩文件大小，减少网络传输开销</li>
+<li>优先级调度：为高优先级任务分配更多资源</li>
+</ul>
+<h4 id="安全性及相关的策略">安全性及相关的策略</h4>
+<p><strong>概述：</strong>
+是保护系统及其数据免受未授权访问、攻击和恶意行为的能力</p>
+<p><strong>目标：</strong></p>
+<ul>
+<li>保证数据的机密性、完整性和可用性</li>
+<li>防止未授权的访问和攻击</li>
+</ul>
+<p><strong>身份验证与授权：</strong></p>
+<ul>
+<li>身份验证(Authentication)：确认用户身份。比如使用OAuth2、JWT(JSON Web
+Token)</li>
+<li>授权(Authorization)：确定用户可以访问的资源范围。比如基于角色的访问控制(RBAC)</li>
+</ul>
+<p><strong>数据保护：</strong></p>
+<ul>
+<li>加密(Encryption)：保护数据在传输和存储中的安全性。比如使用HTTPS(TLS/SLL)，数据库字段加密</li>
+<li>数据校验：使用哈希算法（如SHA-256）验证数据完整性</li>
+</ul>
+<p><strong>攻击防护：</strong></p>
+<ul>
+<li>输入验证：防止SQL注入和跨站脚本攻击（XSS）。比如使用参数化查询，过滤用户输入</li>
+<li>防火墙与WAF(Web Application Firewall)：阻止恶意流量。比如Cloudflare
+WAF</li>
+<li>速率限制：限制单个IP或用户的请求频率，防止DoS攻击</li>
+</ul>
+<p><strong>安全监控：</strong></p>
+<ul>
+<li>安全事件日志：记录用户登录、失败尝试等行为。比如使用SIEM(Security
+Information and Event Management)工具</li>
+<li>实时威胁检测：利用AI分析系统日志，识别潜在威胁</li>
+</ul>
+<h4 id="互操作性和相关策略">互操作性和相关策略</h4>
+<p><strong>概述：</strong>
+是指系统能够与其他系统或组件协同工作，并交换和利用信息的能力</p>
+<p><strong>目标：</strong></p>
+<ul>
+<li>通过标准接口实现不同系统间的兼容性</li>
+<li>使服务之间可以无缝发现和协作</li>
+</ul>
+<p><strong>标准化通信：</strong></p>
+<ul>
+<li>使用开放协议和标准：如REST、gRPC、SOAP等</li>
+<li>数据格式兼容性：支持JSON、XML等通用数据格式</li>
+</ul>
+<p><strong>服务发现：</strong>
+服务发现使得系统组件能动态地找到彼此的位置，尤其是在分布式环境中。</p>
+<ul>
+<li>客户端发现模式：客户端通过服务注册表查找其他服务的位置。比如Netflix
+Eureka</li>
+<li>服务器端发现模式：客户端将请求发送到负载均衡器，由负载均衡器查找服务。比如AWS
+Elastic Load Balancing</li>
+<li>DNS发现：通过DNS查找服务。比如Kubernete的CoreDNS</li>
+</ul>
+<p><strong>数据转换：</strong></p>
+<ul>
+<li>数据网关：在不同数据格式间转换。API
+Gateway将JSON数据转换为XML数据</li>
+<li>中间件：提供不同系统之间的桥梁，解决协议或数据不匹配的问题</li>
+</ul>
+<p><strong>API设计：</strong></p>
+<ul>
+<li>提供清晰的文档和版本控制</li>
+<li>使用工具如 Swagger/OpenAPI自动生成文档</li>
+</ul>
+<h1 id="架构模式">架构模式</h1>
+<h2 id="p2p">P2P</h2>
+<h3 id="简介">简介</h3>
+<p><strong>概述：</strong> Peer to Peer
+是一种分布式网络架构，其中每个节点(Peer)既可以充当客户端发送请求，也可以充当服务器响应请求。与传统的客户端-服务器模型不同，P2P取消了中心化的控制节点，所有节点地位平等</p>
+<p><strong>基本概念：</strong></p>
+<ul>
+<li>节点(Peer)：系统中的每个实体都称为节点，既可以请求服务，也可以提供服务</li>
+<li>去中心化：系统中不存在单一的中央控制点或服务器，减少了单点故障</li>
+<li>资源共享：节点共享计算机资源（如存储、带宽）以提高整体效率</li>
+<li>动态拓扑：节点可以自由加入和离开网络，网络拓扑结构可能会实时变化</li>
+<li>分布式查找与路由：数据存储和检索由多个节点协同完成，典型算法由DHT(分布式哈希表)和超节点路由</li>
+</ul>
+<h3 id="相关的qa">相关的QA</h3>
+<h4 id="可用性">可用性</h4>
+<p><strong>挑战：</strong></p>
+<ul>
+<li>节点动态加入和离开可能导致网络不稳定</li>
+<li>数据丢失或部分节点不可用时，服务可能受到影响</li>
+</ul>
+<p><strong>相关策略：</strong></p>
+<ul>
+<li>数据冗余与副本存储：将数据复制到多个节点以提高数据可用性</li>
+<li>智能路由 与重试机制：在节点故障时，自动重新路由请求到其他节点</li>
+<li>超节点：在纯P2P网络中引入部分高性能节点，负责关键任务（如路由或数据存储）</li>
+</ul>
+<h4 id="性能">性能</h4>
+<p><strong>挑战：</strong></p>
+<ul>
+<li>网络通信延迟：因分布式特性，节点间通信可能较慢</li>
+<li>数据检索效率：节点数量庞大时，查找目标数据可能耗时较长</li>
+</ul>
+<p><strong>相关策略：</strong></p>
+<ul>
+<li>缓存策略(Caching)：在常用节点间缓存常用数据以减少通信延迟</li>
+<li>高效路由协议：采用如Chord和Kademlia的DHT算法，优化节点间查找</li>
+<li>负载均衡：将任务动态分配到多个节点，避免部分节点过载</li>
+</ul>
+<h4 id="可靠性">可靠性</h4>
+<p><strong>挑战：</strong></p>
+<ul>
+<li>节点故障可能导致数据丢失或网络分割</li>
+<li>系统规模扩大可能影响网络健壮性</li>
+</ul>
+<p><strong>相关策略：</strong></p>
+<ul>
+<li>容错机制(Fault
+Tolerance)：通过校验和机制、节点间心跳检测确保网络健壮性</li>
+<li>定期同步：确保副本数据一致性和完整性</li>
+</ul>
+<h4 id="可扩展性">可扩展性</h4>
+<p><strong>挑战：</strong></p>
+<ul>
+<li>节点数量大幅增加时，可能引发网络拥堵或管理复杂度</li>
+</ul>
+<p><strong>相关策略：</strong></p>
+<ul>
+<li>分层架构：通过超节点实现逻辑分区管理，减少全网通信</li>
+<li>动态负载均衡：实时检测并调整节点任务分配，减轻单点压力</li>
+</ul>
+<h3 id="优势">优势</h3>
+<ul>
+<li>去中心化</li>
+<li>高扩展性</li>
+<li>高资源利用率</li>
+<li>低成本</li>
+</ul>
+<h3 id="弱点及改进方法">弱点及改进方法</h3>
+<p><strong>不稳定性（节点频繁加入或离开）：</strong></p>
+<ul>
+<li>使用稳定性协议（如Gossip协议）快速感知网络拓扑变化</li>
+<li>引入超节点机制，让稳定节点承担重要角色</li>
+</ul>
+<p><strong>数据一致性问题：</strong></p>
+<ul>
+<li>使用强一致性模型（如Paxos、Raft）保障关键数据的一致性</li>
+<li>引入事件驱动的同步机制确保节点间的状态同步</li>
+</ul>
+<p><strong>安全问题：</strong></p>
+<ul>
+<li>采用加密通信（如TLS）防止数据泄露</li>
+<li>通过认证机制防止恶意节点加入</li>
+</ul>
+<p><strong>查找效率问题：</strong></p>
+<ul>
+<li>优化分布式哈希表(DHT)路由协议（如Kademlia的高效查找算法）</li>
+<li>引入缓存机制减少频繁数据查找</li>
+</ul>
+<h3 id="跟踪">跟踪</h3>
+<p><strong>跟踪系统需要监控以下方面：</strong></p>
+<ul>
+<li>节点状态：监控节点的在线状态、负载情况以及资源利用率</li>
+<li>网络拓扑：实时可视化网络连接结构，记录拓扑变化</li>
+<li>数据传输：跟踪数据传输延迟、吞吐量以及失败率</li>
+<li>故障日志：记录节点故障、网络分裂等异常事件，用于分析和改进</li>
+</ul>
+<p><strong>工具和技术：</strong></p>
+<ul>
+<li>分布式监控系统，如Prometheus和ELK</li>
+<li>去中心化追踪协议，如分布式日志协议</li>
+</ul>
+<h2 id="mapreduce">MapReduce</h2>
+<p><strong>概述：</strong>
+是一种分布式计算架构模式，用于处理和生成大规模数据库。核心思想是将任务分为映射(Map)和归约(Reduce)两个阶段，适用于大规模数据的并行处理</p>
+<h3 id="核心概念">核心概念</h3>
+<p><strong>映射(Map)：</strong></p>
+<ul>
+<li>将输入数据分割成小的子任务，每个子任务独立处理</li>
+<li>通过映射函数生成键值对(Key-Value Pair)，便于后续分组和归约</li>
+</ul>
+<p><strong>归约(Reduce)：</strong></p>
+<ul>
+<li>将映射阶段生成的中间键值对按照键分组</li>
+<li>对每个分组应用归约函数，聚合或总结结果，生成最终输出</li>
+</ul>
+<p><strong>分发(Distribution)：</strong></p>
+<ul>
+<li>数据和任务分布在多个节点上进行并行计算</li>
+<li>中间结果通过分布式存储进行管理</li>
+</ul>
+<p><strong>容错机制：</strong></p>
+<ul>
+<li>由于MapReduce在分布式环境中运行，节点可能发生故障，系统会自动重新分配失败任务，确保整体计算的完成</li>
+</ul>
+<h3 id="工作流程">工作流程</h3>
+<ol type="1">
+<li>数据分片(Data
+Splitting)：将输入数据划分成固定大小的分片(Split)，分配到各个计算节点</li>
+<li>Map阶段：每个节点运行Map函数，将数据转换为中间键值对</li>
+<li>Shuffle阶段（分组与排序）：
+<ul>
+<li>将Map输出的中间结果根据键值分组并排序</li>
+<li>分发到相应的Reduce节点</li>
+</ul></li>
+<li>Reduce阶段：每个Reduce节点对每组数据运行归约函数，生成最终结果</li>
+<li>结果输出：通常存储在分布式文件系统中</li>
+</ol>
+<h3 id="相关的qa-1">相关的QA</h3>
+<p><strong>可扩展性(Scalability)：</strong></p>
+<ul>
+<li>特点：支持通过增加节点扩展处理能力</li>
+<li>策略：任务分片和分发机制，使任务能够动态适应集群大小</li>
+</ul>
+<p><strong>性能(Performance)：</strong></p>
+<ul>
+<li>特点：支持大规模并行计算</li>
+<li>策略：
+<ul>
+<li>数据本地化（将任务调度到数据所在节点）</li>
+<li>任务管道化（不同阶段的任务同时运行）</li>
+</ul></li>
+</ul>
+<p><strong>可靠性(Reliability)：</strong></p>
+<ul>
+<li>特点：内置容错机制，支持节点故障恢复</li>
+<li>策略：
+<ul>
+<li>定期存储中间结果（快照）</li>
+<li>使用任务重试机制处理失败任务</li>
+</ul></li>
+</ul>
+<p><strong>可用性(Availability)：</strong></p>
+<ul>
+<li>特点：分布式存储和计算，避免单点故障</li>
+<li>策略：
+<ul>
+<li>主节点和从节点分工协作</li>
+<li>使用分布式文件系统（如HDFS）保证数据持久性</li>
+</ul></li>
+</ul>
+<h3 id="优势-1">优势</h3>
+<ul>
+<li>高并行性：分布式任务分配使得多个节点可以同时处理任务，提高效率</li>
+<li>容错能力：自动任务重试和故障节点检测保证计算任务顺利完成</li>
+<li>易于扩展：可以通过增加节点线性扩展系统性能</li>
+<li>适应大规模数据库：适合对TB到PB级别的大数据集进行处理</li>
+</ul>
+<h3 id="弱点及改进方法-1">弱点及改进方法</h3>
+<p><strong>数据传输开销大：</strong></p>
+<ul>
+<li>问题：Map和Reduce阶段之间的数据传输量可能非常打，导致性能瓶颈</li>
+<li>改进方法：
+<ul>
+<li>使用压缩减少数据传输量</li>
+<li>优化Shuffle阶段的分组算法（如预分区）</li>
+</ul></li>
+</ul>
+<p><strong>不适合低延迟应用：</strong></p>
+<ul>
+<li>问题：MapReduce的批处理模式对实时性要求高的应用效果较差</li>
+<li>改进方法：
+<ul>
+<li>使用Spark的内存计算替代MapReduce的磁盘IO模式</li>
+</ul></li>
+</ul>
+<p><strong>编程模型有限：</strong></p>
+<ul>
+<li>问题：MapReduce的编程模型适合线性任务，但对复杂逻辑支持有限</li>
+<li>改进方法：
+<ul>
+<li>使用更高级的分布式计算框架（如Flink、Beam）</li>
+</ul></li>
+</ul>
+<p><strong>单点故障风险：</strong></p>
+<ul>
+<li>问题：主节点失效可能导致整个任务失败</li>
+<li>改进方法：
+<ul>
+<li>主节点高可用配置</li>
+<li>使用分布式协调服务（如ZooKeeper）管理任务</li>
+</ul></li>
+</ul>
+<h3 id="应用场景">应用场景</h3>
+<ul>
+<li>大规模日志处理：分析网站访问日志、提取用户行为模式</li>
+<li>搜索引擎索引构建：解析网页内容并生成倒排索引</li>
+<li>分布式数据库处理：数据清洗、排序、聚合等操作</li>
+<li>机器学习训练：并行计算模型参数</li>
+</ul>
+<h2 id="pubsub">Pub/Sub</h2>
+<p><strong>概述：</strong>
+Pub/Sub是一种面向消息通信的架构模式，适用于松散耦合的系统。在该模式中，发布者(Publisher)和订阅者(Subscriber)不直接交互，而是通过一个消息代理(Broker)或事件总线作为中介，实现消息的分发和处理。</p>
+<h3 id="核心概念-1">核心概念</h3>
+<p><strong>发布者：</strong></p>
+<ul>
+<li>负责生成消息或事件并发送给消息代理</li>
+<li>特点：不关心谁会接收消息，只专注于生产</li>
+</ul>
+<p><strong>订阅者：</strong></p>
+<ul>
+<li>通过消息代理订阅感兴趣的消息类型</li>
+<li>特点：只处理于自身相关的消息，不关系消息来源</li>
+</ul>
+<p><strong>消息代理(Message Broker)：</strong></p>
+<ul>
+<li>作为中间层，负责消息的路由、分发和存储</li>
+<li>典型实现包括RabbitMQ、Kafka、ActiveMQ</li>
+</ul>
+<h3 id="工作流程-1">工作流程</h3>
+<p><strong>基本步骤：</strong></p>
+<ol type="1">
+<li>发布者将消息发送到消息代理，并附带消息的主题或标签（Topic/Channel）</li>
+<li>消息代理根据主题或标签，将消息分类并存储</li>
+<li>已订阅相关主题的订阅者接收消息代理推送的消息</li>
+</ol>
+<p><strong>消息类型：</strong></p>
+<ul>
+<li>主题(Topic)：一种广播模式，消息发送到一个特定的主题，所有订阅者均可接收</li>
+<li>队列(Queue)：一种点对点模式，消息按FIFO顺序分发给单个订阅者</li>
+</ul>
+<h3 id="相关的qa-2">相关的QA</h3>
+<p><strong>可扩展性(Scalability)：</strong></p>
+<ul>
+<li>特点：通过分布式消息代理扩展系统处理能力</li>
+<li>策略：
+<ul>
+<li>分片消息存储</li>
+<li>使用多个代理节点均衡负载（如Kafka的分区）</li>
+</ul></li>
+</ul>
+<p><strong>可用性(Availability)：</strong></p>
+<ul>
+<li>特点：分布式架构和副本机制确保消息持久化和高可用</li>
+<li>策略：
+<ul>
+<li>副本存储（如Kafka）</li>
+<li>主从备份和自动故障转移</li>
+</ul></li>
+</ul>
+<p><strong>性能(Performance)：</strong></p>
+<ul>
+<li>特点：支持高吞吐量的并行消息处理</li>
+<li>策略：
+<ul>
+<li>使用批量传输降低网络开销</li>
+<li>消息压缩优化传输性能</li>
+</ul></li>
+</ul>
+<p><strong>可靠性(Reliability)：</strong></p>
+<ul>
+<li>特点：确保消息不丢失或重复传递</li>
+<li>策略：
+<ul>
+<li>消息确认机制(ACK/NACK)</li>
+<li>使用事务性消息处理</li>
+</ul></li>
+</ul>
+<h3 id="优势-2">优势</h3>
+<ul>
+<li>松耦合：发布者和订阅者互相独立，通过消息代理解耦</li>
+<li>高扩展性</li>
+<li>异步通信</li>
+</ul>
+<h3 id="弱点及改进方法-2">弱点及改进方法</h3>
+<p><strong>延迟问题：</strong></p>
+<ul>
+<li>问题：消息代理可能称为瓶颈，导致消息延迟增加</li>
+<li>改进方法：
+<ul>
+<li>增加代理节点，提升并发处理能力</li>
+<li>优化网络协议（如使用gRPC替代HTTP）</li>
+</ul></li>
+</ul>
+<p><strong>消息丢失风险：</strong></p>
+<ul>
+<li>问题：系统崩溃或网络中断可能导致消息丢失</li>
+<li>改进方法：
+<ul>
+<li>使用持久化存储</li>
+<li>消息代理支持事务性消息</li>
+</ul></li>
+</ul>
+<p><strong>重复消息处理：</strong></p>
+<ul>
+<li>问题：消息代理可能导致重复消息发送</li>
+<li>改进方法：
+<ul>
+<li>使用幂等性设计，在订阅者侧确保重复消息无害</li>
+<li>消息代理引入唯一标识符</li>
+</ul></li>
+</ul>
+<p><strong>运维复杂性：</strong></p>
+<ul>
+<li>问题：分布式消息代理系统需要专业运维</li>
+<li>改进方法：
+<ul>
+<li>引入自动化运维工具（Kubernetes</li>
+<li>使用托管服务（AWS SNS、Azure Service Bus</li>
+</ul></li>
+</ul>
+<h3 id="应用场景-1">应用场景</h3>
+<ul>
+<li>实时事件驱动系统</li>
+<li>分布式日志处理（如Kafka）</li>
+<li>消息通知和广播系统（如电子邮件、短信通知）</li>
+<li>流处理：分析实时数据流</li>
+</ul>
+<h2 id="mvc">MVC</h2>
+<p><strong>概述：</strong> Model-View-Controller
+广泛应用于构建交互式应用程序，特别是在Web开发中。MVC模式通过将应用程序分为三个主要部分：模型、视图和控制器实现了关注点分离(Speration
+of Concerns)，使得代码更加模块化、可维护和可扩展</p>
+<h3 id="核心概念-2">核心概念</h3>
+<p><strong>模型：</strong></p>
+<ul>
+<li>职责：负责处理应用程序的核心数据和业务逻辑，它代表了应用程序的状态、数据以及数据库或其他持久化存储交互的功能</li>
+<li>特点：
+<ul>
+<li>包含数据结构（如对象、表格、文档等）</li>
+<li>提供数据访问和业务逻辑操作的接口</li>
+<li>不依赖于视图或控制器，可以单独测试或维护</li>
+</ul></li>
+</ul>
+<p><strong>视图：</strong></p>
+<ul>
+<li>职责：负责显示模型的数据，并为用户提供交互界面，是用于与系统交互的界面部分，通常是HTML页面、桌面窗口或移动界面等</li>
+<li>特点：
+<ul>
+<li>视图与模型解耦，只关心如何展示数据，而不关心数据的实际来源</li>
+<li>接收用户输入，但不会直接处理这些输入，通常将其传递给控制器</li>
+</ul></li>
+</ul>
+<p><strong>控制器：</strong></p>
+<ul>
+<li>职责：负责接收用户输入、处理用户请求并更新模型和视图。它是视图和模型之间的中间层，确保数据流和控制流的正确性</li>
+<li>特点：
+<ul>
+<li>接收用户操作（如点击按钮、提交表单）并调用模型进行数据更新</li>
+<li>根据模型的变化更新视图，或者根据用户输入选择展示不同的视图</li>
+</ul></li>
+</ul>
+<h3 id="工作流程-2">工作流程</h3>
+<ol type="1">
+<li>用户通过视图与应用交互</li>
+<li>用户的输入事件被控制器捕捉，控制器将请求转发给模型</li>
+<li>模型根据控制器的请求处理数据，并更新状态</li>
+<li>模型状态变化后，控制器更新视图，重新渲染数据给用户</li>
+</ol>
+<p>用户输入 -&gt; 控制器 -&gt; 模型 -&gt; 控制器 -&gt; 视图</p>
+<h3 id="相关的qa-3">相关的QA</h3>
+<p><strong>可扩展性(Scalability)：</strong></p>
+<ul>
+<li>特点：由于MVC模式将应用程序的不同部分分离，可以独立扩展模型、是视图和控制器</li>
+<li>策略：
+<ul>
+<li>模型和视图可以在不同的服务中扩展，控制器可以通过路由机制动态处理不同的请求</li>
+</ul></li>
+</ul>
+<p><strong>可维护性(Maintainability)：</strong></p>
+<ul>
+<li>特点：通过关注点分离，MVC使得应用程序的各个部分更易于修改和扩展</li>
+<li>策略：
+<ul>
+<li>通过解耦的设计，修改模型、视图或控制器的一部分不影响其他部分</li>
+<li>可以在不同层次独立进行单元测试</li>
+</ul></li>
+</ul>
+<p><strong>可重用性(Reusability)：</strong></p>
+<ul>
+<li>特点：模块化设计促进了不同部分的宠用，视图和控制器可以多次复用</li>
+<li>策略：
+<ul>
+<li>视图和模型的解耦使得同一模型可以支持多个视图形式</li>
+</ul></li>
+</ul>
+<h3 id="优势-3">优势</h3>
+<ul>
+<li>关注点分离</li>
+<li>易于维护和扩展</li>
+<li>支持多种视图展示（Web、桌面、移动程序）</li>
+<li>提高开发效率</li>
+</ul>
+<h3 id="弱点及改进方法-3">弱点及改进方法</h3>
+<p><strong>复杂性增加：</strong></p>
+<ul>
+<li>问题：MVC模式处理简单应用时可能显得过于复杂</li>
+<li>改进方法：
+<ul>
+<li>对于小型项目可以采用MVVM、MVP等轻量设计模式</li>
+<li>在MVC中加入设计模式，如工厂模式和策略模式减轻复杂性</li>
+</ul></li>
+</ul>
+<p><strong>不适用所有应用：</strong></p>
+<ul>
+<li>问题：MVC模式特别适合数据驱动型应用，但对于具有复杂界面和业务逻辑的应用可能不够灵活</li>
+<li>改进方法：使用MVVM或MVP</li>
+</ul>
+<h3 id="应用场景-2">应用场景</h3>
+<ul>
+<li>许多Web框架如Django、Rails、Sping MVC</li>
+<li>桌面开发框架如Java Swing、.NET WinForms等</li>
+<li>移动应用开发</li>
+</ul>
+<h2 id="pipe-and-filter">Pipe-and-Filter</h2>
+<p><strong>概述：</strong>
+管道-过滤器是一种常用于数据流处理的架构模式，特别适合处理流数据或需要依次处理多个阶段的任务。这个模式将应用程序的处理过程分解为多个独立的过滤器，并通过管道将过滤器连接起来。</p>
+<h3 id="核心概念-3">核心概念</h3>
+<p><strong>过滤器(Filter)：</strong></p>
+<ul>
+<li>职责：是管道中的一个处理单元，负责对输入数据进行某种处理（如数据转换、过滤、聚合等）。每个过滤器通常是单一职责的、独立进行某一特定任务</li>
+<li>特点：
+<ul>
+<li>接收输入数据，处理并输出结果</li>
+<li>通常具有清晰的输入和输出接口</li>
+<li>过滤器之间没有直接的依赖关系，增加或修改一个过滤器不会影响其他部分</li>
+</ul></li>
+</ul>
+<p><strong>管道(Pipe)：</strong></p>
+<ul>
+<li>职责：管道用于连接各个过滤器，数据通过管道从一个过滤器流向下一个过滤器</li>
+<li>特点：
+<ul>
+<li>管道是数据的传输通道，允许过滤器之间的数据流动</li>
+<li>数据本身通常不进行任何数据处理，只负责传输数据</li>
+</ul></li>
+</ul>
+<h3 id="工作流程-3">工作流程</h3>
+<ol type="1">
+<li>数据输入：输入数据流经过管道进入第一个过滤器</li>
+<li>数据处理：第一个过滤器处理数据，并将结果输出到下一个过滤器</li>
+<li>数据传递：每个过滤器接收前一个过滤器的输出，进行处理，然后将结果传递给下一个过滤器</li>
+<li>数据输出：最终通过管道传递给输出端</li>
+</ol>
+<h3 id="相关的qa-4">相关的QA</h3>
+<p><strong>可扩展性(Scalability)：</strong></p>
+<ul>
+<li>特点：可以灵活地通过增加新的过滤器或管道来扩展系统</li>
+<li>策略：
+<ul>
+<li>增加更多过滤器来处理不同的任务</li>
+<li>通过多线程或分布式计算提升性能和吞吐量</li>
+</ul></li>
+</ul>
+<p><strong>可维护性(Maintainability)：</strong></p>
+<ul>
+<li>特点：每个过滤器都是独立的模块，易于修改和替换，不会影响整个系统</li>
+<li>策略：
+<ul>
+<li>可以独立测试和更新每个过滤器</li>
+<li>新功能可以通过添加新的过滤器来实现，而不需要重构整个系统</li>
+</ul></li>
+</ul>
+<p><strong>性能(Performance)：</strong></p>
+<ul>
+<li>特点：是用于处理大量数据的场景，尤其是当数据需要经过多个独立处理阶段时</li>
+<li>策略：
+<ul>
+<li>通过管道并行化或分布式处理提升性能</li>
+<li>针对每个过滤器的性能进行优化</li>
+</ul></li>
+</ul>
+<h3 id="优势-4">优势</h3>
+<ul>
+<li>模块化设计</li>
+<li>可扩展性强</li>
+<li>清晰的责任分离</li>
+<li>简化调试与测试</li>
+<li>支持并行处理</li>
+</ul>
+<h3 id="弱点及改进方法-4">弱点及改进方法</h3>
+<p><strong>数据传输开销：</strong></p>
+<ul>
+<li>问题：每个过滤器需要通过管道传递数据，可能会引入性能开销，特别时数据需要频繁地在过滤器之间传递时</li>
+<li>改进方法：
+<ul>
+<li>可以优化管道的设计，减少不必要的传输步骤</li>
+<li>在需要时将数据批量处理，减少管道开销</li>
+</ul></li>
+</ul>
+<p><strong>过滤器之间的依赖问题：</strong></p>
+<ul>
+<li>问题：如果过滤器之间存在数据依赖关系，处理链可能变得复杂</li>
+<li>改进方法：
+<ul>
+<li>在设计时尽量减少过滤器间的依赖，可以通过异步处理或消息队列进行解耦</li>
+</ul></li>
+</ul>
+<p><strong>错误处理和恢复：</strong></p>
+<ul>
+<li>问题：由于过滤器通常是单向流动的数据，错误可能在中间阶段发生，导致整个数据流失败</li>
+<li>改进方法：
+<ul>
+<li>引入容错机制，例如在每个过滤器中加入错误捕获和恢复策略</li>
+<li>使用事务会回滚机制来确保数据处理的可靠性</li>
+</ul></li>
+</ul>
+<h3 id="应用场景-3">应用场景</h3>
+<ul>
+<li>数据流处理系统：如数据分析系统，ETL工具</li>
+<li>编译器：编译器的各个阶段（如词法分析、语法分析、优化）通常会采用管道与过滤器模式，每个过滤器负责特定的编译任务</li>
+<li>日志处理系统：在日志收集与分析系统中，日志数据通过多个过滤器进行预处理（如解析日志格式、过滤敏感信息、转换日志格式等）</li>
+<li>音视频处理系统：在音视频流处理中，每个过滤器负责处理视频帧、音频数据、最后输出处理后的流媒体数据</li>
+</ul>
+<h1 id="软件架构设计和评估工具">软件架构设计和评估工具</h1>
+<h2 id="atam">ATAM</h2>
+<p><strong>概述：</strong> Architecture Tradeoff Analysis Method
+是一种架构评估方法，旨在帮助架构师和团队分析软件架构的质量属性和设计决策之间的权衡(tradeoff)，并帮助确定最适合项目的设计决策</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>准备阶段：
+<ul>
+<li>选择架构团队：组件由架构师、开发人员、质量保证人员以及可能的利益相关者组成的评估团队</li>
+<li>收集架构文档：准备架构文件、设计描述、功能要求等，以便评估</li>
+</ul></li>
+<li>质量属性场景的定义：
+<ul>
+<li>需求收集：收集系统的主要质量属性要求（如性能、安全性等）</li>
+<li>场景定义：与利益相关者一起，确定系统必须处理的关键场景，这些场景描述了系统如何在不同条件下运行，以及如何满足质量属性</li>
+</ul></li>
+<li>架构分析：
+<ul>
+<li>识别架构决策：通过分析架构设计，识别与质量属性相关的架构设计决策</li>
+<li>分析权衡：评估不同设计决策如何影响系统的质量属性，并识别潜在的权衡点。例如，提高系统的可扩展性可能会降低可维护性</li>
+</ul></li>
+<li>风险识别与评估：
+<ul>
+<li>识别风险：基于架构决策的分析，识别可能影响系统成功的关键风险</li>
+<li>评估风险的影响：评估每个风险的严重性和可能性，并提出相应的缓解措施</li>
+</ul></li>
+<li>总结与报告：
+<ul>
+<li>总结结果：撰写评估报告，包含架构决策、风险、权衡和改进建议</li>
+<li>建议架构改进：为架构的改进和优化提出建议，帮助架构团队做出更合适的设计决策</li>
+</ul></li>
+</ol>
+<p><strong>优势：</strong></p>
+<ul>
+<li>帮助识别架构设计中潜在风险和问题</li>
+<li>使架构决策变得更加透明，并为利益相关者提供更清晰的决策依据</li>
+<li>促进架构师之间的沟通和协作</li>
+</ul>
+<h2 id="asrs">ASRs</h2>
+<p><strong>概述：</strong> Architecture Significant
+Requirements（架构显著需求）是影响软件架构设计的关键需求。它们不仅定义了系统的功能需求，还涉及到性能、安全性、可用性、扩展性等质量属性。ASRs通常决定了架构涉及的关键决策，并且对架构的整体结构、组件、接口设计等有重大影响</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>需求收集：
+<ul>
+<li>从项目的需求文档、利益相关者会议等来源收集所有功能性和非功能性需求</li>
+<li>需求通常被分为“显著需求”和“普通需求”，显著需求(ASRs)是那些直接影响架构设计的需求</li>
+</ul></li>
+<li>需求分类：
+<ul>
+<li>功能性需求：描述系统需要做说明（如用户认证、数据处理等）</li>
+<li>非功能性需求：描述系统应如何做（如性能、可用性、可扩展性等）</li>
+</ul></li>
+<li>识别ASRs：
+<ul>
+<li>从非功能性需求中，选择那些对架构有重大影响的需求。例如，若一个系统需要高并发数据访问，这将影响系统的架构设计，需要考虑性能、可扩展性等架构方面的决策</li>
+</ul></li>
+<li>跟踪ASRs变化：
+<ul>
+<li>在软件开发过程中，跟踪ASRs的变化，确保架构设计始终符合这些关键需求</li>
+</ul></li>
+</ol>
+<p><strong>优势：</strong></p>
+<ul>
+<li>确保架构设计能够有效地满足项目的关键需求</li>
+<li>通过定义ASRs，有助于明确架构的设计目标和评估标准</li>
+</ul>
+<h2 id="add">ADD</h2>
+<p><strong>概述：</strong> Attribute-Driven Design
+是一种迭代方法，允许架构师选择系统的一部分进行设计，并为这一部分所有具有架构意义的需求，然后创建并测试针对这一部分的设计。ADD的核心是围绕系统的质量属性，逐步细化架构，同时满足功能和非功能需求</p>
+<p><strong>关键点：</strong></p>
+<ul>
+<li>基于系统的QA和ASR来驱动设计过程的</li>
+<li>是一种迭代方法，强调逐步设计和验证架构</li>
+</ul>
+<h2 id="utility-tree">Utility Tree</h2>
+<p><strong>概述：</strong>
+效用树是用于分析架构决策对质量属性的影响的工具。它是ATAM方法的一部分，帮助架构师和评估者理解不同设计决策对系统QA的具体影响。效应树通过将质量属性的要求分解为更小的子目标，帮助团队识别优先级最高的QA需求，并在架构设计中做出相应的权衡</p>
+<p><strong>步骤：</strong></p>
+<ol type="1">
+<li>定义质量属性</li>
+<li>构建效用树：
+<ul>
+<li>将每个QA进一步分解为更小的子目标。子目标描述了如何衡量和优化该QA</li>
+<li>例如，性能的目标可以分解为“响应时间”、“吞吐量”、“并发性”等</li>
+</ul></li>
+<li>确定优先级：
+<ul>
+<li>根据项目的需求和目标，评估不同QA和子目标的优先级。哪些QA对项目的成功最为关键，哪些是可以在后续阶段优化的</li>
+</ul></li>
+<li>评估架构决策：
+<ul>
+<li>使用效用树来评估架构设计中的各个决策，通过分析这些决策如何影响不同QA和子目标，架构师可以更好地衡量结果</li>
+</ul></li>
+<li>更新和调整：
+<ul>
+<li>在项目进展中，根据实际情况和需求变化调整效用树，确保架构设计能够始终满足关键QA需求</li>
+</ul></li>
+</ol>
+<p><strong>优势：</strong></p>
+<ul>
+<li>提供了一种系统化的方式来分析和优化QA</li>
+<li>帮助团队聚焦于最重要的QA，并确保这些QA在架构设计中得到优先考虑</li>
+</ul>
+<h2 id="参与者角色">参与者角色</h2>
+<p><strong>概述：</strong> Participants' Roles
+是指在架构过程中的不同参与者及其职责。</p>
+<p><strong>架构师(Architect)：</strong>
+是架构设计过程中的核心任务，负责整体架构的设计、决策和指导。架构师在设计和决策过程中通常具有主导地位，确保系统架构能够满足所有QA</p>
+<ul>
+<li>定义系统架构、技术堆栈和设计模式</li>
+<li>确保架构能满足业务需求和质量属性需求</li>
+<li>管理架构的复杂性，并确保其可扩展性和可维护性</li>
+<li>在系统生命周期中，跟踪架构的变化，确保其与需求变化一致性</li>
+<li>为开发团队提供架构指导，并解答架构相关问题</li>
+</ul>
+<p><strong>开发人员(Developer)：</strong>
+负责根据架构师的设计实现具体的功能和模块。开发人员通常会根据架构文档和设计方案来编码和构建系统的各个部分，并可能会在实现过程中提出技术上的改进建议</p>
+<ul>
+<li>根据架构设计实现系统功能</li>
+<li>保证代码质量，遵循架构设计中的约定和标准</li>
+<li>与架构师和其他开发人员合作，确保各个模块的接口和交互符合架构要求</li>
+<li>参与单元测试和系统集成，确保架构的实现能够顺利工作</li>
+</ul>
+<p><strong>项目经理(Project Manager)：</strong>
+负责管理项目的进度、资源、预算和团队协作。虽然项目经理不直接参与架构设计，但他们必须确保架构设计能够按时完成，并满足项目的资源需求和时间安排</p>
+<ul>
+<li>管理项目进度和风险，确保架构设计按计划完成</li>
+<li>协调各方参与者的合作</li>
+<li>跟踪项目预算和资源分配，确保架构设计能够在可用资源范围内实现</li>
+<li>与客户和利益相关者沟通，确保架构设计符合业务需求</li>
+</ul>
+<p><strong>测试人员(Tester)：</strong>
+验证架构设计和实现的系统是否符合质量标准。测试人员会根据架构文档和需求文档设计测试用例，并执行各种测试（单元测试、集成测试、系统测试等），确保架构的正确性和可靠性</p>
+<ul>
+<li>设计和执行测试用例，确保系统的各项功能和QA符合要求</li>
+<li>发现系统中的缺陷并报告给开发人员</li>
+<li>参与架构评审和风险评估，帮助架构师识别潜在的设计问题</li>
+<li>确保架构实现具有高可用性、可扩展性和安全性等关键QA</li>
+</ul>
+<p><strong>利益相关者(Stakenholder)：</strong>
+是对系统有直接或间接影响的人或组织。他们可以是业务人员、客户、终端用户、市场团队、法律团队等。利益相关者通常不会直接参与架构设计，但他们提供需求和反馈，这些反馈对架构设计的调整和优化至关重要</p>
+<ul>
+<li>提供系统需求，确保架构能够满足业务目标</li>
+<li>提供对架构设计和决策的反馈</li>
+<li>参与架构评审过程，确保架构设计与业务需求一致</li>
+<li>根据系统运行和维护的情况，提出对架构的改进建议</li>
+</ul>
+<p><strong>安全专家(Security Expert)：</strong>
+负责确保架构在设计和实现过程中满足安全性要求</p>
+<ul>
+<li>识别架构设计中的安全风险，并提出相应的改进措施</li>
+<li>设计并实施安全控制措施，如身份认证、数据加密和访问控制</li>
+<li>在架构评审过程中审查系统的安全性，并验证架构是否符合安全最佳实践</li>
+</ul>
+<h1 id="开放题">开放题</h1>
+<h2
+id="抽象公共服务策略旨在减少耦合但它也可能降低内聚性">抽象公共服务策略旨在减少耦合，但它也可能降低内聚性</h2>
+<p><strong>耦合与内聚性：</strong></p>
+<ul>
+<li>耦合(Coupling)：指的是系统中各个模块或组件之间的依赖关系。耦合越低，意味着模块间的依赖越少，系统的各个部分相对独立，便于维护和扩展。</li>
+<li>内聚性(Cohesion)：指的是模块内部各个组件或功能之间的关联程度。内聚性越高，意味着模块内的功能和组件越紧密地协作。</li>
+</ul>
+<p><strong>抽象公共服务策略：</strong></p>
+<ul>
+<li>指的是将系统中多个组件共享的功能或服务进行抽象，形成一个公共的服务层。这样，多个组件可以通过访问这个公共服务来避免重复实现相同的功能。通常，公共服务通过定义接口或服务抽象层来隐藏具体的实现细节</li>
+<li>示例：一个电商系统中有多个模块（如支付、订单、用户管理等），这些模块可能会共享某些基础功能，如日志记录、身份验证、数据库访问等。为了避免各个模块重复实现这些功能，设计师可能会将这些功能抽象成一个公共服务，所有模块通过调用这个公共服务来获得这些功能</li>
+</ul>
+<p><strong>减少耦合：</strong></p>
+<ul>
+<li><p>抽象公共服务策略的核心目的是减少耦合，通过将常见的功能抽象成公共服务，系统的各个模块可以通过该服务进行交互，而不需要知道具体的实现细节。这种设计使得模块间的依赖减少，因为每个模块不再需要直接引用其他模块的具体实现，只需要依赖于公共服务的接口，这种松散的耦合关系提高了系统的灵活性和可维护性</p></li>
+<li><p>示例：支付模块可以通过公共的支付服务接口来进行支付处理，这样更容易地修改或替换支付服务而不影响其他模块</p></li>
+</ul>
+<p><strong>可能降低内聚性：</strong></p>
+<ul>
+<li>因为通过抽象和拆分系统功能，可能会使得一些模块的职责变得不再单一，甚至不再专注于一个功能领域</li>
+<li>示例：支付模块本应该专注于支付相关的逻辑，但如果它频繁地依赖于公共服务层来进行日志记录、身份验证等功能，那么支付模块的职责就变得不那么清晰，变得更加“分散”。虽然各个服务可以独立开发和维护，但这也可能导致模块的功能变得不再紧密相关，降低了模块内部的内聚性。</li>
+</ul>
+<h2
+id="讨论编程语言的选择技术选择的一个例子及其与体系结构的一般关系">讨论编程语言的选择（技术选择的一个例子）及其与体系结构的一般关系</h2>
+<h3 id="编程语言选择的考虑因素">编程语言选择的考虑因素</h3>
+<p><strong>系统需求与目标：</strong></p>
+<ul>
+<li>性能要求：对于高性能系统（如游戏引擎、实时系统等），可能需要选择具有高执行效率的编程语言，如C/C++</li>
+<li>开发速度与易用性：如果系统需要快速开发，且业务逻辑比较复杂，可能更倾向于选择动态语言，如Python、Ruby或JavaScript，这些语言具有丰富的库和框架支持，可以大大加快开发速度</li>
+<li>并发和分布式处理：对于需要大量并发处理的系统（如大规模分布式系统、云计算平台等），可以能会选择Go、Erlang、Rust这样的语言，它们内建强大的并发支持</li>
+</ul>
+<p><strong>体系结构的需求：</strong></p>
+<ul>
+<li>微服务架构：在微服务架构中，每个微服务可能采用不同的技术栈和编程与语言，可能是Java或C#，因为它们在企业级应用中有成熟的支持，而另一些微服务可能使用Go或Node.js，因为它们能够高效地处理并发请求</li>
+<li>服务器无关架构：如果架构目标是跨平台或无服务器架构（如云函数），编程语言的选择就变得更加最重要。选择支持容器化（Docker）和五服务器架构的语言（如Node.js、Python或Go）可能会使得系统更容易部署到云平台上</li>
+</ul>
+<p><strong>团队技术栈与经验：</strong></p>
+<p>如果团队对某种语言有很强的熟练度，可以选择该语言提高开发效率和降低学习曲线。</p>
+<p><strong>性能与资源限制：</strong></p>
+<p>对于资源受限的系统（如嵌入式设备或移动设备），可能需要选择更加轻量级的语言或针对硬件优化的语言。例如C或Rust在性能和内存管理方面的控制能力优于Java或Python。</p>
+<p><strong>维护和可扩展性：</strong></p>
+<p>某些编程语言的设计理念和生态系统使得它们更适合维护和扩展，比如Java和C#</p>
+<h3 id="编程语言与体系架构的关系">编程语言与体系架构的关系</h3>
+<p><strong>架构风格的选择：</strong></p>
+<ul>
+<li>微服务架构：强调系统由多个独立的服务组成，每个服务可以使用不同的编程语言和技术栈。因此在这种架构下，编程语言的选择更多地受到服务单元的需求和团队技术栈的影响。</li>
+<li>单体架构：所有的功能和模块都紧密耦合在一个应用中，可能需要选择一个同一的编程语言，通常是企业级语言，如Java或C#</li>
+<li>事件驱动架构：强调系统通过事件进行通信和处理，语言的选择需要考虑事件流的高效处理。例如Node.js由于其事件驱动和非阻塞IO的特性，适合开发高并发的事件驱动系统。</li>
+</ul>
+<p><strong>架构的可扩展性与性能：</strong></p>
+<ul>
+<li>高并发和分布式系统：如GO和Erlang天生适合高并发和分布式系统，因为它们在并发处理、消息传递和容错方面具有内建的支持。</li>
+<li>性能优化：对于需要极高性能的系统，如实时系统或需要低延迟的交易系统，选择像C++或Rust这样的语言，可以更好低控制内存和硬件资源，从而使得架构就具有更高的执行效率和更低的资源消耗</li>
+</ul>
+<p><strong>架构的可维护性和开发效率：</strong></p>
+<ul>
+<li>可维护性：面向对象编程语言提供了良好的模块化和封装特性，适合开发大型企业级应用。相比之下Python和Ruby提供了更简单的语法和更快的开发周期</li>
+<li>开发效率：一些编程语言（如Python、Javascript）在开发速度和生态系统支持方面非常强大，适合快速构建和原型支持，通常用于敏捷开发方法中</li>
+</ul>
+<h2
+id="设计高可测试性和高容错性的系统">设计高可测试性和高容错性的系统</h2>
+<p><strong>可测试性：</strong>
+使系统中的故障能够快速且轻松地暴露，以便在测试阶段能够检测并恢复故障</p>
+<p><strong>容错性：</strong>
+使系统在运行时“隐藏”故障，通过机制如冗余、回退或恢复，确保系统在故障发生时仍能正常运行</p>
+<p><strong>兼容可测试性和容错性的设计方法：</strong></p>
+<ul>
+<li>故障注入测试：通过在测试阶段主动引入故障，观察系统的响应能力，从而兼容容错性和可测试性的目标。例如：
+<ul>
+<li>在分布式系统中模拟节点故障</li>
+<li>注入网络延迟、数据损坏等问题以测试容错机制</li>
+</ul></li>
+<li>增强日志和可观测性：
+<ul>
+<li>使用详细的日志记录和监控工具，暴露系统的内部状态</li>
+<li>即使容错机制正在掩盖故障，日志和监控可以帮助开发者了解系统运行过程中的潜在问题</li>
+</ul></li>
+<li>测试模式与生产模式分离：
+<ul>
+<li>测试模式：在测试环境，禁用部分容错机制，允许故障显现并方便调试</li>
+<li>生产模式：启用完整的容错机制，确保系统的稳健运行</li>
+</ul></li>
+<li>优雅降级：
+<ul>
+<li>设计容错机制时，使其在功能降级的同时保留部分信息暴露。比如当某个模块失效时，显示“降级模式”警告而非完全隐藏问题</li>
+</ul></li>
+<li>冗余机制双重用途：
+<ul>
+<li>使用冗余组件不仅用于容错，还可以在测试阶段使用冗余组件来捕获隐藏的故障</li>
+<li>例如在分布式系统中，通过比较多个副本的输出来检测潜在错误</li>
+</ul></li>
+</ul>
+<h2
+id="为atm设计安全性场景并修改其设计以满足这些场景">为ATM设计安全性场景，并修改其设计以满足这些场景</h2>
+<h3 id="安全性场景设计">安全性场景设计</h3>
+<p><strong>防止未授权访问</strong></p>
+<ul>
+<li>场景描述：某用户尝试插入银行卡，但输入了三次错误的PIN码，系统应锁定该帐户并通知银行后台</li>
+<li>安全需求：
+<ul>
+<li>必须限制PIN码的尝试次数</li>
+<li>系统需实时记录帐户锁定事件并发送通知</li>
+</ul></li>
+</ul>
+<p><strong>防止数据泄露：</strong></p>
+<ul>
+<li>场景描述：ATM与银行服务器之间传输的数据被第三方拦截。需要确保敏感数据（如PIN码、帐户信息）不被窃取</li>
+<li>安全需求：
+<ul>
+<li>数据传输必须采用加密协议（如TLS）</li>
+<li>PIN码等敏感信息在传输和存储时需加密</li>
+</ul></li>
+</ul>
+<p><strong>防止内部攻击</strong></p>
+<ul>
+<li>场景描述：内部工作人员尝试通过直接访问ATM设备或后端系统窃取用户数据。</li>
+<li>安全需求：
+<ul>
+<li>系统需记录并监控所有管理员操作。</li>
+<li>后端访问权限应采用最小权限原则，严格控制。</li>
+</ul></li>
+</ul>
+<h3 id="修改atm设计以满足安全性场景">修改ATM设计以满足安全性场景</h3>
+<p><strong>增加用户认证机制：</strong></p>
+<ul>
+<li>PIN码验证失败3次后，锁定账户并通知银行后台。</li>
+<li>支持生物识别（如指纹或人脸识别）作为双重验证。</li>
+</ul>
+<p><strong>加强数据加密传输：</strong></p>
+<ul>
+<li>使用TLS加密协议对数据传输进行加密。</li>
+<li>PIN码和账户信息在设备端进行加密，再传输至服务器。</li>
+</ul>
+<p><strong>后端访问控制：</strong></p>
+<ul>
+<li>对管理员和银行操作员的访问权限进行严格控制，所有操作需记录并可追溯。</li>
+<li>定期审计后台操作记录，识别并防范内部攻击。</li>
+</ul>
+<h1 id="补充">补充</h1>
+<h2 id="cap定理">CAP定理</h2>
+<p><strong>概述：</strong>
+它指出在一个分布式系统中，Consistency-Availability-Partition
+Tolerance(分区容错性)三者不能同时完全满足。在实际应用中，为了保证高可用性和分区容错性，通常牺牲强一致性，提供最终一致性</p>
+<h2 id="冗余设计">冗余设计</h2>
+<p><strong>概述：</strong>
+是一种通过引入额外资源或组件来提升系统可用性和容错能力的策略。其核心思想是通过增加冗余的计算、存储或网络资源，使系统在遇到故障时能够继续运行，从而减少服务中断的概率</p>
+<p><strong>主要形式：</strong></p>
+<ul>
+<li>硬件冗余：增加物理设备</li>
+<li>软件冗余：在软件层面设计备用逻辑或服务</li>
+<li>时间冗余：在系统中重复执行相同操作，以检测和修复偶发性错误</li>
+<li>信息冗余：通过增加校验信息来检测和纠正数据错误</li>
+<li>网络冗余：配置备用网络路径或路由器</li>
+</ul>
+<p><strong>实现方式：</strong></p>
+<ul>
+<li>主备切换(Active-Passive)：一个主节点工作，备用节点处于待机状态</li>
+<li>双活设计(Active-Active)：多个节点同时处于活跃状态，共同分担负载</li>
+<li>多重备份(N+1或N+M冗余)</li>
+<li>数据复制(Data Repication)：将数据复制到多个存储节点中</li>
+<li>故障检测与切换：使用心跳检测和健康检查机制，即使发现故障并切换执行</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A4%A7%E5%AD%A6%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/" class="category-chain-item">大学课程笔记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84/" class="print-no-link">#软件架构</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>软件架构期末复习笔记</div>
+      <div>http://example.com/2024/12/16/软件架构期末复习笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年12月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/12/20/IT%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="IT项目管理期末复习笔记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">IT项目管理期末复习笔记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/13/Redis%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E6%8C%81%E4%B9%85%E5%8C%96%E6%8A%80%E6%9C%AF/" title="Redis学习——持久化技术">
+                        <span class="hidden-mobile">Redis学习——持久化技术</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

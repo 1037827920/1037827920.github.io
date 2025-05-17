@@ -1,0 +1,882 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="opengl环境光的应用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenGL入门008——环境光在片段着色器中的应用">
+<meta property="og:url" content="http://example.com/2024/11/20/OpenGL%E5%85%A5%E9%97%A8008%E2%80%94%E2%80%94%E7%8E%AF%E5%A2%83%E5%85%89%E5%9C%A8%E7%89%87%E6%AE%B5%E7%9D%80%E8%89%B2%E5%99%A8%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="opengl环境光的应用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/OpenGL%E5%85%A5%E9%97%A8008%E2%80%94%E2%80%94%E7%8E%AF%E5%A2%83%E5%85%89%E5%9C%A8%E7%89%87%E6%AE%B5%E7%9D%80%E8%89%B2%E5%99%A8%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8.png">
+<meta property="article:published_time" content="2024-11-20T13:16:11.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:03:15.067Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="cmake">
+<meta property="article:tag" content="c++">
+<meta property="article:tag" content="opengl">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/OpenGL%E5%85%A5%E9%97%A8008%E2%80%94%E2%80%94%E7%8E%AF%E5%A2%83%E5%85%89%E5%9C%A8%E7%89%87%E6%AE%B5%E7%9D%80%E8%89%B2%E5%99%A8%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8.png">
+  
+  
+  
+  <title>OpenGL入门008——环境光在片段着色器中的应用 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="OpenGL入门008——环境光在片段着色器中的应用"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-11-20 21:16" pubdate>
+          2024年11月20日, 9:16 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          2.6k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">OpenGL入门008——环境光在片段着色器中的应用</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本节将在片段着色器中应用环境光照(Ambient)</p>
+<h1 id="一些概念">一些概念</h1>
+<h2 id="光照模型">光照模型</h2>
+<h3 id="环境光">环境光</h3>
+<p><strong>概述：</strong>
+在场景中无处不在、均匀分布的光线，用来模拟从周伟环境反射到物体上的光。即使没有明确的光源，物体表面仍然有一定亮度</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>不依赖光源方向</li>
+<li>为整个物体提供均匀的基本亮度</li>
+<li>不计算光源与物体表面的方向关系</li>
+</ul>
+<p><strong>公式：</strong> <span class="math display">\[
+I_a = K_a \cdot I_{ambient}
+\]</span></p>
+<ul>
+<li><span class="math inline">\(I_a\)</span>：物体表面的环境光亮度</li>
+<li><span
+class="math inline">\(k_a\)</span>：环境光的反射系数（0到1之间）</li>
+<li><span class="math inline">\(I_{ambient}\)</span>：环境光强度</li>
+</ul>
+<h3 id="漫反射">漫反射</h3>
+<p><strong>概述：</strong>
+描述的是粗糙表面对光的反射，反射的光线相关各个方向均匀分布，与视角无光</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>亮度取决于光源的方向和物体表面法向量之间的夹角</li>
+<li>适合模拟不光滑的表面，例如木材、纸张等</li>
+<li>视角变化不会影响光的强度</li>
+</ul>
+<p><strong>公式（朗伯余弦定律）：</strong> <span class="math display">\[
+I_d = k_d \cdot I_{light} \cdot max(0, L \cdot N)
+\]</span></p>
+<ul>
+<li><span class="math inline">\(I_d\)</span>：物体表面的漫反射亮度</li>
+<li><span
+class="math inline">\(k_d\)</span>：漫反射的反射系数(0到1之间)</li>
+<li><span class="math inline">\(I_{light}\)</span>：光源强度</li>
+<li>L：指向光源的单位向量</li>
+<li>N：表面的法向量</li>
+</ul>
+<h3 id="镜面反射">镜面反射</h3>
+<p><strong>概述：</strong>
+镜面反射描述的是光滑表面（如金属或镜子）对光的反射，反射光集中在一个特定方向上，与视角密切相关</p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>表现为高光，即表面某些点的强亮反射</li>
+<li>亮度取决于观察者方向、光源方向于物体表面的关系</li>
+<li>表面越光滑，高光越集中；越粗糙，高光越分散</li>
+</ul>
+<p><strong>公式（Phong反射模型）：</strong> <span
+class="math display">\[
+I_s = k_s \cdot I_{light} \cdot max(0, R \cdot V)^n
+\]</span></p>
+<ul>
+<li><span class="math inline">\(I_s\)</span>：镜面反射亮度</li>
+<li><span
+class="math inline">\(k_s\)</span>：镜面反射系数（0到1之间）</li>
+<li>R：反射方向的单位向量</li>
+<li>V：观察方向的单位向量</li>
+<li>n：高光的锐利程度，称为”高光指数“</li>
+</ul>
+<h3 id="总结">总结</h3>
+<ul>
+<li>环境光：提供基础的整体亮度，与光源和视角无光</li>
+<li>漫反射：模拟粗糙表面的光照，依赖于光源方向，但与视角无关</li>
+<li>镜面反射：模拟光滑表面的高光，依赖于光源方向和视角</li>
+</ul>
+<p>这三种光照成分通常组合在一起形成Phong光照模型，用于计算场景中物体的颜色和亮度：
+<span class="math display">\[
+I = I_a + I_d + I_s
+\]</span></p>
+<h1 id="实战">实战</h1>
+<h2 id="简介">简介</h2>
+<p>怎么在vscode上使用cmake构建项目，具体可以看这篇<a
+target="_blank" rel="noopener" href="https://1037827920.github.io/2024/10/31/Windows上如何使用CMake构建项目/">Windows上如何使用CMake构建项目
+- 凌云行者的博客</a></p>
+<p><strong>目的：</strong> 使用环境光</p>
+<ul>
+<li>编译工具链：使用msys2安装的mingw-gcc</li>
+<li>依赖项：glfw3:x64-mingw-static，glad:x64-mingw-static（通过vcpkg安装）</li>
+</ul>
+<p><strong>源码：</strong> <a
+target="_blank" rel="noopener" href="https://github.com/1037827920/OpenGL-Learn-Program/tree/main/008-ambient-light">OpenGL-Learn-Program/008-ambient-light
+at main · 1037827920/OpenGL-Learn-Program</a></p>
+<h2 id="dependencies">dependencies</h2>
+<h3 id="lightshader.vs">lightShader.vs</h3>
+<p>点光源的顶点着色器源码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs vs">#version 330 core<br>layout (location = 0) in vec3 vPos;<br>layout (location = 1) in vec2 aTexCoord;<br><br>uniform mat4 model;<br>uniform mat4 view;<br>uniform mat4 projection;<br><br>void main()<br>&#123;<br>    gl_Position = projection * view * model * vec4(vPos, 1.0f);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="lightshader.fs">lightShader.fs</h3>
+<p>点光源的片段着色器源码：</p>
+<figure class="highlight fs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs fs">#version <span class="hljs-number">330</span> core<br><br><span class="hljs-comment">// 光源颜色</span><br>uniform vec3 lightColor;<br><br><span class="hljs-comment">// 输出的片段颜色</span><br>out vec4 FragColor;<br><br><span class="hljs-keyword">void</span> main()<br>&#123;<br>    FragColor <span class="hljs-operator">=</span> vec4(lightColor, <span class="hljs-number">1.0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="shader.vs">shader.vs</h3>
+<p>立方体的顶点着色器源码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs vs">#version 330 core<br>layout (location = 0) in vec3 vPos;<br>layout (location = 1) in vec2 vTexCoord;<br><br>uniform mat4 model;<br>uniform mat4 view;<br>uniform mat4 projection;<br><br>out vec2 TexCoord;<br><br>void main()<br>&#123;<br>    gl_Position = projection * view * model * vec4(vPos, 1.0f);<br><br>    TexCoord = vTexCoord;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<h3 id="shader.fs">shader.fs</h3>
+<figure class="highlight fs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs fs">#version <span class="hljs-number">330</span> core<br><br><span class="hljs-keyword">in</span> vec2 TexCoord;<br><br><span class="hljs-comment">// 第一个纹理</span><br>uniform sampler2D texture0;<br><span class="hljs-comment">// 第二个纹理</span><br>uniform sampler2D texture1;<br><span class="hljs-comment">// 混合比例</span><br>uniform float blendRatio;<br><span class="hljs-comment">// 光源颜色</span><br>uniform vec3 lightColor;<br><br>out vec4 FragColor;<br><br><span class="hljs-keyword">void</span> main()<br>&#123;<br>    <span class="hljs-comment">// 环境光强度</span><br>    float ambientStrength <span class="hljs-operator">=</span> <span class="hljs-number">0.2</span>;<br>    <span class="hljs-comment">// 计算环境光分量</span><br>    vec3 ambient <span class="hljs-operator">=</span> ambientStrength <span class="hljs-operator">*</span> lightColor;<br><br>    <span class="hljs-comment">// 最终颜色结果</span><br>    vec3 lighting <span class="hljs-operator">=</span> ambient;<br><br>    <span class="hljs-comment">// 将两个纹理混合并乘以环境光分量</span><br>    FragColor <span class="hljs-operator">=</span> mix(texture(texture0, TexCoord), texture(texture1, TexCoord), blendRatio) <span class="hljs-operator">*</span> vec4(lighting, <span class="hljs-number">1.0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>顶点着色器源码的输出会作为片段着色器源码的输入</p>
+<h2 id="utils">utils</h2>
+<p>新增的代码文件只有Cube.h和Cube.cpp，其他可以看<a
+target="_blank" rel="noopener" href="https://github.com/1037827920/OpenGL-Learn-Program/tree/main/008-ambient-light/utils">源码的utils目录</a></p>
+<h3 id="cube.h">Cube.h</h3>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> once</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;windowFactory.h&quot;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;glad/glad.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;shader.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cmath&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;glm/glm.hpp&gt;</span> </span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;glm/gtc/matrix_transform.hpp&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;glm/gtc/type_ptr.hpp&gt;</span></span><br><br><span class="hljs-keyword">using</span> std::vector;<br><span class="hljs-keyword">using</span> std::string;<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Cube</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// 构造函数</span><br>    <span class="hljs-built_in">Cube</span>(GLFWWindowFactory* window);<br><br>    <span class="hljs-comment">// 析构函数</span><br>    ~<span class="hljs-built_in">Cube</span>();<br><br>    <span class="hljs-comment">// 绘制函数</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">draw</span><span class="hljs-params">()</span></span>;<br><br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-comment">// 顶点数组对象</span><br>    GLuint VAO;<br>    <span class="hljs-comment">// 顶点缓冲对象</span><br>    GLuint VBO;<br>    <span class="hljs-comment">// 索引缓冲对象</span><br>    GLuint EBO;<br>    <span class="hljs-comment">// 着色器对象</span><br>    Shader shader;<br>    <span class="hljs-comment">// 点光源着色器对象</span><br>    Shader lightShader;<br>    <span class="hljs-comment">// 窗口对象</span><br>    GLFWWindowFactory* window;<br>    <span class="hljs-comment">// 纹理对象</span><br>    vector&lt;GLuint&gt; texture;<br><br>    <span class="hljs-comment">// 设置顶点数据</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setupVertices</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-comment">// 加载纹理</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">loadTexture</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-comment">// 绑定纹理</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">bindTexture</span><span class="hljs-params">(GLuint&amp; textureId, <span class="hljs-type">const</span> <span class="hljs-type">char</span>* path)</span></span>;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h3 id="cube.cpp">Cube.cpp</h3>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;Cube.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> STB_IMAGE_IMPLEMENTATION</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;stb_image.h&quot;</span></span><br><br>Cube::<span class="hljs-built_in">Cube</span>(GLFWWindowFactory* window) : <span class="hljs-built_in">window</span>(window) &#123;<br>    <span class="hljs-keyword">this</span>-&gt;shader = <span class="hljs-built_in">Shader</span>(<span class="hljs-string">&quot;shader.vs&quot;</span>, <span class="hljs-string">&quot;shader.fs&quot;</span>);<br>    <span class="hljs-keyword">this</span>-&gt;lightShader = <span class="hljs-built_in">Shader</span>(<span class="hljs-string">&quot;lightShader.vs&quot;</span>, <span class="hljs-string">&quot;lightShader.fs&quot;</span>);<br>    <span class="hljs-comment">// 加载纹理</span><br>    <span class="hljs-built_in">loadTexture</span>();<br>    <span class="hljs-comment">// 设置顶点数据</span><br>    <span class="hljs-built_in">setupVertices</span>();<br>&#125;<br><br>Cube::~<span class="hljs-built_in">Cube</span>() &#123;<br>    <span class="hljs-built_in">glDeleteVertexArrays</span>(<span class="hljs-number">1</span>, &amp;VAO);<br>    <span class="hljs-built_in">glDeleteBuffers</span>(<span class="hljs-number">1</span>, &amp;VBO);<br>    <span class="hljs-built_in">glDeleteBuffers</span>(<span class="hljs-number">1</span>, &amp;EBO);<br>&#125;<br><br><span class="hljs-comment">/// Public</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Cube::draw</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 存储光源的位置和强度</span><br>    vector&lt;<span class="hljs-type">float</span>&gt; lightPos = &#123; <span class="hljs-number">2.0f</span>, <span class="hljs-number">1.5f</span>, <span class="hljs-number">-1.55f</span>, <span class="hljs-number">1.0f</span> &#125;;<br><br>    <span class="hljs-comment">// 使用立方体的着色器</span><br>    shader.<span class="hljs-built_in">use</span>();<br>    <span class="hljs-comment">// 将立方体的VAO绑定到上下文</span><br>    <span class="hljs-built_in">glBindVertexArray</span>(<span class="hljs-keyword">this</span>-&gt;VAO);<br><br>    <span class="hljs-comment">// 设置立方体模型矩阵</span><br>    <span class="hljs-keyword">auto</span> model = glm::<span class="hljs-built_in">mat4</span>(<span class="hljs-number">1.0f</span>);<br>    <span class="hljs-comment">// 设置平移矩阵</span><br>    model = glm::<span class="hljs-built_in">translate</span>(model, glm::<span class="hljs-built_in">vec3</span>(<span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">-3.0f</span>));<br>    <span class="hljs-comment">// 设置旋转矩阵</span><br>    model = glm::<span class="hljs-built_in">rotate</span>(model, glm::<span class="hljs-built_in">radians</span>(<span class="hljs-number">20.0f</span>), glm::<span class="hljs-built_in">vec3</span>(<span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>));<br><br>    <span class="hljs-comment">// 将uniform变量传递给着色器</span><br>    shader.<span class="hljs-built_in">setMat4</span>(<span class="hljs-string">&quot;model&quot;</span>, model);<br>    shader.<span class="hljs-built_in">setMat4</span>(<span class="hljs-string">&quot;view&quot;</span>, <span class="hljs-keyword">this</span>-&gt;window-&gt;<span class="hljs-built_in">getViewMatrix</span>());<br>    shader.<span class="hljs-built_in">setMat4</span>(<span class="hljs-string">&quot;projection&quot;</span>, <span class="hljs-keyword">this</span>-&gt;window-&gt;<span class="hljs-built_in">getProjectionMatrix</span>());<br>    shader.<span class="hljs-built_in">setVec3</span>(<span class="hljs-string">&quot;lightColor&quot;</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>);<br>    shader.<span class="hljs-built_in">setVec3</span>(<span class="hljs-string">&quot;lightPos&quot;</span>, lightPos[<span class="hljs-number">0</span>], lightPos[<span class="hljs-number">1</span>], lightPos[<span class="hljs-number">2</span>]);<br>    shader.<span class="hljs-built_in">setFloat</span>(<span class="hljs-string">&quot;blendRatio&quot;</span>, <span class="hljs-number">0.5f</span>);<br><br>    <span class="hljs-comment">// 绘制立方体</span><br>    <span class="hljs-built_in">glDrawElements</span>(GL_TRIANGLES, <span class="hljs-number">36</span>, GL_UNSIGNED_INT, <span class="hljs-number">0</span>);<br><br>    <span class="hljs-comment">// 使用光源的着色器</span><br>    lightShader.<span class="hljs-built_in">use</span>();<br>    <span class="hljs-comment">// 光源的VAO仍然使用立方体的VAO</span><br>    <span class="hljs-comment">// 设置模型矩阵</span><br>    model = glm::<span class="hljs-built_in">mat4</span>(<span class="hljs-number">1.0f</span>);<br>    <span class="hljs-comment">// 设置平移矩阵</span><br>    model = glm::<span class="hljs-built_in">translate</span>(model, glm::<span class="hljs-built_in">vec3</span>(lightPos[<span class="hljs-number">0</span>], lightPos[<span class="hljs-number">1</span>], lightPos[<span class="hljs-number">2</span>]));<br>    <span class="hljs-comment">// 设置缩放矩阵</span><br>    model = glm::<span class="hljs-built_in">scale</span>(model, glm::<span class="hljs-built_in">vec3</span>(<span class="hljs-number">0.2f</span>));<br><br>    <span class="hljs-comment">// 将uniform变量传递给着色器</span><br>    lightShader.<span class="hljs-built_in">setMat4</span>(<span class="hljs-string">&quot;model&quot;</span>, model);<br>    lightShader.<span class="hljs-built_in">setMat4</span>(<span class="hljs-string">&quot;view&quot;</span>, <span class="hljs-keyword">this</span>-&gt;window-&gt;<span class="hljs-built_in">getViewMatrix</span>());<br>    lightShader.<span class="hljs-built_in">setMat4</span>(<span class="hljs-string">&quot;projection&quot;</span>, <span class="hljs-keyword">this</span>-&gt;window-&gt;<span class="hljs-built_in">getProjectionMatrix</span>());<br>    lightShader.<span class="hljs-built_in">setVec3</span>(<span class="hljs-string">&quot;lightColor&quot;</span>, glm::<span class="hljs-built_in">vec3</span>(<span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>));<br><br>    <span class="hljs-comment">// 绘制光源</span><br>    <span class="hljs-built_in">glDrawElements</span>(GL_TRIANGLES, <span class="hljs-number">36</span>, GL_UNSIGNED_INT, <span class="hljs-number">0</span>);<br>&#125;<br><br><br><span class="hljs-comment">/// Private</span><br><span class="hljs-comment">// 设置顶点数据</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Cube::setupVertices</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 顶点数据</span><br>    <span class="hljs-type">float</span> vectices[] = &#123;<br>        <span class="hljs-comment">// Front</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-0.75f</span>,<span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>,  <span class="hljs-comment">// Bottom-left vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">-0.75f</span>,<span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>,   <span class="hljs-comment">// Bottom-right vertex</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.75f</span>,<span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>,   <span class="hljs-comment">// Top-left vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.75f</span>,<span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>,    <span class="hljs-comment">// Top-right vertex</span><br><br>        <span class="hljs-comment">// Back</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>,  <span class="hljs-comment">// Bottom-left vertex</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>,   <span class="hljs-comment">// Bottom-right vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>,   <span class="hljs-comment">// Top-left vertex</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>,    <span class="hljs-comment">// Top-right vertex</span><br><br>        <span class="hljs-comment">// Left</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>,  <span class="hljs-comment">// Bottom-left vertex</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>,   <span class="hljs-comment">// Bottom-right vertex</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>,   <span class="hljs-comment">// Top-left vertex</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>,    <span class="hljs-comment">// Top-right vertex</span><br><br>        <span class="hljs-comment">// Right</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>,  <span class="hljs-comment">// Bottom-left vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>,   <span class="hljs-comment">// Bottom-right vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>,   <span class="hljs-comment">// Top-left vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>,    <span class="hljs-comment">// Top-right vertex</span><br><br>        <span class="hljs-comment">// Top</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>,  <span class="hljs-comment">// Bottom-left vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>,   <span class="hljs-comment">// Bottom-right vertex</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>,   <span class="hljs-comment">// Top-left vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>,    <span class="hljs-comment">// Top-right vertex</span><br><br>        <span class="hljs-comment">// Bottom</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>,  <span class="hljs-comment">// Bottom-left vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-1.5f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">0.0f</span>,   <span class="hljs-comment">// Bottom-right vertex</span><br>        <span class="hljs-number">-0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>,   <span class="hljs-comment">// Top-left vertex</span><br>        <span class="hljs-number">0.75f</span>, <span class="hljs-number">-0.75f</span>, <span class="hljs-number">0.0f</span>, <span class="hljs-number">1.0f</span>, <span class="hljs-number">1.0f</span>    <span class="hljs-comment">// Top-right vertex</span><br>    &#125;;<br><br>    <span class="hljs-comment">// 索引数据</span><br>    <span class="hljs-type">int</span> indices[] = &#123;<br>        <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>,<br>        <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>,<br><br>        <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>,<br>        <span class="hljs-number">6</span>, <span class="hljs-number">5</span>, <span class="hljs-number">7</span>,<br><br>        <span class="hljs-number">8</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span>,<br>        <span class="hljs-number">10</span>, <span class="hljs-number">9</span>, <span class="hljs-number">11</span>,<br><br>        <span class="hljs-number">12</span>, <span class="hljs-number">13</span>, <span class="hljs-number">14</span>,<br>        <span class="hljs-number">14</span>, <span class="hljs-number">13</span>, <span class="hljs-number">15</span>,<br><br>        <span class="hljs-number">16</span>, <span class="hljs-number">17</span>, <span class="hljs-number">18</span>,<br>        <span class="hljs-number">18</span>, <span class="hljs-number">17</span>, <span class="hljs-number">19</span>,<br><br>        <span class="hljs-number">20</span>, <span class="hljs-number">21</span>, <span class="hljs-number">22</span>,<br>        <span class="hljs-number">22</span>, <span class="hljs-number">21</span>, <span class="hljs-number">23</span><br>    &#125;;<br><br>    <span class="hljs-comment">// 创建VAO, VBO, EBO</span><br>    <span class="hljs-built_in">glGenVertexArrays</span>(<span class="hljs-number">1</span>, &amp;VAO);<br>    <span class="hljs-built_in">glGenBuffers</span>(<span class="hljs-number">1</span>, &amp;VBO);<br>    <span class="hljs-built_in">glGenBuffers</span>(<span class="hljs-number">1</span>, &amp;EBO);<br><br>    <span class="hljs-comment">// 绑定VAO</span><br>    <span class="hljs-built_in">glBindVertexArray</span>(VAO);<br><br>    <span class="hljs-comment">// 绑定VBO</span><br>    <span class="hljs-built_in">glBindBuffer</span>(GL_ARRAY_BUFFER, VBO);<br>    <span class="hljs-comment">// 将顶点数据复制到VBO</span><br>    <span class="hljs-built_in">glBufferData</span>(GL_ARRAY_BUFFER, <span class="hljs-built_in">sizeof</span>(vectices), vectices, GL_STATIC_DRAW);<br><br>    <span class="hljs-comment">// 绑定EBO</span><br>    <span class="hljs-built_in">glBindBuffer</span>(GL_ELEMENT_ARRAY_BUFFER, EBO);<br>    <span class="hljs-comment">// 将索引数据复制到EBO</span><br>    <span class="hljs-built_in">glBufferData</span>(GL_ELEMENT_ARRAY_BUFFER, <span class="hljs-built_in">sizeof</span>(indices), indices, GL_STATIC_DRAW);<br><br>    <span class="hljs-comment">// 设置顶点位置属性（这里跟顶点着色器源码强相关，每个属性有多少个元素都是看这个顶点着色器源码是怎么写的）</span><br>    <span class="hljs-comment">// 位置属性</span><br>    <span class="hljs-built_in">glVertexAttribPointer</span>(<span class="hljs-number">0</span>, <span class="hljs-number">3</span>, GL_FLOAT, GL_FALSE, <span class="hljs-number">5</span> * <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">float</span>), (<span class="hljs-type">void</span>*)<span class="hljs-number">0</span>);<br>    <span class="hljs-built_in">glEnableVertexAttribArray</span>(<span class="hljs-number">0</span>);<br>    <span class="hljs-comment">// 纹理位置属性</span><br>    <span class="hljs-built_in">glVertexAttribPointer</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, GL_FLOAT, GL_FALSE, <span class="hljs-number">5</span> * <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">float</span>), (<span class="hljs-type">void</span>*)(<span class="hljs-number">3</span> * <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">float</span>)));<br>    <span class="hljs-built_in">glEnableVertexAttribArray</span>(<span class="hljs-number">1</span>);<br><br>    <span class="hljs-comment">// 恢复上下人默认的VAO</span><br>    <span class="hljs-built_in">glBindVertexArray</span>(<span class="hljs-number">0</span>);<br>&#125;<br><br><span class="hljs-comment">// 加载纹理</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Cube::loadTexture</span><span class="hljs-params">()</span> </span>&#123;<br>    vector&lt;string&gt; paths = &#123; <span class="hljs-string">&quot;teenager.png&quot;</span>, <span class="hljs-string">&quot;tex.png&quot;</span> &#125;;<br>    <span class="hljs-keyword">this</span>-&gt;texture.<span class="hljs-built_in">resize</span>(paths.<span class="hljs-built_in">size</span>());<br>    <span class="hljs-comment">// 绑定纹理</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; paths.<span class="hljs-built_in">size</span>(); i++) &#123;<br>        <span class="hljs-built_in">bindTexture</span>(<span class="hljs-keyword">this</span>-&gt;texture[i], paths[i].<span class="hljs-built_in">c_str</span>());<br>    &#125;<br><br>    <span class="hljs-comment">// 激活纹理</span><br>    <span class="hljs-built_in">glActiveTexture</span>(GL_TEXTURE0);<br>    <span class="hljs-comment">// 将纹理绑定到上下文</span><br>    <span class="hljs-built_in">glBindTexture</span>(GL_TEXTURE_2D, <span class="hljs-keyword">this</span>-&gt;texture[<span class="hljs-number">0</span>]);<br>    <span class="hljs-comment">// 激活纹理</span><br>    <span class="hljs-built_in">glActiveTexture</span>(GL_TEXTURE1);<br>    <span class="hljs-comment">// 将纹理绑定到上下文</span><br>    <span class="hljs-built_in">glBindTexture</span>(GL_TEXTURE_2D, <span class="hljs-keyword">this</span>-&gt;texture[<span class="hljs-number">1</span>]);<br><br>    <span class="hljs-comment">// 使用立方体着色器</span><br>    <span class="hljs-keyword">this</span>-&gt;shader.<span class="hljs-built_in">use</span>();<br>    <span class="hljs-comment">// 为着色器设置uniform变量</span><br>    <span class="hljs-keyword">this</span>-&gt;shader.<span class="hljs-built_in">setInt</span>(<span class="hljs-string">&quot;texture0&quot;</span>, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">this</span>-&gt;shader.<span class="hljs-built_in">setInt</span>(<span class="hljs-string">&quot;texture1&quot;</span>, <span class="hljs-number">1</span>);<br>&#125;<br><br><span class="hljs-comment">// 绑定纹理</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Cube::bindTexture</span><span class="hljs-params">(GLuint&amp; textureId, <span class="hljs-type">const</span> <span class="hljs-type">char</span>* path)</span> </span>&#123;<br>    <span class="hljs-comment">// 生成纹理</span><br>    <span class="hljs-built_in">glGenTextures</span>(<span class="hljs-number">1</span>, &amp;textureId);<br>    <span class="hljs-comment">// 绑定上下文的纹理</span><br>    <span class="hljs-built_in">glBindTexture</span>(GL_TEXTURE_2D, textureId);<br><br>    <span class="hljs-comment">// 设置纹理环绕方式</span><br>    <span class="hljs-built_in">glTexParameteri</span>(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);<br>    <span class="hljs-built_in">glTexParameteri</span>(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);<br>    <span class="hljs-comment">// 设置纹理过滤方式</span><br>    <span class="hljs-built_in">glTexParameteri</span>(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);<br>    <span class="hljs-built_in">glTexParameteri</span>(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br><br>    <span class="hljs-comment">// 加载和生成纹理</span><br>    <span class="hljs-built_in">stbi_set_flip_vertically_on_load</span>(<span class="hljs-literal">true</span>);<br>    <span class="hljs-type">int</span> width, height, nrChannels;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>* data = <span class="hljs-built_in">stbi_load</span>(path, &amp;width, &amp;height, &amp;nrChannels, <span class="hljs-number">0</span>);<br><br>    <span class="hljs-keyword">if</span> (data) &#123;<br>        GLenum format;<br>        <span class="hljs-keyword">if</span> (nrChannels == <span class="hljs-number">4</span>)<br>            format = GL_RGBA;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (nrChannels == <span class="hljs-number">3</span>)<br>            format = GL_RGB;<br>        <span class="hljs-keyword">else</span><br>            format = GL_RED;<br><br>        <span class="hljs-built_in">glTexImage2D</span>(GL_TEXTURE_2D, <span class="hljs-number">0</span>, format, width, height, <span class="hljs-number">0</span>, format, GL_UNSIGNED_BYTE, data);<br>        <span class="hljs-built_in">glGenerateMipmap</span>(GL_TEXTURE_2D);<br>    &#125;<br>    <span class="hljs-keyword">else</span> &#123;<br>        std::cout &lt;&lt; <span class="hljs-string">&quot;Failed to load texture&quot;</span> &lt;&lt; std::endl;<br>    &#125;<br><br>    <span class="hljs-built_in">stbi_image_free</span>(data);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="main.cpp">main.cpp</h2>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;utils/Cube.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;utils/windowFactory.h&quot;</span></span><br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 创建一个窗口Factory对象</span><br>    <span class="hljs-function">GLFWWindowFactory <span class="hljs-title">myWindow</span><span class="hljs-params">(<span class="hljs-number">800</span>, <span class="hljs-number">600</span>, <span class="hljs-string">&quot;This is Title&quot;</span>)</span></span>;<br>    <span class="hljs-comment">// 创建一个矩形模型对象</span><br>    <span class="hljs-function">Cube <span class="hljs-title">cube</span><span class="hljs-params">(&amp;myWindow)</span></span>;<br>    <br>    <span class="hljs-comment">// 运行窗口，传入一个lambda表达式，用于自定义渲染逻辑</span><br>    myWindow.<span class="hljs-built_in">run</span>([&amp;]() &#123;<br>        <span class="hljs-comment">// 绘制矩形</span><br>        cube.<span class="hljs-built_in">draw</span>();<br>    &#125;);<br>    <br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="cmakelists.txt">CMakeLists.txt</h2>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs cmake"><span class="hljs-comment"># 设置CMake的最低版本要求</span><br><span class="hljs-keyword">cmake_minimum_required</span>(VERSION <span class="hljs-number">3.10</span>)<br><span class="hljs-comment"># 设置项目名称</span><br><span class="hljs-keyword">project</span>(Ambient)<br><br><span class="hljs-comment"># vcpkg集成, 这里要换成你自己的vcpkg工具链文件和共享库路径</span><br><span class="hljs-keyword">set</span>(VCPKG_ROOT D:/software6/vcpkg/)<br><span class="hljs-keyword">set</span>(CMAKE_TOOLCHAIN_FILE <span class="hljs-variable">$&#123;VCPKG_ROOT&#125;</span>/scripts/buildsystems/vcpkg.cmake)<br><span class="hljs-keyword">set</span>(CMAKE_PREFIX_PATH <span class="hljs-variable">$&#123;VCPKG_ROOT&#125;</span>/installed/x64-mingw-static/share)<br><br><span class="hljs-comment"># 查找所需的包</span><br><span class="hljs-keyword">find_package</span>(glad CONFIG REQUIRED)<br><span class="hljs-keyword">find_package</span>(glfw3 CONFIG REQUIRED)<br><span class="hljs-keyword">find_package</span>(glm CONFIG REQUIRED)<br><span class="hljs-keyword">find_package</span>(assimp CONFIG REQUIRED)<br><span class="hljs-keyword">find_package</span>(yaml-cpp CONFIG REQUIRED)<br><br><span class="hljs-comment"># 搜索并收集utils文件夹下的所有源文件</span><br><span class="hljs-keyword">file</span>(GLOB UTILS <span class="hljs-string">&quot;utils/*.cpp&quot;</span>, <span class="hljs-string">&quot;utils/*.h&quot;</span>)<br><br><span class="hljs-comment"># 添加可执行文件（还要加入utils文件夹下的源文件）</span><br><span class="hljs-keyword">add_executable</span>(Ambient main.cpp <span class="hljs-variable">$&#123;UTILS&#125;</span>)<br><br><span class="hljs-comment"># 链接所需的库</span><br><span class="hljs-keyword">target_link_libraries</span>(Ambient PRIVATE glad::glad glfw glm::glm assimp::assimp yaml-cpp::yaml-cpp)<br><br><span class="hljs-comment"># 检查项目是否有dependeicies目录，如果存在，则在使用add_custom_command命令在构建后将dependencies目录中的文件复制到项目的输出目录</span><br><span class="hljs-keyword">set</span>(SOURCE_DIR <span class="hljs-string">&quot;$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/dependencies&quot;</span>)<br><span class="hljs-keyword">if</span>(<span class="hljs-keyword">EXISTS</span> <span class="hljs-variable">$&#123;SOURCE_DIR&#125;</span>)<br>    <span class="hljs-keyword">add_custom_command</span>(<span class="hljs-keyword">TARGET</span> Ambient POST_BUILD<br>        <span class="hljs-keyword">COMMAND</span> <span class="hljs-variable">$&#123;CMAKE_COMMAND&#125;</span> -E copy_directory<br>        <span class="hljs-variable">$&#123;SOURCE_DIR&#125;</span> $&lt;TARGET_FILE_DIR:Ambient&gt;)<br><span class="hljs-keyword">endif</span>()<br></code></pre></td></tr></table></figure>
+<h2 id="最终效果">最终效果</h2>
+<img src="/2024/11/20/OpenGL%E5%85%A5%E9%97%A8008%E2%80%94%E2%80%94%E7%8E%AF%E5%A2%83%E5%85%89%E5%9C%A8%E7%89%87%E6%AE%B5%E7%9D%80%E8%89%B2%E5%99%A8%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/image-20241120204702647.png" srcset="/img/loading.gif" lazyload class="">
+<p>可以看到，在只有环境光的情况下，立方体是很暗的，因为点光源（右上角那个很亮的立方体）的光源还没有应用到立方体上</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/OpenGL/" class="category-chain-item">OpenGL</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/cmake/" class="print-no-link">#cmake</a>
+      
+        <a href="/tags/c/" class="print-no-link">#c++</a>
+      
+        <a href="/tags/opengl/" class="print-no-link">#opengl</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>OpenGL入门008——环境光在片段着色器中的应用</div>
+      <div>http://example.com/2024/11/20/OpenGL入门008——环境光在片段着色器中的应用/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年11月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/11/20/OpenGL%E5%85%A5%E9%97%A8009%E2%80%94%E2%80%94%E6%BC%AB%E5%8F%8D%E5%B0%84%E5%9C%A8%E7%89%87%E6%AE%B5%E7%9D%80%E8%89%B2%E5%99%A8%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" title="OpenGL入门009——漫反射在片段着色器中的应用">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OpenGL入门009——漫反射在片段着色器中的应用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/11/17/JMeter%E7%9A%84%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" title="JMeter的简单使用">
+                        <span class="hidden-mobile">JMeter的简单使用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
