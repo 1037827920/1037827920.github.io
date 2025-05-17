@@ -19,24 +19,24 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="RAID的简要介绍以及创建">
+    <meta name="description" content="使用lvm进行磁盘分区的教程">
 <meta property="og:type" content="article">
-<meta property="og:title" content="RAID学习笔记">
-<meta property="og:url" content="http://example.com/2025/05/17/RAID%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:title" content="使用lvm进行磁盘分区">
+<meta property="og:url" content="http://example.com/2025/05/17/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="RAID的简要介绍以及创建">
+<meta property="og:description" content="使用lvm进行磁盘分区的教程">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/RAID%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
-<meta property="article:published_time" content="2025-05-17T11:23:07.000Z">
-<meta property="article:modified_time" content="2025-05-17T11:31:44.299Z">
+<meta property="og:image" content="http://example.com/img/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA.png">
+<meta property="article:published_time" content="2025-05-17T11:47:39.000Z">
+<meta property="article:modified_time" content="2025-05-17T11:49:51.990Z">
 <meta property="article:author" content="凌云行者">
-<meta property="article:tag" content="RAID">
+<meta property="article:tag" content="lvm">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/RAID%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+<meta name="twitter:image" content="http://example.com/img/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA.png">
   
   
   
-  <title>RAID学习笔记 - 凌云行者的博客</title>
+  <title>使用lvm进行磁盘分区 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="RAID学习笔记"></span>
+            <span id="subtitle" data-typed-text="使用lvm进行磁盘分区"></span>
           
         </div>
 
@@ -238,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-17 19:23" pubdate>
-          2025年05月17日, 7:23 晚上
+        <time datetime="2025-05-17 19:47" pubdate>
+          2025年05月17日, 7:47 晚上
         </time>
       </span>
     
@@ -251,7 +251,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          1.2k 字
+          149 字
         
       </span>
     
@@ -299,145 +299,40 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">RAID学习笔记</h1>
+            <h1 id="seo-header">使用lvm进行磁盘分区</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="简介">简介</h1>
-<p><strong>概述：</strong> RAID(Redundant Array of Independent Disks,
-独立磁盘冗余阵列)是一种将多个物理硬盘组合成一个逻辑单元的存储技术，旨在提升数据存储的性能、容量和可靠性。通过不同的组合方式（称为RAID级别），RAID可以实现数据冗余、提高读写速度或两者兼顾</p>
-<p><strong>基本原理：</strong></p>
-<ul>
-<li>数据条带化：将数据分割并并行写入多个磁盘，提高读写性能</li>
-<li>数据镜像：将相同的数据写入两块或多块磁盘，实现数据冗余，提高数据安全性</li>
-<li>奇偶校验：通过计算校验信息存储在磁盘上，即使某一磁盘发生故障，也能通过校验信息恢复数据</li>
-</ul>
-<p><strong>实现方式：</strong></p>
-<ul>
-<li>硬件RAID：使用专用的RAID控制器卡来管理磁盘阵列，通常提供更高的性能和更多的高级功能，如热插拔、热备盘等</li>
-<li>软件RAID：由操作系统通过软件方式实现RAID功能，例如linux中的<code>mdadm</code>工具，成本较低，灵活性高，但可能占用更多的cpu资源</li>
-</ul>
-<h1 id="raid级别">RAID级别</h1>
-<h2 id="raid-0条带化">RAID 0(条带化)</h2>
-<p><strong>最少磁盘数：</strong> 2</p>
-<p><strong>特点：</strong>
-将数据分割并并行写入多个磁盘，提高读写性能，但不提供数据冗余，任一磁盘故障都会导致数据丢失</p>
-<h2 id="raid-1镜像">RAID 1(镜像)</h2>
-<p><strong>最少磁盘数：</strong> 2</p>
-<p><strong>特点：</strong>
-将相同的数据写入两块磁盘，实现数据冗余，提高数据安全性，但存储利用率为50%</p>
-<h2 id="raid-5带奇偶校验的条带化">RAID 5(带奇偶校验的条带化)</h2>
-<p><strong>最少磁盘数：</strong> 3</p>
-<p><strong>特点：</strong>
-数据和奇偶校验信息分布在所有磁盘上，提供较好的性能和容错能力，允许一块磁盘故障而不丢失数据</p>
-<h2 id="raid-6双重奇偶校验">RAID 6(双重奇偶校验)</h2>
-<p><strong>最少磁盘数：</strong> 4</p>
-<p><strong>特点：</strong> 类似于RAID
-5，但增加了第二个奇偶校验块，允许同时两块磁盘故障而不丢失数据，提高了容错能力</p>
-<h2 id="raid-10raid10">RAID 10(RAID1+0)</h2>
-<p><strong>最少磁盘数：</strong> 4</p>
-<p><strong>特点：</strong> 将RAID 1的镜像和RAID
-0的条带化结合，既提供高性能，又具有高数据冗余能力</p>
-<h1 id="mdadm使用">mdadm使用</h1>
-<h2 id="安装">安装</h2>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> yum install mdadm  <span class="hljs-comment"># 适用于 CentOS/RHEL</span><br><span class="hljs-built_in">sudo</span> apt install mdadm  <span class="hljs-comment"># 适用于 Debian/Ubuntu</span><br></code></pre></td></tr></table></figure>
-<h2 id="创建软raid-0">创建软RAID 0</h2>
-<p><strong>1. 检查两个硬盘是否有超级块：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -E /dev/sd[b-c]<br></code></pre></td></tr></table></figure>
-<blockquote>
-<p>没有超级块是正常的</p>
-</blockquote>
-<blockquote>
-<p>这里可以对磁盘进行分区，这样的话可以让分区的磁盘来创建raid设备，而不是将整个裸磁盘来创建raid设备</p>
-</blockquote>
-<p><strong>2. 创建raid设备：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -Cv /dev/md0 -l raid0 -n 2 /dev/sd[b-c]<br></code></pre></td></tr></table></figure>
-<ul>
-<li>-C：--create，创建</li>
-<li>-v：--verbose，输出详细创建过程的日志</li>
-<li>-l：raid级别</li>
-<li>-n：磁盘数量</li>
-</ul>
-<p><strong>3. 验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /proc/mdstat<br></code></pre></td></tr></table></figure>
-<blockquote>
-<p>状态为active即正确</p>
-</blockquote>
-<p><strong>4. 检查两个磁盘是否有超级块：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -E /dev/sd[b-c]<br></code></pre></td></tr></table></figure>
-<blockquote>
-<p>有超级块是正常的</p>
-</blockquote>
-<p><strong>5. 查看raid设备详细信息：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -D /dev/md0<br></code></pre></td></tr></table></figure>
-<p><strong>6. 给raid设备创建文件系统：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mkfs.ext4 /dev/md0<br></code></pre></td></tr></table></figure>
-<p><strong>7. 挂载raid设备：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> -p /mnt/md0<br>mount /dev/md0 /mnt/md0<br></code></pre></td></tr></table></figure>
+                <h1 id="使用lvm进行磁盘分区">使用lvm进行磁盘分区</h1>
+<p><strong>目的：</strong>
+使用<code>/dev/vdb</code>创建一个5g的逻辑卷挂载到<code>/mnt/lvmtest</code></p>
+<p><strong>前提：</strong>
+<code>/dev/vdb</code>是一块干净的空磁盘，数据会被清空！！！</p>
+<p><strong>1. 创建物理卷(PV)：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pvcreate /dev/sdb<br></code></pre></td></tr></table></figure>
+<p><strong>2. 验证：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pvs<br></code></pre></td></tr></table></figure>
+<p><strong>3. 创建卷组(VG)：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vgcreate vgtest /dev/vdb<br></code></pre></td></tr></table></figure>
+<p><strong>4. 验证：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vgs<br></code></pre></td></tr></table></figure>
+<p><strong>5. 创建逻辑卷(LV)：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">lvcreate -L 10G -n lvtest vgtest<br></code></pre></td></tr></table></figure>
+<p><strong>6. 验证：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">lvs<br></code></pre></td></tr></table></figure>
+<p><strong>7. 格式化并挂载：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">mkfs.ext4 /dev/vgtest/lvtest<br><span class="hljs-built_in">mkdir</span> -p /mnt/lvmtest<br>mount /dev/vgtest/lvtest /mnt/lvmtest<br></code></pre></td></tr></table></figure>
 <p><strong>8. 验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -h<br></code></pre></td></tr></table></figure>
-<p><strong>9. 配置启动自动挂载：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/fstab<br><span class="hljs-comment"># /dev/md0	/mnt/md0	defaults	0 0</span><br><br><span class="hljs-comment"># 使用一下命令验证</span><br>mount -a<br></code></pre></td></tr></table></figure>
-<p><strong>10. 保存raid配置：</strong></p>
-<blockquote>
-<p>如果你想要重启raid设备，这一步是必须的。如果只是重启系统的话，并不会关闭raid设备，所以也可以不用这一步，如果你保证你的raid设备不会被关闭。</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -E -s -v &gt;&gt; /etc/mdadm.conf<br><span class="hljs-built_in">cat</span> /etc/mdadm.conf<br></code></pre></td></tr></table></figure>
-<h2 id="创建软raid-10">创建软RAID 10</h2>
-<p><strong>1. 检查四个硬盘是否有超级块：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -E /dev/sd[b-e]<br></code></pre></td></tr></table></figure>
-<blockquote>
-<p>没有超级块是正常的</p>
-</blockquote>
-<p><strong>2. 创建raid设备：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -Cv /dev/md0 -l raid10 -n 4 /dev/sd[b-e]<br></code></pre></td></tr></table></figure>
-<ul>
-<li>-C：--create，创建</li>
-<li>-v：--verbose，输出详细创建过程的日志</li>
-<li>-l：raid级别</li>
-<li>-n：磁盘数量</li>
-</ul>
-<p><strong>3. 验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /proc/mdstat<br></code></pre></td></tr></table></figure>
-<blockquote>
-<p>状态为active即正确</p>
-</blockquote>
-<p><strong>4. 检查四个磁盘是否有超级块：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -E /dev/sd[b-c]<br></code></pre></td></tr></table></figure>
-<blockquote>
-<p>有超级块是正常的</p>
-</blockquote>
-<p><strong>5. 查看raid设备详细信息：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -D /dev/md0<br></code></pre></td></tr></table></figure>
-<p><strong>6. 给raid设备创建文件系统：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mkfs.ext4 /dev/md0<br></code></pre></td></tr></table></figure>
-<p><strong>7. 挂载raid设备：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> -p /mnt/md0<br>mount /dev/md0 /mnt/md0<br></code></pre></td></tr></table></figure>
-<p><strong>8. 验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -h<br></code></pre></td></tr></table></figure>
-<p><strong>9. 配置启动自动挂载：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/fstab<br><span class="hljs-comment"># /dev/md0	/mnt/md0	defaults	0 0</span><br><br><span class="hljs-comment"># 使用一下命令验证</span><br>mount -a<br></code></pre></td></tr></table></figure>
-<p><strong>10. 保存raid配置：</strong></p>
-<blockquote>
-<p>如果你想要重启raid设备，这一步是必须的。如果只是重启系统的话，并不会关闭raid设备，所以也可以不用这一步，如果你保证你的raid设备不会被关闭。</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -E -s -v &gt;&gt; /etc/mdadm.conf<br><span class="hljs-built_in">cat</span> /etc/mdadm.conf<br></code></pre></td></tr></table></figure>
-<h2 id="删除软raid设备">删除软RAID设备</h2>
-<p><strong>1. 卸载raid设备：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">umount /dev/md0<br></code></pre></td></tr></table></figure>
-<p><strong>2. 关闭raid设备：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -S /dev/md0<br></code></pre></td></tr></table></figure>
-<p><strong>3. 卸载raid设备中的所有磁盘：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm --misc --zero-superblock /dev/sd[b-c]<br></code></pre></td></tr></table></figure>
-<h2 id="使用loop设备创建raid">使用loop设备创建raid</h2>
-<p><strong>1. 创建几个用于模拟磁盘的文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> -p /raid-test<br><span class="hljs-built_in">cd</span> /raid-test<br><span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/zero of=disk1.img bs=100M count=10<br><span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/zero of=disk2.img bs=100M count=10<br><span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/zero of=disk3.img bs=100M count=10<br><span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/zero of=disk4.img bs=100M count=10<br></code></pre></td></tr></table></figure>
-<p><strong>2. 通过loop设备将这些文件映射为块设备：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">losetup -fP disk1.img<br>losetup -fP disk2.img<br>losetup -fP disk3.img<br>losetup -fP disk4.img<br></code></pre></td></tr></table></figure>
-<p><strong>3. 查看分配结果：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">losetup -a<br></code></pre></td></tr></table></figure>
-<p><strong>4. 然后创建raid的时候选择loop0-3设备即可</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -h | grep lvmtest<br></code></pre></td></tr></table></figure>
+<p><strong>9. 开机自动挂载：</strong></p>
+<p>先查uuid：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">blkid /dev/vgtest/lvtest<br></code></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">/dev/vgdata/lvtest: <span class="hljs-type">UUID</span>=&quot;xxxx-xxxx&quot; <span class="hljs-keyword">TYPE</span>=&quot;ext4&quot;<br></code></pre></td></tr></table></figure>
+<p>编辑<code>/etc/fstab</code>加入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">UUID=xxxx-xxxx  /mnt/lvmtest  ext4  defaults  0 0<br></code></pre></td></tr></table></figure>
+<p><strong>10. reboot验证</strong></p>
 
                 
               </div>
@@ -471,7 +366,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/RAID/" class="print-no-link">#RAID</a>
+        <a href="/tags/lvm/" class="print-no-link">#lvm</a>
       
     </div>
   
@@ -483,8 +378,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>RAID学习笔记</div>
-      <div>http://example.com/2025/05/17/RAID学习笔记/</div>
+      <div>使用lvm进行磁盘分区</div>
+      <div>http://example.com/2025/05/17/使用lvm进行磁盘分区/</div>
     </div>
     <div class="license-meta">
       
@@ -540,18 +435,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/17/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA/" title="使用lvm进行磁盘分区">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">使用lvm进行磁盘分区</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/03/06/Linux%E4%B8%AD%E7%9A%84SMEP/" title="Linux中的SMEP&amp;SMAP">
-                        <span class="hidden-mobile">Linux中的SMEP&amp;SMAP</span>
+                      <a href="/2025/05/17/RAID%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="RAID学习笔记">
+                        <span class="hidden-mobile">RAID学习笔记</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

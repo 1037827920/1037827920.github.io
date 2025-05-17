@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>使用lvm进行磁盘分区</title>
+    <link href="/2025/05/17/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA/"/>
+    <url>/2025/05/17/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA/</url>
+    
+    <content type="html"><![CDATA[<h1 id="使用lvm进行磁盘分区">使用lvm进行磁盘分区</h1><p><strong>目的：</strong>使用<code>/dev/vdb</code>创建一个5g的逻辑卷挂载到<code>/mnt/lvmtest</code></p><p><strong>前提：</strong><code>/dev/vdb</code>是一块干净的空磁盘，数据会被清空！！！</p><p><strong>1. 创建物理卷(PV)：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pvcreate /dev/sdb<br></code></pre></td></tr></table></figure><p><strong>2. 验证：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pvs<br></code></pre></td></tr></table></figure><p><strong>3. 创建卷组(VG)：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vgcreate vgtest /dev/vdb<br></code></pre></td></tr></table></figure><p><strong>4. 验证：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vgs<br></code></pre></td></tr></table></figure><p><strong>5. 创建逻辑卷(LV)：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">lvcreate -L 10G -n lvtest vgtest<br></code></pre></td></tr></table></figure><p><strong>6. 验证：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">lvs<br></code></pre></td></tr></table></figure><p><strong>7. 格式化并挂载：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">mkfs.ext4 /dev/vgtest/lvtest<br><span class="hljs-built_in">mkdir</span> -p /mnt/lvmtest<br>mount /dev/vgtest/lvtest /mnt/lvmtest<br></code></pre></td></tr></table></figure><p><strong>8. 验证：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -h | grep lvmtest<br></code></pre></td></tr></table></figure><p><strong>9. 开机自动挂载：</strong></p><p>先查uuid：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">blkid /dev/vgtest/lvtest<br></code></pre></td></tr></table></figure><p>输出：</p><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">/dev/vgdata/lvtest: <span class="hljs-type">UUID</span>=&quot;xxxx-xxxx&quot; <span class="hljs-keyword">TYPE</span>=&quot;ext4&quot;<br></code></pre></td></tr></table></figure><p>编辑<code>/etc/fstab</code>加入：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">UUID=xxxx-xxxx  /mnt/lvmtest  ext4  defaults  0 0<br></code></pre></td></tr></table></figure><p><strong>10. reboot验证</strong></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>磁盘</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>lvm</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>RAID学习笔记</title>
     <link href="/2025/05/17/RAID%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"/>
     <url>/2025/05/17/RAID%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
