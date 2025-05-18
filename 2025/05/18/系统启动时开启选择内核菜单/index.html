@@ -19,24 +19,25 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="使用lvm进行磁盘分区的教程">
+    <meta name="description" content="教你如何在系统重启时能够选择想要的内核版本启动">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用lvm进行磁盘分区">
-<meta property="og:url" content="http://example.com/2025/05/17/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA/index.html">
+<meta property="og:title" content="系统启动时开启选择内核菜单">
+<meta property="og:url" content="http://example.com/2025/05/18/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="使用lvm进行磁盘分区的教程">
+<meta property="og:description" content="教你如何在系统重启时能够选择想要的内核版本启动">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA.png">
-<meta property="article:published_time" content="2025-05-17T11:47:39.000Z">
-<meta property="article:modified_time" content="2025-05-17T11:49:51.990Z">
+<meta property="og:image" content="http://example.com/img/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95.png">
+<meta property="article:published_time" content="2025-05-18T11:19:07.000Z">
+<meta property="article:modified_time" content="2025-05-18T11:21:23.689Z">
 <meta property="article:author" content="凌云行者">
-<meta property="article:tag" content="lvm">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="reboot">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA.png">
+<meta name="twitter:image" content="http://example.com/img/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95.png">
   
   
   
-  <title>使用lvm进行磁盘分区 - 凌云行者的博客</title>
+  <title>系统启动时开启选择内核菜单 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -227,7 +228,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="使用lvm进行磁盘分区"></span>
+            <span id="subtitle" data-typed-text="系统启动时开启选择内核菜单"></span>
           
         </div>
 
@@ -238,8 +239,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-17 19:47" pubdate>
-          2025年05月17日, 7:47 晚上
+        <time datetime="2025-05-18 19:19" pubdate>
+          2025年05月18日, 7:19 晚上
         </time>
       </span>
     
@@ -251,7 +252,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          149 字
+          87 字
         
       </span>
     
@@ -299,40 +300,19 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">使用lvm进行磁盘分区</h1>
+            <h1 id="seo-header">系统启动时开启选择内核菜单</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="使用lvm进行磁盘分区">使用lvm进行磁盘分区</h1>
-<p><strong>目的：</strong>
-使用<code>/dev/vdb</code>创建一个5g的逻辑卷挂载到<code>/mnt/lvmtest</code></p>
-<p><strong>前提：</strong>
-<code>/dev/vdb</code>是一块干净的空磁盘，数据会被清空！！！</p>
-<p><strong>1. 创建物理卷(PV)：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pvcreate /dev/sdb<br></code></pre></td></tr></table></figure>
-<p><strong>2. 验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pvs<br></code></pre></td></tr></table></figure>
-<p><strong>3. 创建卷组(VG)：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vgcreate vgtest /dev/vdb<br></code></pre></td></tr></table></figure>
-<p><strong>4. 验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vgs<br></code></pre></td></tr></table></figure>
-<p><strong>5. 创建逻辑卷(LV)：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">lvcreate -L 10G -n lvtest vgtest<br></code></pre></td></tr></table></figure>
-<p><strong>6. 验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">lvs<br></code></pre></td></tr></table></figure>
-<p><strong>7. 格式化并挂载：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">mkfs.ext4 /dev/vgtest/lvtest<br><span class="hljs-built_in">mkdir</span> -p /mnt/lvmtest<br>mount /dev/vgtest/lvtest /mnt/lvmtest<br></code></pre></td></tr></table></figure>
-<p><strong>8. 验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -h | grep lvmtest<br></code></pre></td></tr></table></figure>
-<p><strong>9. 开机自动挂载：</strong></p>
-<p>先查uuid：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">blkid /dev/vgtest/lvtest<br></code></pre></td></tr></table></figure>
-<p>输出：</p>
-<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">/dev/vgdata/lvtest: <span class="hljs-type">UUID</span>=&quot;xxxx-xxxx&quot; <span class="hljs-keyword">TYPE</span>=&quot;ext4&quot;<br></code></pre></td></tr></table></figure>
-<p>编辑<code>/etc/fstab</code>加入：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">UUID=xxxx-xxxx  /mnt/lvmtest  ext4  defaults  0 0<br></code></pre></td></tr></table></figure>
-<p><strong>10. reboot验证</strong></p>
+                <h1 id="系统启动时开启选择内核菜单">系统启动时开启选择内核菜单</h1>
+<blockquote>
+<p>也可以通过vnc登陆然后按esc</p>
+</blockquote>
+<p>修改<code>/etc/default/grub</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">GRUB_TIMEOUT_STYLE=menu      <span class="hljs-comment"># 强制显示菜单（非倒计时）</span><br>GRUB_TIMEOUT=60              <span class="hljs-comment"># 菜单显示10秒（可自定义）</span><br>GRUB_DEFAULT=saved           <span class="hljs-comment"># 不记住上次选择</span><br>GRUB_SAVEDEFAULT=<span class="hljs-literal">false</span>       <span class="hljs-comment"># 禁用自动保存选项</span><br></code></pre></td></tr></table></figure>
+<p>使配置生效：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># ubuntu</span><br><span class="hljs-built_in">sudo</span> update-grub<br><span class="hljs-comment"># centos</span><br>grub2-mkconfig -o /boot/grub2/grub.cfg<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -351,7 +331,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E7%A3%81%E7%9B%98/" class="category-chain-item">磁盘</a>
+  <a href="/categories/linux%E6%93%8D%E4%BD%9C/" class="category-chain-item">linux操作</a>
   
   
 
@@ -366,7 +346,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/lvm/" class="print-no-link">#lvm</a>
+        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+      
+        <a href="/tags/reboot/" class="print-no-link">#reboot</a>
       
     </div>
   
@@ -378,8 +360,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>使用lvm进行磁盘分区</div>
-      <div>http://example.com/2025/05/17/使用lvm进行磁盘分区/</div>
+      <div>系统启动时开启选择内核菜单</div>
+      <div>http://example.com/2025/05/18/系统启动时开启选择内核菜单/</div>
     </div>
     <div class="license-meta">
       
@@ -391,7 +373,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年5月17日</div>
+          <div>2025年5月18日</div>
         </div>
       
       
@@ -435,18 +417,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/18/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95/" title="系统启动时开启选择内核菜单">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">系统启动时开启选择内核菜单</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/17/RAID%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="RAID学习笔记">
-                        <span class="hidden-mobile">RAID学习笔记</span>
+                      <a href="/2025/05/17/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA/" title="使用lvm进行磁盘分区">
+                        <span class="hidden-mobile">使用lvm进行磁盘分区</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
