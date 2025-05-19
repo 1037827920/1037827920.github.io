@@ -19,25 +19,27 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="教你如何在系统重启时能够选择想要的内核版本启动">
+    <meta name="description" content="本文章旨在讲解如何去追踪附加了ebpf程序的内核函数">
 <meta property="og:type" content="article">
-<meta property="og:title" content="系统启动时开启选择内核菜单">
-<meta property="og:url" content="http://example.com/2025/05/18/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95/index.html">
+<meta property="og:title" content="如何追踪追踪程序">
+<meta property="og:url" content="http://example.com/2025/05/19/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="教你如何在系统重启时能够选择想要的内核版本启动">
+<meta property="og:description" content="本文章旨在讲解如何去追踪附加了ebpf程序的内核函数">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95.png">
-<meta property="article:published_time" content="2025-05-18T11:19:07.000Z">
-<meta property="article:modified_time" content="2025-05-18T11:21:23.689Z">
+<meta property="og:image" content="http://example.com/img/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F.png">
+<meta property="article:published_time" content="2025-05-19T05:30:52.000Z">
+<meta property="article:modified_time" content="2025-05-19T05:33:52.015Z">
 <meta property="article:author" content="凌云行者">
-<meta property="article:tag" content="kernel">
-<meta property="article:tag" content="reboot">
+<meta property="article:tag" content="ebpf">
+<meta property="article:tag" content="tracepoint">
+<meta property="article:tag" content="kprobe">
+<meta property="article:tag" content="tracing">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95.png">
+<meta name="twitter:image" content="http://example.com/img/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F.png">
   
   
   
-  <title>系统启动时开启选择内核菜单 - 凌云行者的博客</title>
+  <title>如何追踪追踪程序 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -228,7 +230,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="系统启动时开启选择内核菜单"></span>
+            <span id="subtitle" data-typed-text="如何追踪追踪程序"></span>
           
         </div>
 
@@ -239,8 +241,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-18 19:19" pubdate>
-          2025年05月18日, 7:19 晚上
+        <time datetime="2025-05-19 13:30" pubdate>
+          2025年05月19日, 1:30 下午
         </time>
       </span>
     
@@ -252,7 +254,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          87 字
+          984 字
         
       </span>
     
@@ -300,19 +302,98 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">系统启动时开启选择内核菜单</h1>
+            <h1 id="seo-header">如何追踪追踪程序</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="系统启动时开启选择内核菜单">系统启动时开启选择内核菜单</h1>
+                <h1 id="如何追踪追踪程序">如何追踪追踪程序</h1>
+<p><strong>概述：</strong>
+就是如何去追踪自己写的ebpf程序的性能。举个例子，你写了一个ebpf程序，想要将其附加到内核函数后，看看内核函数的延迟变大了多少。</p>
+<p><strong>说明：</strong>
+本文章以测试<code>tcp_v4_send_reset()</code>函数延迟为例子，我们可以知道<code>tcp_send_reset()</code>本身是作为一个tracepoint的，而且<code>tcp_v4_send_reset()</code>会调用它。所以我们将epbf程序通过tracepoint附加到<code>tcp_send_reset()</code>，通过kprobe/fentry附加到<code>tcp_v4_send_reset()</code>，只需要通过测试<code>tcp_v4_send_reset()</code>延迟即可比较二者性能差异</p>
+<p><strong>相关仓库：</strong> - 测试负载代码仓库：
+https://github.com/1037827920/test-for-rstreason - ebpf程序代码仓库：
+https://github.com/1037827920/libbpf-template</p>
+<p><strong>工具介绍：</strong> - <a
+target="_blank" rel="noopener" href="https://github.com/OpenCloudOS/perf-prof">perf-prof</a>，这是一个基于perf的工具，可以通过perf
+probe来附加探针后进行统计内核函数运行时间。直接下载源码编译即可。 - <a
+target="_blank" rel="noopener" href="https://github.com/torvalds/linux/tree/master/tools/perf">perf</a>，用于系统性能调优，瓶颈定位和应用程序行为分析。利用硬件性能计数器(PMU)、软件事件、tracpoints、kprobes和uprobes等机制，提供对内核和用户空间的深入观察能力</p>
+<h2 id="无探针情况">无探针情况</h2>
+<p><strong>概述：</strong>
+首先我们要先测试在没有任何ebpf程序附加的情况下，内核函数的运行时间，以此来作为baseline。</p>
+<p><strong>测试步骤：</strong> 1. 增加probe点： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf probe --add tcp_v4_send_reset<br>perf probe --add <span class="hljs-string">&quot;tcp_v4_send_reset%return&quot;</span><br></code></pre></td></tr></table></figure> 2.
+执行perf-prof工具： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf-prof multi-trace -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset&quot;</span> -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset__return&quot;</span><br></code></pre></td></tr></table></figure> 3. 执行测试负载： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash test-skb-performance.sh<br></code></pre></td></tr></table></figure></p>
+<p><strong>测试结果：</strong> <img
+src="ebpf学习笔记.assets/image-20250519115303350.png" srcset="/img/loading.gif" lazyload
+alt="image-20250519115303350" /></p>
+<h2 id="针对tracepoint类型">针对tracepoint类型</h2>
+<p><strong>概述：</strong>
+在将ebpf程序附加到tracepoint上，测试内核函数的延迟</p>
+<p><strong>测试步骤：</strong> 1.
+将ebpf程序附加到<code>tcp_send_reset()</code>tracepoint： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库libbpf-template examples/tracepoint/tcp_send_reset下的程序</span><br>./main<br></code></pre></td></tr></table></figure>
+2. 执行perf-prof工具： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf-prof multi-trace -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset&quot;</span> -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset__return&quot;</span><br></code></pre></td></tr></table></figure> 3. 执行测试负载： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash test-skb-performance.sh<br></code></pre></td></tr></table></figure></p>
+<p><strong>测试结果：</strong> <img
+src="ebpf学习笔记.assets/image-20250519120109574.png" srcset="/img/loading.gif" lazyload
+alt="image-20250519120109574" /></p>
+<h2 id="针对kprobe类型">针对kprobe类型</h2>
+<p><strong>概述：</strong>
+在将ebpf程序附加到tracepoint上，测试内核函数的延迟。因为perf
+probe机制其实就是通过给函数的入口和出口以kprobe的方式附加ebpf程序进行延迟计算，而内核是无法确定你注册的两个ebpf程序的执行顺序，所以在针对附加了kprobe类型ebpf程序的内核函数延迟计算，我想到的方法就是直接在要附加的ebpf程序的入口和出口都进行时间戳的记录然后计算delta值</p>
+<p><strong>测试步骤：</strong> 1.
+将ebpf程序附加到<code>tcp_v4_send_reset()</code>kprobe： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库libbpf-template examples/kprobe/tcp_v4_send_reset下的程序</span><br>./main<br></code></pre></td></tr></table></figure>
+2. 执行perf-prof工具： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf-prof multi-trace -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset&quot;</span> -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset__return&quot;</span><br></code></pre></td></tr></table></figure> 3. 执行delta值计算脚本：
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash collect-delta.sh<br></code></pre></td></tr></table></figure> 4. 执行测试负载： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash test-skb-performance.sh<br></code></pre></td></tr></table></figure></p>
+<p><strong>测试结果：</strong> <img
+src="ebpf学习笔记.assets/image-20250519130022147.png" srcset="/img/loading.gif" lazyload
+alt="image-20250519130022147" /></p>
+<h2 id="结果">结果</h2>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>无probe</th>
+<th>tracepoint</th>
+<th>kprobe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>时间(ns)</td>
+<td>8.299</td>
+<td>13.894</td>
+<td>23.430</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到kprobe的性能是要比tracepoint的差的</p>
+<h2 id="fentry和kprobe谁先执行">fentry和kprobe谁先执行？</h2>
+<p><strong>概述：</strong>
+在一开始的时候，作者想直接通过fentry的方式来计算带有kprobe类型ebpf程序的内核函数延迟，即通过funclatency（这是bcc中的一个工具）。但是想要这样测试，必须先验证一下二者的执行顺序，作者一开始没有做实验被坑惨了</p>
+<p><strong>方法：</strong> 通过bpftrace快速编写ebpf程序进行测试</p>
+<p><strong>测试步骤：</strong></p>
+<ol type="1">
+<li>附加一个kprobe类型的ebpf程序：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">bpftrace -e <span class="hljs-string">&#x27;</span><br><span class="hljs-string">kprobe:tcp_v4_send_reset &#123;</span><br><span class="hljs-string">    debugf(&quot;kprobe Enter tcp_v4_send_reset&quot;);</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string"></span><br><span class="hljs-string">kretprobe:tcp_v4_send_reset &#123;</span><br><span class="hljs-string">    debugf(&quot;kretprobe Exit tcp_v4_send_reset&quot;);</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
+<ol start="2" type="1">
+<li>附加一个fentry类型的ebpf程序：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">bpftrace -e <span class="hljs-string">&#x27;</span><br><span class="hljs-string">kfunc:tcp_v4_send_reset &#123;</span><br><span class="hljs-string">    debugf(&quot;fentry Enter tcp_v4_send_reset&quot;);</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string"></span><br><span class="hljs-string">kretfunc:tcp_v4_send_reset &#123;</span><br><span class="hljs-string">    debugf(&quot;fexit Exit tcp_v4_send_reset&quot;);</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
+<ol start="3" type="1">
+<li>执行测试程序：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash test-skb-reset-reason.sh<br></code></pre></td></tr></table></figure>
+<ol start="4" type="1">
+<li>观察：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /sys/kernel/debug/tracing/trace_pipe<br></code></pre></td></tr></table></figure>
+<p><strong>结果：</strong> <img
+src="ebpf学习笔记.assets/image-20250519132704067.png" srcset="/img/loading.gif" lazyload
+alt="image-20250519132704067" /></p>
 <blockquote>
-<p>也可以通过vnc登陆然后按esc</p>
+<p>可以看到是先执行kprobe类型的ebpf程序的，即使把kprobe和fentry的附加顺序换一下还是一样的结果</p>
 </blockquote>
-<p>修改<code>/etc/default/grub</code>：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">GRUB_TIMEOUT_STYLE=menu      <span class="hljs-comment"># 强制显示菜单（非倒计时）</span><br>GRUB_TIMEOUT=60              <span class="hljs-comment"># 菜单显示10秒（可自定义）</span><br>GRUB_DEFAULT=saved           <span class="hljs-comment"># 不记住上次选择</span><br>GRUB_SAVEDEFAULT=<span class="hljs-literal">false</span>       <span class="hljs-comment"># 禁用自动保存选项</span><br></code></pre></td></tr></table></figure>
-<p>使配置生效：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># ubuntu</span><br><span class="hljs-built_in">sudo</span> update-grub<br><span class="hljs-comment"># centos</span><br>grub2-mkconfig -o /boot/grub2/grub.cfg<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -331,7 +412,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/linux%E6%93%8D%E4%BD%9C/" class="category-chain-item">linux操作</a>
+  <a href="/categories/ebpf/" class="category-chain-item">ebpf</a>
   
   
 
@@ -346,9 +427,13 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+        <a href="/tags/ebpf/" class="print-no-link">#ebpf</a>
       
-        <a href="/tags/reboot/" class="print-no-link">#reboot</a>
+        <a href="/tags/tracepoint/" class="print-no-link">#tracepoint</a>
+      
+        <a href="/tags/kprobe/" class="print-no-link">#kprobe</a>
+      
+        <a href="/tags/tracing/" class="print-no-link">#tracing</a>
       
     </div>
   
@@ -360,8 +445,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>系统启动时开启选择内核菜单</div>
-      <div>http://example.com/2025/05/18/系统启动时开启选择内核菜单/</div>
+      <div>如何追踪追踪程序</div>
+      <div>http://example.com/2025/05/19/如何追踪追踪程序/</div>
     </div>
     <div class="license-meta">
       
@@ -373,7 +458,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年5月18日</div>
+          <div>2025年5月19日</div>
         </div>
       
       
@@ -417,18 +502,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/19/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F/" title="如何追踪追踪程序">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">如何追踪追踪程序</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/17/%E4%BD%BF%E7%94%A8lvm%E8%BF%9B%E8%A1%8C%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA/" title="使用lvm进行磁盘分区">
-                        <span class="hidden-mobile">使用lvm进行磁盘分区</span>
+                      <a href="/2025/05/18/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95/" title="系统启动时开启选择内核菜单">
+                        <span class="hidden-mobile">系统启动时开启选择内核菜单</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
