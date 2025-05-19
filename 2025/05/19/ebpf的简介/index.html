@@ -19,27 +19,24 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="本文章旨在讲解如何去追踪附加了ebpf程序的内核函数">
+    <meta name="description" content="本文章旨在简要介绍epbf以及其相关概念，帮助读者对ebpf有个总体的认识">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何追踪追踪程序">
-<meta property="og:url" content="http://example.com/2025/05/19/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F/index.html">
+<meta property="og:title" content="ebpf简介">
+<meta property="og:url" content="http://example.com/2025/05/19/ebpf%E7%9A%84%E7%AE%80%E4%BB%8B/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="本文章旨在讲解如何去追踪附加了ebpf程序的内核函数">
+<meta property="og:description" content="本文章旨在简要介绍epbf以及其相关概念，帮助读者对ebpf有个总体的认识">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F.png">
-<meta property="article:published_time" content="2025-05-19T05:30:52.000Z">
-<meta property="article:modified_time" content="2025-05-19T05:46:37.559Z">
+<meta property="og:image" content="http://example.com/img/ebpf%E7%AE%80%E4%BB%8B.png">
+<meta property="article:published_time" content="2025-05-19T10:03:08.000Z">
+<meta property="article:modified_time" content="2025-05-19T10:09:25.530Z">
 <meta property="article:author" content="凌云行者">
 <meta property="article:tag" content="ebpf">
-<meta property="article:tag" content="tracepoint">
-<meta property="article:tag" content="kprobe">
-<meta property="article:tag" content="tracing">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F.png">
+<meta name="twitter:image" content="http://example.com/img/ebpf%E7%AE%80%E4%BB%8B.png">
   
   
   
-  <title>如何追踪追踪程序 - 凌云行者的博客</title>
+  <title>ebpf简介 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -230,7 +227,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="如何追踪追踪程序"></span>
+            <span id="subtitle" data-typed-text="ebpf简介"></span>
           
         </div>
 
@@ -241,8 +238,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-19 13:30" pubdate>
-          2025年05月19日, 1:30 下午
+        <time datetime="2025-05-19 18:03" pubdate>
+          2025年05月19日, 6:03 晚上
         </time>
       </span>
     
@@ -254,7 +251,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          984 字
+          2k 字
         
       </span>
     
@@ -302,90 +299,162 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">如何追踪追踪程序</h1>
+            <h1 id="seo-header">ebpf简介</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="如何追踪追踪程序">如何追踪追踪程序</h1>
+                <h1 id="简介">简介</h1>
 <p><strong>概述：</strong>
-就是如何去追踪自己写的ebpf程序的性能。举个例子，你写了一个ebpf程序，想要将其附加到内核函数后，看看内核函数的延迟变大了多少。</p>
-<p><strong>说明：</strong>
-本文章以测试<code>tcp_v4_send_reset()</code>函数延迟为例子，我们可以知道<code>tcp_send_reset()</code>本身是作为一个tracepoint的，而且<code>tcp_v4_send_reset()</code>会调用它。所以我们将epbf程序通过tracepoint附加到<code>tcp_send_reset()</code>，通过kprobe/fentry附加到<code>tcp_v4_send_reset()</code>，只需要通过测试<code>tcp_v4_send_reset()</code>延迟即可比较二者性能差异</p>
-<p><strong>相关仓库：</strong> - 测试负载代码仓库：
-https://github.com/1037827920/test-for-rstreason - ebpf程序代码仓库：
-https://github.com/1037827920/libbpf-template</p>
-<p><strong>工具介绍：</strong> - <a
-target="_blank" rel="noopener" href="https://github.com/OpenCloudOS/perf-prof">perf-prof</a>，这是一个基于perf的工具，可以通过perf
-probe来附加探针后进行统计内核函数运行时间。直接下载源码编译即可。 - <a
-target="_blank" rel="noopener" href="https://github.com/torvalds/linux/tree/master/tools/perf">perf</a>，用于系统性能调优，瓶颈定位和应用程序行为分析。利用硬件性能计数器(PMU)、软件事件、tracpoints、kprobes和uprobes等机制，提供对内核和用户空间的深入观察能力</p>
-<h2 id="无探针情况">无探针情况</h2>
-<p><strong>概述：</strong>
-首先我们要先测试在没有任何ebpf程序附加的情况下，内核函数的运行时间，以此来作为baseline。</p>
-<p><strong>测试步骤：</strong> 1. 增加probe点： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf probe --add tcp_v4_send_reset<br>perf probe --add <span class="hljs-string">&quot;tcp_v4_send_reset%return&quot;</span><br></code></pre></td></tr></table></figure> 2.
-执行perf-prof工具： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf-prof multi-trace -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset&quot;</span> -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset__return&quot;</span><br></code></pre></td></tr></table></figure> 3. 执行测试负载： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash test-skb-performance.sh<br></code></pre></td></tr></table></figure></p>
-<p><strong>测试结果：</strong> <img src="/2025/05/19/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F/image-20250519115303350.png" srcset="/img/loading.gif" lazyload class=""></p>
-<h2 id="针对tracepoint类型">针对tracepoint类型</h2>
-<p><strong>概述：</strong>
-在将ebpf程序附加到tracepoint上，测试内核函数的延迟</p>
-<p><strong>测试步骤：</strong> 1.
-将ebpf程序附加到<code>tcp_send_reset()</code>tracepoint： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库libbpf-template examples/tracepoint/tcp_send_reset下的程序</span><br>./main<br></code></pre></td></tr></table></figure>
-2. 执行perf-prof工具： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf-prof multi-trace -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset&quot;</span> -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset__return&quot;</span><br></code></pre></td></tr></table></figure> 3. 执行测试负载： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash test-skb-performance.sh<br></code></pre></td></tr></table></figure></p>
-<p><strong>测试结果：</strong> <img src="/2025/05/19/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F/image-20250519120109574.png" srcset="/img/loading.gif" lazyload class=""></p>
-<h2 id="针对kprobe类型">针对kprobe类型</h2>
-<p><strong>概述：</strong>
-在将ebpf程序附加到tracepoint上，测试内核函数的延迟。因为perf
-probe机制其实就是通过给函数的入口和出口以kprobe的方式附加ebpf程序进行延迟计算，而内核是无法确定你注册的两个ebpf程序的执行顺序，所以在针对附加了kprobe类型ebpf程序的内核函数延迟计算，我想到的方法就是直接在要附加的ebpf程序的入口和出口都进行时间戳的记录然后计算delta值</p>
-<p><strong>测试步骤：</strong> 1.
-将ebpf程序附加到<code>tcp_v4_send_reset()</code>kprobe： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库libbpf-template examples/kprobe/tcp_v4_send_reset下的程序</span><br>./main<br></code></pre></td></tr></table></figure>
-2. 执行perf-prof工具： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf-prof multi-trace -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset&quot;</span> -e <span class="hljs-string">&quot;probe:tcp_v4_send_reset__return&quot;</span><br></code></pre></td></tr></table></figure> 3. 执行delta值计算脚本：
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash collect-delta.sh<br></code></pre></td></tr></table></figure> 4. 执行测试负载： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash test-skb-performance.sh<br></code></pre></td></tr></table></figure></p>
-<p><strong>测试结果：</strong> <img src="/2025/05/19/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F/image-20250519130022147.png" srcset="/img/loading.gif" lazyload class=""></p>
-<h2 id="结果">结果</h2>
-<table>
-<thead>
-<tr>
-<th>类型</th>
-<th>无probe</th>
-<th>tracepoint</th>
-<th>kprobe</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>时间(ns)</td>
-<td>8.299</td>
-<td>13.894</td>
-<td>23.430</td>
-</tr>
-</tbody>
-</table>
-<p>可以看到kprobe的性能是要比tracepoint的差的</p>
-<h2 id="fentry和kprobe谁先执行">fentry和kprobe谁先执行？</h2>
-<p><strong>概述：</strong>
-在一开始的时候，作者想直接通过fentry的方式来计算带有kprobe类型ebpf程序的内核函数延迟，即通过funclatency（这是bcc中的一个工具）。但是想要这样测试，必须先验证一下二者的执行顺序，作者一开始没有做实验被坑惨了</p>
-<p><strong>方法：</strong> 通过bpftrace快速编写ebpf程序进行测试</p>
-<p><strong>测试步骤：</strong></p>
+允许用户在内核空间动态加载并执行自定义程序，从而实现对系统行为的深度监控与控制。其核心在于高性能、低侵入性和安全性。</p>
+<p><strong>发展：</strong></p>
+<ul>
+<li>cbpf：最初用于网络数据包过滤，通过在虚拟机在内核执行过滤逻辑，性能远超过用户态方案</li>
+<li>ebpf：引入linux内核3.15，突破原有限制，支持更多事件类型（如系统调用、跟踪点）、更大指令集和复杂的数据结构</li>
+</ul>
+<p><strong>核心特性：</strong></p>
+<ul>
+<li>动态性：无需重启系统或修改内核代码，可实时附加/移除探测点</li>
+<li>灵活性：支持几乎所有内核函数（部分保留函数如<code>kprobe</code>本身不可探测）</li>
+<li>低开销：ebpf程序在内核JIT编译为本地指令，执行效率高；回调函数运行时关闭抢占，避免上下文切换</li>
+</ul>
+<p><strong>核心运行机制：</strong></p>
+<ul>
+<li>状态机模型：ebpf程序以内核态虚拟机运行，通过事件触发(如网络包到达、系统调用执行)激活，执行后返回结果或更新状态</li>
+<li>钩子机制：程序可挂载到内核关键位置（如<code>kprobe</code>、<code>tracepoint</code>、<code>XDP</code>），实现无侵入式监控，例如，<code>tracepoint:syscalls:sys_enter_execve</code>可捕获所有<code>execve</code>系统调用</li>
+<li>验证器：加载前检查程序安全性，防止无限循环、非法内存访问等，确保内核稳定性</li>
+</ul>
+<p><strong>开发步骤：</strong></p>
 <ol type="1">
-<li>附加一个kprobe类型的ebpf程序：</li>
+<li>编写程序：使用c编写逻辑，通过<code>BPF_HASH</code>等宏定义映射，挂钩事件处理函数。例如，跟踪TCP连接与断开</li>
+<li>编译字节码：借助llvm/clang将c代码编译成ebpf字节码</li>
+<li>加载与验证：通过bpf()系统调用加载到内核，验证器确保代码安全</li>
 </ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">bpftrace -e <span class="hljs-string">&#x27;</span><br><span class="hljs-string">kprobe:tcp_v4_send_reset &#123;</span><br><span class="hljs-string">    debugf(&quot;kprobe Enter tcp_v4_send_reset&quot;);</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string"></span><br><span class="hljs-string">kretprobe:tcp_v4_send_reset &#123;</span><br><span class="hljs-string">    debugf(&quot;kretprobe Exit tcp_v4_send_reset&quot;);</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
-<ol start="2" type="1">
-<li>附加一个fentry类型的ebpf程序：</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">bpftrace -e <span class="hljs-string">&#x27;</span><br><span class="hljs-string">kfunc:tcp_v4_send_reset &#123;</span><br><span class="hljs-string">    debugf(&quot;fentry Enter tcp_v4_send_reset&quot;);</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string"></span><br><span class="hljs-string">kretfunc:tcp_v4_send_reset &#123;</span><br><span class="hljs-string">    debugf(&quot;fexit Exit tcp_v4_send_reset&quot;);</span><br><span class="hljs-string">&#125;</span><br><span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
-<ol start="3" type="1">
-<li>执行测试程序：</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 执行仓库test-for-rstreason下的脚本</span><br>bash test-skb-reset-reason.sh<br></code></pre></td></tr></table></figure>
-<ol start="4" type="1">
-<li>观察：</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /sys/kernel/debug/tracing/trace_pipe<br></code></pre></td></tr></table></figure>
-<p><strong>结果：</strong> <img src="/2025/05/19/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F/image-20250519132704067.png" srcset="/img/loading.gif" lazyload class=""></p>
+<p><strong>应用场景：</strong></p>
+<ul>
+<li>性能监控与调优：
+<ul>
+<li>函数调用跟踪：通过<code>kprobe</code>捕获内核函数执行，分析cpu热点</li>
+<li>IO延迟分析：追踪块设备或网络IO延迟，定位性能瓶颈</li>
+</ul></li>
+<li>网络优化与安全：
+<ul>
+<li>DDos防护：在XDP层实时过滤恶意流量，降低内核处理开销</li>
+<li>容器网络隔离：Cilium利用ebpf实现容器间网络策略，替代iptables</li>
+</ul></li>
+<li>安全审计与防护：
+<ul>
+<li>系统调用监控：记录敏感操作（如文件访问），检测异常行为</li>
+<li>内存保护：拦截非法内存访问，防止漏洞利用</li>
+</ul></li>
+</ul>
+<h1 id="概念">概念</h1>
+<h2 id="hook">Hook</h2>
+<p><strong>预定义钩子：</strong>
+ebpf程序是事件驱动的，当内核或应用程序通过某个钩子点时运行。预定义钩子包括系统调用、函数进入/退出、内核跟踪点、网络事件等</p>
+<p><strong><a href="#%20kprobe">kprobe</a>/uprobe：</strong>
+如果不存在特定需求的预定义钩子，则可以创建内核探测器(kprobe)或用户探测器(uprobe)，以将ebpf程序附加到内核或用户应用程序中的几乎任何位置</p>
+<h2 id="如何编写">如何编写</h2>
+<ul>
+<li><p>一般不直接编写，而是通过cilium、bcc、bpftrace、libbpf等项目间接使用。</p></li>
+<li><p>如果要直接编写，一般通过llvm将c代码编译成ebpf字节码</p></li>
+</ul>
+<h2 id="加载器验证架构">加载器&amp;验证架构</h2>
+<p><strong>概述：</strong>
+当确定了所需的钩子时，可以使用bpf系统调用将ebpf程序加载到linux内核中。这通常是使用可用的ebpf库完成的</p>
+<p><strong>大致流程图：</strong></p>
+<img src="/2025/05/19/ebpf%E7%9A%84%E7%AE%80%E4%BB%8B/ebpf%E7%A8%8B%E5%BA%8F%E5%8A%A0%E8%BD%BD%E6%B5%81%E7%A8%8B%E5%9B%BE.png" srcset="/img/loading.gif" lazyload class="">
+<p>当程序被加载到linux
+kernel中，会经过两个verifier验证和JIT编译步骤，然后被附加到请求的钩子上</p>
+<h3 id="验证">验证</h3>
+<p><strong>概述：</strong>
+确保ebpf程序可以安全运行，验证以下条件：（这里是简单描述，
+实际上挺复杂的）</p>
+<ul>
+<li>加载ebpf程序的进程拥有所需的权限，除非启用了非特权的ebpf，否则只有特权进程才能加载ebpf程序</li>
+<li>该程序不会崩溃或损害系统</li>
+<li>程序始终运行完成，不会死循环</li>
+</ul>
+<h3 id="jit编译">JIT编译</h3>
+<p><strong>概述：</strong>
+Just-in-Time编译步骤将程序的通用字节码转换为特定于机器的指令集，以优化程序的执行速度。这使得ebpf程序的运行效率与本地编译的内核代码或作为内核模块加载的代码一样高效</p>
+<h2 id="maps">Maps</h2>
+<p><strong>概述：</strong>
+ebpf程序的一个重要能力是共享收集的信息和存储状态，ebpf程序可以利用ebpf
+maps的概念在各种数据结构中存储和检索数据。ebpf
+maps可以从ebpf程序访问，也可以通过系统调用从用户空间中的应用程序访问。</p>
+<p><strong>支持的map类型：</strong></p>
+<ul>
+<li>哈希表、数组</li>
+<li>LRU</li>
+<li>Ring Buffer</li>
+<li>堆栈跟踪</li>
+<li>LPM(最长前缀匹配)</li>
+</ul>
+<h2 id="helper-calls">Helper Calls</h2>
+<p><strong>概述：</strong>
+ebpf程序无法调用任意内核函数，允许这样做只会将ebpf程序绑定到特定的内核版本，并使程序的兼容性复杂化。相反，ebpf程序可以将函数调用转换为辅助函数，这是内核提供的众所周知且稳定的API。</p>
+<p><strong>可用的Helper Calls示例：</strong></p>
+<ul>
+<li>bpf_get_prandom_u32()：生成一个32位无符号伪随机数</li>
+<li>bpf_ktime_get_ns()：返回系统启动以来的纳秒级单调时间（不受系统时间调整影响），常用于性能分析（如系统调用耗时）、事件时间戳记录</li>
+<li>ebpf map access：
+<ul>
+<li>bpf_map_lookup_elem()：通过键查找Map中的值</li>
+<li>bpf_map_update_elem()：更新或插入Map中的键值对</li>
+<li>bpf_map_delete_elem()：删除Map中的键值对</li>
+<li>bpf_for_each_map_elem()：遍历Map中的所有元素</li>
+</ul></li>
+<li>get process/cgroup context：
+<ul>
+<li>bpf_get_current_pid_tgid()：获取当前进程ID和线程ID</li>
+<li>bpf_get_current_uid_gid()：获取当前用户ID和组ID</li>
+<li>bpf_get_current_cgroup_id()：获取当前cgroup ID</li>
+<li>bpf_get_current_ancestor_cgroup_id()：获取祖先cgroup ID</li>
+</ul></li>
+<li>manipute network packets and forwarding logic：
+<ul>
+<li>bpf_skb_load_bytes()/bpf_skb_store_bytes()：读取/修改数据包内容</li>
+<li>bpf_l3_csum_replace()/bpf_l4_csum_replace()：更新校验和</li>
+<li>bpf_clone_redirect()：克隆并重定向数据包</li>
+<li>bpf_redirect()：直接重定向数据包</li>
+<li>bpf_skb_adjust_room()：调整数据包空间</li>
+</ul></li>
+</ul>
+<h2 id="tailfunction-call">Tail&amp;Function Call</h2>
+<p><strong>概述：</strong>
+ebpf程序可以通过尾部调用和函数调用的概念进行组合，</p>
+<ul>
+<li>函数调用：允许ebpf程序中定义和调用函数</li>
+<li>尾调用：可以调用并执行另一个ebpf程序，并替换执行上下文，类似于execve()系统调用对常规进程的操作方式。</li>
+</ul>
+<h3 id="tail-call">Tail Call</h3>
+<p><strong>概述：</strong>
+内核栈是很宝贵的，尾调用最大的优势就是其复用了当前栈帧并跳转至另外一个ebpf程序</p>
 <blockquote>
-<p>可以看到是先执行kprobe类型的ebpf程序的，即使把kprobe和fentry的附加顺序换一下还是一样的结果</p>
+<p>ebpf程序都是独立验证的（调用者的对战和寄存器中的值被调用者不可访问），所以状态的传递一般可以使用per-cpu
+map传递</p>
 </blockquote>
+<h2 id="堆栈槽slot">堆栈槽(slot)</h2>
+<p><strong>概述：</strong>
+指的是ebpf程序用于存储局部变量和临时数据的内存区域。BPF
+程序拥有一个大小为 512 字节的固定堆栈空间，由特殊寄存器 R10
+指向堆栈的顶部（高地址）。程序通过对 R10 进行负偏移来访问堆栈，例如
+<code>r10 - 8</code> 表示堆栈顶部向下偏移 8 字节的位置。</p>
+<h1 id="开发工具链">开发工具链</h1>
+<h2 id="bcc">bcc</h2>
+<p><strong>概述：</strong>
+使用户能够编写嵌入了ebpf程序的python程序，该框架主要针对涉及应用程序和系统分析跟踪的用例，其中ebpf程序用于收集统计数据或生成事件，而用户空间对应的程序收集数据并以人类可读的形式显示。运行该python程序会生成ebpf字节码并加载到内核中</p>
+<h2 id="bpftrace">bpftrace</h2>
+<p><strong>概述：</strong> 是一种适用于linuc
+ebpf的高级跟踪语言，可用于半更新的linux内核(4.x)。bpftrace使用llvm作为后端将脚本编译为ebpf字节码，并利用bcc与linux
+ebpf子系统以及现有的linux跟踪功能进行交互：内核动态跟踪(kprobes)、用户级动态跟踪(uprobes)和跟踪点。</p>
+<h2 id="ebpf-go-library">ebpf go library</h2>
+<p><strong>概述：</strong> cilium社区开发了一个ebpf go
+library，作为通用的ebpf库，它将获取ebpf字节码的过程与ebpf程序的加载和管理解藕。ebpf程序通常是通过编写更高级的语言(比如go)来创建的，然后使用clang/llvm编译器编译为ebpf字节码</p>
+<h2 id="libbpf-cc-library">libbpf c/c++ library</h2>
+<p><strong>概述：</strong>
+是一个基于c/c++的通用ebpf库，它有助于clang/llvm编译器生成的ebpf目标文件加载到内核中，并且通过为应用程序提供易于使用的库API来抽象与bpf系统调用的交互</p>
 
                 
               </div>
@@ -421,12 +490,6 @@ probe机制其实就是通过给函数的入口和出口以kprobe的方式附加
       
         <a href="/tags/ebpf/" class="print-no-link">#ebpf</a>
       
-        <a href="/tags/tracepoint/" class="print-no-link">#tracepoint</a>
-      
-        <a href="/tags/kprobe/" class="print-no-link">#kprobe</a>
-      
-        <a href="/tags/tracing/" class="print-no-link">#tracing</a>
-      
     </div>
   
 </div>
@@ -437,8 +500,8 @@ probe机制其实就是通过给函数的入口和出口以kprobe的方式附加
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>如何追踪追踪程序</div>
-      <div>http://example.com/2025/05/19/如何追踪追踪程序/</div>
+      <div>ebpf简介</div>
+      <div>http://example.com/2025/05/19/ebpf的简介/</div>
     </div>
     <div class="license-meta">
       
@@ -494,18 +557,12 @@ probe机制其实就是通过给函数的入口和出口以kprobe的方式附加
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/19/ebpf%E7%9A%84%E7%AE%80%E4%BB%8B/" title="ebpf简介">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">ebpf简介</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/18/%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8%E6%97%B6%E5%BC%80%E5%90%AF%E9%80%89%E6%8B%A9%E5%86%85%E6%A0%B8%E8%8F%9C%E5%8D%95/" title="系统启动时开启选择内核菜单">
-                        <span class="hidden-mobile">系统启动时开启选择内核菜单</span>
+                      <a href="/2025/05/19/%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E8%BF%BD%E8%B8%AA%E7%A8%8B%E5%BA%8F/" title="如何追踪追踪程序">
+                        <span class="hidden-mobile">如何追踪追踪程序</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
