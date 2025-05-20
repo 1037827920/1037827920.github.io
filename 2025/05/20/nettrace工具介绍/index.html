@@ -1,0 +1,875 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本文章旨在简单介绍一个基于ebpf的网络包追踪和诊断工具">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nettrace工具介绍">
+<meta property="og:url" content="http://example.com/2025/05/20/nettrace%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="本文章旨在简单介绍一个基于ebpf的网络包追踪和诊断工具">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/nettrace%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D.png">
+<meta property="article:published_time" content="2025-05-20T01:18:59.000Z">
+<meta property="article:modified_time" content="2025-05-20T01:24:21.804Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="ebpf">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/nettrace%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D.png">
+  
+  
+  
+  <title>nettrace工具介绍 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="nettrace工具介绍"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-20 09:18" pubdate>
+          2025年05月20日, 9:18 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          1.4k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">nettrace工具介绍</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="简介">简介</h1>
+<p><strong>仓库地址：</strong>
+https://github.com/OpenCloudOS/nettrace</p>
+<p><strong>背景：</strong>
+在云原生场景中，linux系统中的网络部署变得越来越复杂，一个tcp连接，从客户端到服务器，中间可能要经过复杂的<code>NAT</code>、<code>GRE</code>、<code>IPVS</code>等过程，网络报文在节点上的处理路径也变得越来越长，在发生网络故障时，如何快速定位、有效地定位出网络问题成为一个难题</p>
+<p><strong>现有的网络工具：</strong></p>
+<ul>
+<li>tcpdump：只能在链路层抓包，无法定位内核协议栈中的问题，比如常规的内核丢包问题</li>
+<li>ftrace：只能追踪内核函数，无法进行报文过滤，且入手较难，需要对内核协议栈有一定了解</li>
+<li>kprobe：临时编写内核模块，效率和安全性低</li>
+<li>BCC：功能单一，临时编写BCC程序跟踪效率低，需要对内核有一定了解</li>
+<li>dropwatch：功能单一，只能查看网络丢包问题</li>
+</ul>
+<p><strong>功能介绍：</strong></p>
+<ul>
+<li>网络报文追踪：跟踪网络报文从进入到内核协议栈到释放/丢弃的过程中在内核所走过的路径，实现报文整个生命周期的监控，并采集生命周期各个阶段的事件、信息。</li>
+<li>网络故障诊断：将以往的经验集成到工具的知识库，通过知识匹配的方式来主动诊断当前网络故障，给出诊断结果以及修复建议。</li>
+<li>网络异常监控：常态化部署到生产环境中，主动地发现、上报环境上的网络异常</li>
+<li>droptrace：用于跟踪、监控系统中的丢包事件的工具，目前已经集成到nettrace中，通过<code>nettrace --drop</code>使用</li>
+<li>性能分析：通过跟踪协议栈处理延迟、TCP RTT等信息进行网络性能分析</li>
+</ul>
+<p><strong>工作机制：</strong></p>
+
+<h1 id="参数介绍">参数介绍</h1>
+<h2 id="过滤类参数">过滤类参数</h2>
+<p><strong>s/saddr：</strong> 根据源ip地址过滤网络包</p>
+<p><strong>d/daddr：</strong> 根据目标ip地址过滤网络包</p>
+<p><strong>addr：</strong> 根据源或目标地址ip过滤网络包</p>
+<p><strong>S/sport：</strong> 根据源TCP/UDP端口过滤网络包</p>
+<p><strong>D/dport：</strong> 根据目的TCP/UDP端口过滤网络包</p>
+<p><strong>P/port：</strong> 根据源或目标TCP/UDP端口过滤网络包</p>
+<p><strong>p/proto：</strong> 根据L3/L4协议过滤网络包</p>
+<p><strong>netns：</strong>
+根据网络命令空间进行过滤，该参数后面跟的是网络命名空间的inode，可以通过<code>ls -l /proc/&lt;pid&gt;/ns/net</code>来查看对应进程的网络命名空间的inode号</p>
+<p><strong>netns-current：</strong> 仅显示当前网络命名空间的报文</p>
+<p><strong>pid：</strong> 根据当前处理报文的进程id进行过滤</p>
+<p><strong>min-latency：</strong> 根据报文的寿命进行过滤，
+仅打印处理时长超过该值的报文，单位为us。该参数在<code>默认/diag/latency</code>模式下可用</p>
+<p><strong>pkt-len：</strong> 根据IP报文总长度来进行过滤</p>
+<p><strong>tcp-flags：</strong>
+根据tcp报文的flags进行过滤，支持的flag包括：SAPRF</p>
+<h2 id="模式类参数">模式类参数</h2>
+<blockquote>
+<p>默认启用的是生命周期跟踪模式</p>
+</blockquote>
+<p><strong>basic：</strong>
+基本模式，会直接打印出报文所经过的内核函数/tracepoint。</p>
+<p><strong>diag：</strong> 启用诊断模式</p>
+<p><strong>diag-quiet：</strong>
+只显示出现存在问题的报文，不显示正常的报文</p>
+<p><strong>diag-keep：</strong>
+持续跟踪，diag模式下，默认在跟踪到异常报文后会停止跟踪，使用该参数后，会持续跟踪下去</p>
+<p><strong>drop：</strong> 进行系统丢包监控</p>
+<p><strong>drop-stack：</strong>
+打印kfree_skb内核函数的调用堆栈，等价于<code>--trace-stack kfree_skb</code></p>
+<p><strong>sock：</strong>
+启用socket模式。这个模式下，不会再跟踪报文(skb)，而会跟踪socket</p>
+<p><strong>monitor：</strong>
+启用监控模式。一种轻量化的实时监控系统中网络异常的模式</p>
+<p><strong>rtt：</strong> 启用Rtt统计模式，会统计tcp rtt分布情况</p>
+<p><strong>rtt-detail：</strong>
+详细模式，输出符合过滤条件的每个报文的rtt数据</p>
+<p><strong>filter-srtt：</strong>
+根据srtt来进行过滤，<code>rtt/rtt-detail</code>模式下可用，单位ms</p>
+<p><strong>filter-minrtt：</strong>
+根据minrtt来进行过滤，<code>rtr/rtt-detail</code>模式下可用，单位ms</p>
+<p><strong>latency-show：</strong> 显示延迟（协议栈处理耗时）信息，
+<code>basic/sock</code>模式下不可用</p>
+<p><strong>latency：</strong>
+启用延迟分析模式，可以高效分析每个报文协议处理耗时</p>
+<p><strong>latency-summary：</strong>
+启用延迟分析统计模式，可以统计协议栈处理耗时的分布情况</p>
+<h2 id="显示类参数">显示类参数</h2>
+<h3 id="ttrace">t/trace</h3>
+<p><strong>概述：</strong>
+要启用的跟踪group或者是具体的追踪点（通过<code>trace.yaml</code>可以知道所有的group以及追踪点）</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">nettrace -t tcp<br>nettrace -t tcp_v4_send_reset<br></code></pre></td></tr></table></figure>
+<h3 id="ret">ret</h3>
+<p>跟踪和显示内核函数的返回值</p>
+<h3 id="detail">detail</h3>
+<p>显示跟踪详细信息，包括当前的进程、网口和cpu等信息</p>
+<h3 id="date">date</h3>
+<p>以时间格式打印，而不是时间戳</p>
+<h3 id="ccount">c/count</h3>
+<p>指定要跟踪的报文个数c，达到该个数后自动退出</p>
+<h3 id="hooks">hooks</h3>
+<p>结合netfilter做的适配</p>
+<h3 id="tiny-show">tiny-show</h3>
+<p>精简显示，只显示第一个报文的内容，用于提升性能</p>
+<h3 id="trace-stack">trace-stack</h3>
+<p><strong>概述：</strong>
+指定需要进行堆栈打印的内核函数，可以指定多个，用","分隔</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">nettrace --trace-stack tcp_send_active_reset<br></code></pre></td></tr></table></figure>
+<h3 id="trace-matcher">trace-matcher</h3>
+<p>指定进行报文匹配的内核函数，默认所有的函数，用于提升性能</p>
+<h3 id="trace-exclude">trace-exclude</h3>
+<p><strong>概述：</strong>
+不进行跟踪的group或者是具体的追踪点（通过<code>trace.yaml</code>可以知道所有的group以及追踪点）</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">nettrace --trace-exclude life<br>nettrace --trace-exclude kfree_skb<br></code></pre></td></tr></table></figure>
+<h3 id="trace-noclone">trace-noclone</h3>
+<p>不跟踪报文的clone时间，即不把clone出来的报文和当前报文放到一块跟踪</p>
+<h3 id="func-stats">func-stats</h3>
+<p>只统计内核函数被调用的次数，不打印具体的报文，可指定过滤条件</p>
+<h3 id="rate-limit">rate-limit</h3>
+<p>进行限速，限制每秒事件输出的数量</p>
+<h3 id="btf-path">btf-path</h3>
+<p>手动指定btf文件的路径</p>
+<h3 id="debug">debug</h3>
+<p><strong>概述：</strong> 显示nettrace中的debug信息</p>
+<h3 id="bpf-debug">bpf-debug</h3>
+<p><strong>概述：</strong>
+启用ebpf程序的debug日志输出，需要在使用make编译时添加选项<code>BPF_DEBUG=1</code></p>
+<p><strong>示例：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">make BPF_DEBUG=1<br>nettrace --bpf-debug<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/ebpf/" class="category-chain-item">ebpf</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ebpf/" class="print-no-link">#ebpf</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>nettrace工具介绍</div>
+      <div>http://example.com/2025/05/20/nettrace工具介绍/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年5月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/19/ebpf-verifier/" title="ebpf-verifier">
+                        <span class="hidden-mobile">ebpf-verifier</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
