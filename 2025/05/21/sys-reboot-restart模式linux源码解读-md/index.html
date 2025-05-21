@@ -1,0 +1,818 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本文章旨在解读linux中reboot系统调用的模式之一restart">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sys_reboot-restart模式linux源码解读.md">
+<meta property="og:url" content="http://example.com/2025/05/21/sys-reboot-restart%E6%A8%A1%E5%BC%8Flinux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB-md/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="本文章旨在解读linux中reboot系统调用的模式之一restart">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/sys-reboot-restart%E6%A8%A1%E5%BC%8Flinux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB.png">
+<meta property="article:published_time" content="2025-05-21T02:43:49.000Z">
+<meta property="article:modified_time" content="2025-05-21T02:57:20.113Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="sys_reboot">
+<meta property="article:tag" content="restart">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/sys-reboot-restart%E6%A8%A1%E5%BC%8Flinux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB.png">
+  
+  
+  
+  <title>sys_reboot-restart模式linux源码解读.md - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="sys_reboot-restart模式linux源码解读.md"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-21 10:43" pubdate>
+          2025年05月21日, 10:43 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          1.8k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">sys_reboot-restart模式linux源码解读.md</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="kernel_restart">kernel_restart()</h1>
+<blockquote>
+<p>linux 6.6</p>
+</blockquote>
+
+<p><strong>作用：</strong> 重启。这在中断上下文中调用是不安全的</p>
+<p><strong>参数：</strong></p>
+<ul>
+<li>cmd：指向缓冲区的指针，其中包含命令行参数，可以为NULL</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">kernel_restart</span><span class="hljs-params">(<span class="hljs-type">char</span> *cmd)</span> &#123;<br>    <span class="hljs-comment">// 调用准备函数，处理一些重启前的准备工作</span><br>    kernel_restart_prepare(cmd);<br>    <span class="hljs-comment">// 调用系统重启前的额外准备工作</span><br>    do_kernel_restart_prepare();<br>    <span class="hljs-comment">// 将当前进程迁移到重启所需的CPU上，确保重启操作是在正确的CPU上执行</span><br>    migrate_to_reboot_cpu();<br>    <span class="hljs-comment">// 执行系统关闭的钩子函数（例如，关闭文件系统等）</span><br>    <span class="hljs-comment">// 这个机制主要是跟reboot有关，可以让其他子系统注册一些回调函数，在系统reboot的时候执行</span><br>    syscore_shutdown();<br>    <br>    <span class="hljs-comment">// 判断是否有提供命令行参数</span><br>    <span class="hljs-keyword">if</span> (!cmd) <br>        pr_emerg(<span class="hljs-string">&quot;Restarting system\n&quot;</span>);<br>    <span class="hljs-keyword">else</span><br>        pr_emerg(<span class="hljs-string">&quot;Restarting system with command &#x27;%s&#x27;\n&quot;</span>, cmd);<br>    <br>    <span class="hljs-comment">// 打印内核日志的内容，通常包括系统状态和错误信息</span><br>    kmsg_dump(KMSG_DUMP_SHUTDOWN);<br>    <span class="hljs-comment">// 执行与机器硬件相关的重启操作，这通常是硬件相关的操作，可能涉及重启操作系统、重启硬件等</span><br>    machine_restart(cmd);<br>&#125;<br><span class="hljs-comment">// 通过EXPORT_SYMBOL_GPL将kernel_restart函数导出为符号，使得其他模块可以调用它。</span><br>EXPORT_SYMBOL_GPL(kernel_restart);<br></code></pre></td></tr></table></figure>
+<h2 id="kernel_restart_prepare">kernel_restart_prepare()</h2>
+<blockquote>
+<p>linux 6.6</p>
+</blockquote>
+<p><strong>作用：</strong> 处理一些重启前的准备工作</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">kernel_restart_prepare</span><span class="hljs-params">(<span class="hljs-type">char</span> *cmd)</span> &#123;<br>    <span class="hljs-comment">// 调用阻塞的通知链，通知所有注册的重启通知处理函数，传递重启相关信息</span><br>    <span class="hljs-comment">// 通知链是一种机制，允许多个函数注册为回调函数，在特定事件发生时被调用</span><br>    <span class="hljs-comment">// reboot_notifier_list是一个通知链，所有希望在系统重启时执行某些操作的函数都应该注册到这个链表。通过传递SYS_RESTART作为事件代码（注册此通知链的回调函数通常属于内核子系统或驱动程序,例如卸载文件系统、关闭网络接口等）</span><br>    blocking_notifier_call_chain(&amp;reboot_notifier_list, SYS_RESTART, cmd);<br>    <br>    <span class="hljs-comment">// 设置系统状态为重启中，表明系统正处于重启流程中</span><br>    system_state = SYSTEM_RESTART;<br>    <br>    <span class="hljs-comment">// 禁用用户态帮助程序，这可能会阻止再重启期间重启新的用户态进程</span><br>    <span class="hljs-comment">// 用户态帮助程序通常负责在内核和用户空间之间传递任务或启动进程。</span><br>    usermodehelper_disable();<br>    <br>    <span class="hljs-comment">// 执行设备的关闭操作，例如卸载文件系统、关闭网络接口等</span><br>    device_shutdown();<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="do_kernel_restart_prepare">do_kernel_restart_prepare()</h2>
+<blockquote>
+<p>linux 6.6</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// static关键字意味着该函数只有在当前源文件内可见</span><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">do_kernel_restart_prepare</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>    <span class="hljs-comment">// 调用阻塞的通知链，通知所有注册的回调函数进行重启前的准备工作（注册此通知链的回调函数通常是与硬件相关的重启准备处理程序，比如watchdog）</span><br>    <span class="hljs-comment">// 这里的事件代码是0，表示没有特定的事件代码，回调函数只需要执行它们自己的重启准备逻辑</span><br>    blocking_notifier_call_chain(&amp;restart_prep_handler_list, <span class="hljs-number">0</span>, <span class="hljs-literal">NULL</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="migrate_to_reboot_cpu">migrate_to_reboot_cpu()</h2>
+<blockquote>
+<p>linux 6.6</p>
+</blockquote>
+<p><strong>作用：</strong>
+将当前任务迁移到一个特定的CPU上运行，通常是为了解决重启或迁移操作时的CPU选择问题。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">migrate_to_reboot_cpu</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>    <span class="hljs-comment">// 启动cpu总是逻辑cpu0</span><br>    <span class="hljs-type">int</span> cpu = reboot_cpu;<br>    <br>    cpu_hotplug_disable();<br>    <br>    <span class="hljs-comment">// 确保要重启的cpu处于在线状态</span><br>    <span class="hljs-keyword">if</span> (!cpu_online(cpu))<br>        cpu = cpumask_first(cpu_online_mask);<br>    <br>    <span class="hljs-comment">// 防止与迁移此任务的其他任务竞争</span><br>    current-&gt;flags |= PF_NO_SETAFFINITY;<br>    <br>    <span class="hljs-comment">// 确保只在合适的处理器上运行</span><br>    set_cpus_allowed_ptr(current, cpumask_of(cpu));<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="syscore_shutdown">syscore_shutdown()</h2>
+<p><strong>作用：</strong> 执行所有注册的系统核心关机回调</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">syscore_shutdown</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">syscore_ops</span> *<span class="hljs-title">ops</span>;</span><br>    <br>    mutex_lock(&amp;syscore_ops_lock);<br>    <br>    list_for_each_entry_reverse(ops, &amp;syscore_ops_list, node)<br>        <span class="hljs-keyword">if</span> (ops-&gt;shutdown) &#123;<br>            <span class="hljs-keyword">if</span> (initcall_debug)<br>                pr_info(<span class="hljs-string">&quot;PM: Calling %pS\n&quot;</span>, ops-&gt;shutdown);<br>            ops-&gt;shutdown();<br>        &#125;<br>    <br>    mutex_lock(&amp;syscore_ops_lock);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="machine_restart">machine_restart()</h2>
+<p><strong>作用：</strong> 执行实际的重启操作</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">machine_restart</span><span class="hljs-params">(<span class="hljs-type">char</span> *cmd)</span> &#123;<br>    machine_ops.restart(cmd);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="native_machine_restart">native_machine_restart()</h2>
+<p><strong>作用：</strong> 执行系统的重启操作</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">native_machine_restart</span><span class="hljs-params">(<span class="hljs-type">char</span> *__unused)</span> &#123;<br>    <span class="hljs-comment">// 打印日志，指示正在进行机器重启</span><br>    pr_notice(<span class="hljs-string">&quot;machine restart\n&quot;</span>);<br>    <br>    <span class="hljs-comment">// 如果没有强制重启（即reboot_force为假），则执行关机操作</span><br>    <span class="hljs-keyword">if</span> (!reboot_force)<br>        machine_shutdown();<br>    <br>    <span class="hljs-comment">// 调用紧急重启函数，参数为0</span><br>    __machine_emergency_restart(<span class="hljs-number">0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="machine_shutdown">machine_shutdown()</h3>
+<p><strong>作用：</strong> 执行具体的关机操作</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">machine_shutdown</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>    <span class="hljs-comment">// 调用machine_ops.shutdown()执行具体的关机操作</span><br>    machine_ops.shutdown();<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="native_machine_shutdown">native_machine_shutdown()</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">native_machine_shutdown</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> CONFIG_X86_IO_APIC</span><br>    <span class="hljs-comment">// 在禁用本地APIC之前禁用IO APIC</span><br>    <span class="hljs-comment">// 先停止外部中断的接收再禁用本地CPU的中断处理</span><br>    clear_IO_APIC();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> CONFIG_SMP</span><br>    <span class="hljs-comment">// 禁用本地中断，以防止接收每个CPU的定时器中断，这可能会触发调度器的负载平衡</span><br>    local_irq_disable();<br>    <span class="hljs-comment">// 停止所有非当前CPU的执行，这样可以确保所有CPU在关机过程中不再执行任何任务</span><br>    stop_other_cpus();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>    <br>    <span class="hljs-comment">// 清理和关闭本地APIC中断，涉及释放硬件资源</span><br>    lapic_shutdown();<br>    <span class="hljs-comment">// 恢复引导时的中断模式。在系统启动时，中断控制器和处理器处于某种初始状态，在关机或重启过程中，需要恢复系统最初的中断模式，以确保关机操作能够顺利进行</span><br>   	<span class="hljs-comment">// 因为DragonOS没有实现也没有启用legacy pic，所以暂时也没写</span><br>    restore_boot_irq_mode();<br>    <br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> CONFIG_HPET_TIMER</span><br>    <span class="hljs-comment">// 禁用HPET</span><br>    hpet_disable();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>    <br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> CONFIG_X86_64</span><br>    <span class="hljs-comment">// 关闭IOMMU。IOMMU(输入输出内存管理单元)是一种硬件设备，用于管理内存映射。</span><br>    x86_platform.iommu_shutdown();<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="machine_emergency_restart">__machine_emergency_restart()</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 当通过紧急方式重启时，这个变量被设置</span><br><span class="hljs-type">static</span> reboot_emergency;<br><span class="hljs-type">static</span> <span class="hljs-type">void</span> __machine_emergency_restart(<span class="hljs-type">int</span> emergency) &#123;<br>    reboot_emergency = emergency;<br>    machine_ops.emergency_restart();<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3
+id="native_machine_emergency_restart">native_machine_emergency_restart()</h3>
+<blockquote>
+<p>linux 6.6</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">native_machine_emergency_restart</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>    <span class="hljs-type">int</span> i;<br>    <span class="hljs-comment">// 重试次数</span><br>    <span class="hljs-type">int</span> attempt = <span class="hljs-number">0</span>;<br>    <span class="hljs-comment">// 记录原始的重启类型</span><br>    <span class="hljs-type">int</span> orig_reboot_type = reboot_type;<br>    <span class="hljs-comment">// 存储重启模式</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> mode;<br>    <br>    <span class="hljs-comment">// 如果发生了紧急重启，禁用所有VMX操作（虚拟化相关）</span><br>    <span class="hljs-keyword">if</span> (reboot_emergency)<br>       emergency_reboot_disable_virtualization();<br>    <br>    <span class="hljs-comment">// 调用Tboot来关闭机器并准备重启</span><br>    tboot_shutdown(TB_SHUTDOWN_REBOOT);<br>    <br>    <span class="hljs-comment">// 告诉BIOS我们想要冷重启还是热重启</span><br>    mode = reboot_mode == REBOOT_WARM ? <span class="hljs-number">0X1234</span> : <span class="hljs-number">0</span>;<br>    <span class="hljs-comment">// 写入0x472寄存器表示重启类型</span><br>    *((<span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> *)__va(<span class="hljs-number">0x472</span>)) = mode;<br>    <br>    <span class="hljs-comment">// 如果EFI capsule已注册，强制执行EFI重启</span><br>    <span class="hljs-keyword">if</span> (efi_capsule_pending(<span class="hljs-literal">NULL</span>)) &#123;<br>        pr_info(<span class="hljs-string">&quot;EFI capsule is pending, forcing EFI reboot. \n&quot;</span>);<br>        reboot_type = BOOT_EFI;<br>    &#125;<br>    <br>    <span class="hljs-comment">// 死循环，逐步尝试不同的重启方式</span><br>    <span class="hljs-keyword">for</span> (;;) &#123;<br>        <span class="hljs-comment">// 根据当前reboot_type选择不同的重启方法</span><br>        <span class="hljs-keyword">switch</span> (reboot_type) &#123;<br>            <span class="hljs-keyword">case</span> BOOT_ACPI:<br>                acpi_reboot();<br>                <span class="hljs-comment">// ACPI重启失败，转到键盘重启</span><br>                reboot_type = BOOT_KBD;<br>                <span class="hljs-keyword">break</span>;<br>                <br>            <span class="hljs-keyword">case</span> BOOT_KBD:<br>                <span class="hljs-comment">// 执行与主板相关的特定修复（通常是对某些硬件的特定处理）</span><br>                mach_reboot_fixups();<br>                <br>                <span class="hljs-comment">// 重试10次键盘重启方式，每次等待50微妙</span><br>                <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) &#123;<br>                    <span class="hljs-comment">// 等待键盘事件</span><br>                    kb_wait();<br>                    udelay(<span class="hljs-number">50</span>);<br>                    <span class="hljs-comment">// 发送0xfe到键盘控制器以触发重启</span><br>                    <span class="hljs-comment">// 0x64通常是键盘控制器的命令端口</span><br>                    outb(<span class="hljs-number">0xfe</span>, <span class="hljs-number">0x64</span>);<br>                    udelay(<span class="hljs-number">50</span>);<br>                &#125;<br>                <br>                <span class="hljs-comment">// 如果这是第一次尝试键盘重启，且原始重启类型是ACPI，则再次尝试ACPI</span><br>                <span class="hljs-keyword">if</span> (attempt == <span class="hljs-number">0</span> &amp;&amp; orig_reboot_type == BOOT_ACPI) &#123;<br>                    attempt = <span class="hljs-number">1</span>;<br>                    reboot_type = BOOT_ACPI;<br>                &#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-comment">// 否则转到EFI重启</span><br>                    reboot_type = BOOT_EFT;<br>                &#125;<br>                <span class="hljs-keyword">break</span>;<br>                <br>            <span class="hljs-keyword">case</span> BOOT_EFI:<br>                efi_reboot(reboot_mode, <span class="hljs-literal">NULL</span>);<br>                <span class="hljs-comment">// 如果EFI重启失败，转到BIOS重启</span><br>                reboot_type = BOOT_BIOS;<br>                <span class="hljs-keyword">break</span>;<br>                <br>            <span class="hljs-keyword">case</span> BOOT_BIOS:<br>                <span class="hljs-comment">// 尝试通过BIOS重启机器</span><br>                machine_real_restart(MBR_BIOS);<br>                <br>                <span class="hljs-comment">// 如果到了这里，系统可能已经挂掉了，但我们依然会继续执行，转到CF9安全重启</span><br>                reboot_type = BOOT_CF9_SAFE;<br>                <span class="hljs-keyword">break</span>;<br>                <br>            <span class="hljs-keyword">case</span> BOOT_CF9_FORCE:<br>                <span class="hljs-comment">// 设置标志</span><br>                port_cf9_safe = <span class="hljs-literal">true</span>;<br>                <span class="hljs-comment">// 强制执行下一个重启方式（即CF9安全重启）</span><br>                fallthrough;<br>                <br>            <span class="hljs-keyword">case</span> BOOT_CF9_SAFE:<br>                <span class="hljs-keyword">if</span> (port_cf9_safe) &#123;<br>                    <span class="hljs-comment">// 根据重启模式选择不同重启代码</span><br>                    u8 reboot_code = reboot_mode == REBOOT_WARM ? <span class="hljs-number">0X06</span> : <span class="hljs-number">0x0E</span>;<br>                    u8 cf9 = inb(<span class="hljs-number">0xcf9</span>) &amp; ~reboot_code;<br>                    outb(cf9|<span class="hljs-number">2</span>, <span class="hljs-number">0xcf9</span>); <span class="hljs-comment">// 请求硬重启</span><br>                    udelay(<span class="hljs-number">50</span>);<br>                    <span class="hljs-comment">// 执行实际的重启</span><br>                    outb(cf9|reboot_code, <span class="hljs-number">0xcf9</span>);<br>                    udelay(<span class="hljs-number">50</span>);<br>                &#125;<br>                <span class="hljs-comment">// CF9重启失败后，转到三重重启方式</span><br>                reboot_type = BOOT_TRIPLE;<br>                <span class="hljs-keyword">break</span>;<br>                <br>            <span class="hljs-keyword">case</span> BOOT_TRIPLE:<br>                <span class="hljs-comment">// 执行三重重启，通过int3触发调试中断</span><br>                idt_invalidate();<br>                <span class="hljs-comment">// 执行int3指令，触发调试异常</span><br>                __asm__ __volatile__(<span class="hljs-string">&quot;int3&quot;</span>);<br>                <br>                <span class="hljs-comment">// 执行到这里系统很大可能挂掉了</span><br>                reboot_type = BOOT_KBD; <span class="hljs-comment">// 转到键盘重启</span><br>                <span class="hljs-keyword">break</span>;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>后续有时间再继续整理重启的各种模式</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/linux/" class="print-no-link">#linux</a>
+      
+        <a href="/tags/sys-reboot/" class="print-no-link">#sys_reboot</a>
+      
+        <a href="/tags/restart/" class="print-no-link">#restart</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>sys_reboot-restart模式linux源码解读.md</div>
+      <div>http://example.com/2025/05/21/sys-reboot-restart模式linux源码解读-md/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年5月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/20/linux%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="linux内核编译学习笔记">
+                        <span class="hidden-mobile">linux内核编译学习笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
