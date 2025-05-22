@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>linux内核模块编译</title>
+    <link href="/2025/05/22/linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E7%BC%96%E8%AF%91/"/>
+    <url>/2025/05/22/linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E7%BC%96%E8%AF%91/</url>
+    
+    <content type="html"><![CDATA[<h1 id="示例程序">示例程序</h1><p><strong>1. 编写c语言程序：</strong></p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/module.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/init.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/kernel.h&gt;</span></span><br><br>MODULE_LICENSE(<span class="hljs-string">&quot;GPL&quot;</span>);<br>MODULE_AUTHOR(<span class="hljs-string">&quot;THE_FLY&quot;</span>);<br>MODULE_DESCRIPTION(<span class="hljs-string">&quot;Hello World Kernel Module&quot;</span>);<br><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> __init <span class="hljs-title function_">hello_init</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    printk(KERN_INFO <span class="hljs-string">&quot;Hello, World!\n&quot;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> __exit <span class="hljs-title function_">hello_exit</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    printk(KERN_INFO <span class="hljs-string">&quot;Goodbye, World!\n&quot;</span>);<br>&#125;<br><br>module_init(hello_init);<br>module_exit(hello_exit);<br></code></pre></td></tr></table></figure><p><strong>2. 编写Makefile文件：</strong></p><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-keyword">ifneq</span> (<span class="hljs-variable">$(KERNELRELEASE)</span>,)<br>obj-m :=hello.o<br><span class="hljs-keyword">else</span><br>KDIR :=/lib/modules/<span class="hljs-variable">$(<span class="hljs-built_in">shell</span> uname -r)</span>/build<br><span class="hljs-section">all:</span><br>make -C <span class="hljs-variable">$(KDIR)</span> M=<span class="hljs-variable">$(PWD)</span> modules<br><span class="hljs-section">clean:</span><br>rm -f *.ko *.o *.mod.o *.mod.c *.symvers *.order<br><span class="hljs-keyword">endif</span><br></code></pre></td></tr></table></figure><p><strong>3. 执行命令：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make<br></code></pre></td></tr></table></figure><p><strong>4. 安装模块：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">insmod hello.ko<br></code></pre></td></tr></table></figure><blockquote><p>如果安装失败，查看内核配置是否开启了CONFIG_MODULE_SIG配置，如果开启了需要对内核模块进行签名后才可以安装</p></blockquote><p><strong>5. 检查：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">lsmod | grep hello<br>dmesg | grep hello<br></code></pre></td></tr></table></figure><p><strong>6. 卸载模块：</strong></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">rmmod hello<br></code></pre></td></tr></table></figure><h1 id="可能出现的问题">可能出现的问题</h1><p>如果出现如下问题：</p><img src="/2025/05/22/linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E7%BC%96%E8%AF%91/image-20250521212002070.png" class=""><p>很有可能是make没有识别到<code>obj-m</code>，如果是linux内核自带的模块，Makefile文件一般是<code>obj-$(配置名)</code>，如果没有检测到配置名，那这个模块就会被忽略掉不编译，所以如果想让他识别到只能重新配置内核配置并编译，或者直接硬编码，修改Makefile为<code>obj-m</code>即可</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>linux</tag>
+      
+      <tag>mod</tag>
+      
+      <tag>compile</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>sys_reboot-restart模式linux源码解读3103</title>
     <link href="/2025/05/21/sys-reboot-restart%E6%A8%A1%E5%BC%8Flinux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/"/>
     <url>/2025/05/21/sys-reboot-restart%E6%A8%A1%E5%BC%8Flinux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</url>
@@ -51,9 +80,9 @@
       
       <tag>linux</tag>
       
-      <tag>kernel</tag>
-      
       <tag>compile</tag>
+      
+      <tag>kernel</tag>
       
     </tags>
     

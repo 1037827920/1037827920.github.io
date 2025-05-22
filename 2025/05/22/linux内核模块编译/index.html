@@ -19,26 +19,26 @@
   <meta name="author" content="凌云行者">
   <meta name="keywords" content="">
   
-    <meta name="description" content="本文章旨在记录个人的linux内核编译学习笔记">
+    <meta name="description" content="本文章旨在教程如何去编译并安装一个内核模块">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux内核编译学习笔记">
-<meta property="og:url" content="http://example.com/2025/05/20/linux%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:title" content="linux内核模块编译">
+<meta property="og:url" content="http://example.com/2025/05/22/linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E7%BC%96%E8%AF%91/index.html">
 <meta property="og:site_name" content="凌云行者的博客">
-<meta property="og:description" content="本文章旨在记录个人的linux内核编译学习笔记">
+<meta property="og:description" content="本文章旨在教程如何去编译并安装一个内核模块">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/img/linux%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
-<meta property="article:published_time" content="2025-05-20T05:01:13.000Z">
-<meta property="article:modified_time" content="2025-05-20T05:05:44.104Z">
+<meta property="og:image" content="http://example.com/img/linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E7%BC%96%E8%AF%91.png">
+<meta property="article:published_time" content="2025-05-22T01:48:46.000Z">
+<meta property="article:modified_time" content="2025-05-22T01:50:43.595Z">
 <meta property="article:author" content="凌云行者">
 <meta property="article:tag" content="linux">
+<meta property="article:tag" content="mod">
 <meta property="article:tag" content="compile">
-<meta property="article:tag" content="kernel">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/img/linux%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.png">
+<meta name="twitter:image" content="http://example.com/img/linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E7%BC%96%E8%AF%91.png">
   
   
   
-  <title>linux内核编译学习笔记 - 凌云行者的博客</title>
+  <title>linux内核模块编译 - 凌云行者的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -229,7 +229,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="linux内核编译学习笔记"></span>
+            <span id="subtitle" data-typed-text="linux内核模块编译"></span>
           
         </div>
 
@@ -240,8 +240,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-05-20 13:01" pubdate>
-          2025年05月20日, 1:01 下午
+        <time datetime="2025-05-22 09:48" pubdate>
+          2025年05月22日, 9:48 上午
         </time>
       </span>
     
@@ -253,7 +253,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          648 字
+          275 字
         
       </span>
     
@@ -301,63 +301,31 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">linux内核编译学习笔记</h1>
+            <h1 id="seo-header">linux内核模块编译</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="内核编译">内核编译</h1>
-<h2 id="共同的步骤">共同的步骤</h2>
-<p><strong>1. 下载源码：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">https://github.com/torvalds/linux.git<br></code></pre></td></tr></table></figure>
-<p><strong>2. 安装工具包： </strong>
-在编译过程中按照具体报错再具体安装对应的工具包</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># CentOS</span><br>yum -y groupinstall <span class="hljs-string">&quot;development tools&quot;</span><br><span class="hljs-comment"># ubuntu</span><br><span class="hljs-built_in">sudo</span> apt-get update<br><span class="hljs-built_in">sudo</span> apt-get install gcc g++<br><span class="hljs-built_in">sudo</span> apt-get install -y libncurses5-dev build-essential libssl-dev libc6-dev bin86 flex bison qttools5-dev libelf-dev<br></code></pre></td></tr></table></figure>
-<p><strong>3. 清除残留信息：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">make mrproper<br>make distclean<br></code></pre></td></tr></table></figure>
-<p><strong>4. 生成配置文件：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">make memuconfig         <span class="hljs-comment">#提供一个基于curses的命令行界面（需要curses库的支持）</span><br>make nconfig            <span class="hljs-comment">#提供一个基于ncurses（下一代curses）的命令行界面（需要ncurses库的支持）</span><br>make xconfig            <span class="hljs-comment">#基于QT的X Window图形化界面</span><br>make gconfig            <span class="hljs-comment">#基于GTK+的X Window图形化界面</span><br>make oldconfig          <span class="hljs-comment">#新配置的.config文件基于已经存在的.config，已经存在的.config中的值在新的.config文件中都成为默认值。</span><br>make silentoldconfig    <span class="hljs-comment">#同“make oldconfig”，但是该命令会避免被已经回答的问题弄乱屏幕，另外还会更新依赖。</span><br>make allyesconfig       <span class="hljs-comment">#在创建.config配置文件时，会尽可能选择“y”。(内核会非常大)</span><br>make allmodconfig       <span class="hljs-comment">#在创建.config配置文件时，会尽可能选择“m”。</span><br>make allnoconfig        <span class="hljs-comment">#在创建.config配置文件时，会尽可能选择“n”。</span><br>make randconfig         <span class="hljs-comment">#在创建.config配置文件时，会对各个选项进行随机设置（随机选择“y”、“m”、“n”）。</span><br>make defconfig          <span class="hljs-comment">#使用各架构下默认的.config文件（位于arch/&lt;arch&gt;/configs/*_defconfig）。</span><br><span class="hljs-comment"># 也可以用自己的内核配置，cp过去</span><br><span class="hljs-built_in">cp</span> /boot/config=$(<span class="hljs-built_in">uname</span> -r) .config<br></code></pre></td></tr></table></figure>
-<p><strong>5. 自动处理.config文件，不用手动去处理：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">./scripts/config -e CONFIG_LOCALVERSION_AUTO -d MODULE_SIG<br></code></pre></td></tr></table></figure>
-<ul>
-<li>-e：表示启用，这里CONFIG_LOCALVERSION_AUTO的意思是内核版本字符串会自动追加一个后缀（基于git仓库信息或本地修改）</li>
-<li>-d：表示禁用，MODULE_SIG是内核模块签名验证相关的配置，禁用后，内核允许加载未签名的模块</li>
-</ul>
-<h2 id="直接编译安装">直接编译安装</h2>
-<p><strong>1. 编译linux内核源码：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">make -j64<br><span class="hljs-comment"># 使用clang编译</span><br>make LLVM=1 -j64<br></code></pre></td></tr></table></figure>
-<p><strong>2. 安装linux内核：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">make modules_install <span class="hljs-comment"># 安装模块</span><br>make headers_install <span class="hljs-comment"># 安装linux内核头文件</span><br>make install <span class="hljs-comment"># 安装内核镜像</span><br></code></pre></td></tr></table></figure>
-<h2 id="生成rpm包安装">生成rpm包安装</h2>
-<p><strong>1. 构建rpm包：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make rpm-pkg -j64<br></code></pre></td></tr></table></figure>
-<ul>
-<li>rpm-pkg相对于rpm，会先执行make clean再进行构建</li>
-</ul>
-<p><strong>2. 安装kernel：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">rpm -ivh --force kernel-4-5.4.*.rpm<br></code></pre></td></tr></table></figure>
-<h1 id="更换kernel">更换kernel</h1>
-<p><strong>查看已安装的kernel：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">grubby --info=ALL | grep ^kernel<br></code></pre></td></tr></table></figure>
-<p><strong>选定需要默认启动的kernel并将其设置为默认启动：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">grubby --set-default=&lt;kernel-path&gt;<br></code></pre></td></tr></table></figure>
-<p><strong>重启切换：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">reboot<br></code></pre></td></tr></table></figure>
-<p><strong>验证：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">uname</span> -r<br></code></pre></td></tr></table></figure>
-<p><strong>删除某个内核启动项：</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> grubby --remove-kernel=&lt;kernel-path&gt;<br></code></pre></td></tr></table></figure>
-<h1 id="安装工具tools">安装工具(tools)</h1>
-<h2 id="bpftool">bpftool</h2>
-<p>编译：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make -C tools/bpf/bpftool<br></code></pre></td></tr></table></figure>
-<p>安装：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make install -C tools/bpf/bpftool<br></code></pre></td></tr></table></figure>
-<h1 id="内核配置学习">内核配置学习</h1>
-<h2 id="启用btf配置">启用BTF配置</h2>
-<p>如果想要开启BTF配置，前提是要启动调试，即打开下面配置</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">CONFIG_DEBUG_INFO_BTF=y<br></code></pre></td></tr></table></figure>
-<p>使用上面提到的脚本： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">./scripts/config -e CONFIG_DEBUG_INFO_BTF<br></code></pre></td></tr></table></figure></p>
+                <h1 id="示例程序">示例程序</h1>
+<p><strong>1. 编写c语言程序：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/module.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/init.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/kernel.h&gt;</span></span><br><br>MODULE_LICENSE(<span class="hljs-string">&quot;GPL&quot;</span>);<br>MODULE_AUTHOR(<span class="hljs-string">&quot;THE_FLY&quot;</span>);<br>MODULE_DESCRIPTION(<span class="hljs-string">&quot;Hello World Kernel Module&quot;</span>);<br><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> __init <span class="hljs-title function_">hello_init</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    printk(KERN_INFO <span class="hljs-string">&quot;Hello, World!\n&quot;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> __exit <span class="hljs-title function_">hello_exit</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>    printk(KERN_INFO <span class="hljs-string">&quot;Goodbye, World!\n&quot;</span>);<br>&#125;<br><br>module_init(hello_init);<br>module_exit(hello_exit);<br></code></pre></td></tr></table></figure>
+<p><strong>2. 编写Makefile文件：</strong></p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-keyword">ifneq</span> (<span class="hljs-variable">$(KERNELRELEASE)</span>,)<br>obj-m :=hello.o<br><span class="hljs-keyword">else</span><br>KDIR :=/lib/modules/<span class="hljs-variable">$(<span class="hljs-built_in">shell</span> uname -r)</span>/build<br><span class="hljs-section">all:</span><br>	make -C <span class="hljs-variable">$(KDIR)</span> M=<span class="hljs-variable">$(PWD)</span> modules<br><span class="hljs-section">clean:</span><br>	rm -f *.ko *.o *.mod.o *.mod.c *.symvers *.order<br><span class="hljs-keyword">endif</span><br></code></pre></td></tr></table></figure>
+<p><strong>3. 执行命令：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make<br></code></pre></td></tr></table></figure>
+<p><strong>4. 安装模块：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">insmod hello.ko<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>如果安装失败，查看内核配置是否开启了CONFIG_MODULE_SIG配置，如果开启了需要对内核模块进行签名后才可以安装</p>
+</blockquote>
+<p><strong>5. 检查：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">lsmod | grep hello<br>dmesg | grep hello<br></code></pre></td></tr></table></figure>
+<p><strong>6. 卸载模块：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">rmmod hello<br></code></pre></td></tr></table></figure>
+<h1 id="可能出现的问题">可能出现的问题</h1>
+<p>如果出现如下问题：</p>
+<img src="/2025/05/22/linux%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E7%BC%96%E8%AF%91/image-20250521212002070.png" srcset="/img/loading.gif" lazyload class="">
+<p>很有可能是make没有识别到<code>obj-m</code>，如果是linux内核自带的模块，Makefile文件一般是<code>obj-$(配置名)</code>，如果没有检测到配置名，那这个模块就会被忽略掉不编译，所以如果想让他识别到只能重新配置内核配置并编译，或者直接硬编码，修改Makefile为<code>obj-m</code>即可</p>
 
                 
               </div>
@@ -393,9 +361,9 @@
       
         <a href="/tags/linux/" class="print-no-link">#linux</a>
       
-        <a href="/tags/compile/" class="print-no-link">#compile</a>
+        <a href="/tags/mod/" class="print-no-link">#mod</a>
       
-        <a href="/tags/kernel/" class="print-no-link">#kernel</a>
+        <a href="/tags/compile/" class="print-no-link">#compile</a>
       
     </div>
   
@@ -407,8 +375,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>linux内核编译学习笔记</div>
-      <div>http://example.com/2025/05/20/linux内核编译学习笔记/</div>
+      <div>linux内核模块编译</div>
+      <div>http://example.com/2025/05/22/linux内核模块编译/</div>
     </div>
     <div class="license-meta">
       
@@ -420,7 +388,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年5月20日</div>
+          <div>2025年5月22日</div>
         </div>
       
       
@@ -464,18 +432,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/05/21/sys-reboot-restart%E6%A8%A1%E5%BC%8Flinux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" title="sys_reboot-restart模式linux源码解读3103">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">sys_reboot-restart模式linux源码解读3103</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/05/20/nettrace%E5%B7%A5%E5%85%B7%E4%BB%8B%E7%BB%8D/" title="nettrace工具介绍">
-                        <span class="hidden-mobile">nettrace工具介绍</span>
+                      <a href="/2025/05/21/sys-reboot-restart%E6%A8%A1%E5%BC%8Flinux%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" title="sys_reboot-restart模式linux源码解读3103">
+                        <span class="hidden-mobile">sys_reboot-restart模式linux源码解读3103</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
