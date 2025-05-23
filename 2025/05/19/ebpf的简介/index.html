@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/ebpf%E7%AE%80%E4%BB%8B.png">
 <meta property="article:published_time" content="2025-05-19T10:03:08.000Z">
-<meta property="article:modified_time" content="2025-05-19T10:09:25.530Z">
+<meta property="article:modified_time" content="2025-05-23T02:11:39.085Z">
 <meta property="article:author" content="凌云行者">
 <meta property="article:tag" content="ebpf">
 <meta name="twitter:card" content="summary_large_image">
@@ -251,7 +251,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          2k 字
+          2.4k 字
         
       </span>
     
@@ -355,9 +355,17 @@ ebpf程序是事件驱动的，当内核或应用程序通过某个钩子点时�
 <p><strong><a href="#%20kprobe">kprobe</a>/uprobe：</strong>
 如果不存在特定需求的预定义钩子，则可以创建内核探测器(kprobe)或用户探测器(uprobe)，以将ebpf程序附加到内核或用户应用程序中的几乎任何位置</p>
 <h2 id="如何编写">如何编写</h2>
+<p><strong>概述：</strong></p>
 <ul>
-<li><p>一般不直接编写，而是通过cilium、bcc、bpftrace、libbpf等项目间接使用。</p></li>
-<li><p>如果要直接编写，一般通过llvm将c代码编译成ebpf字节码</p></li>
+<li>一般不直接编写，而是通过cilium、bcc、bpftrace、libbpf等项目间接使用。</li>
+<li>如果要直接编写，一般通过llvm将c代码编译成ebpf字节码</li>
+</ul>
+<p><strong>ebpf程序的基本框架：</strong></p>
+<ul>
+<li>包含头文件：需要包含linux/bpf.h和bpf/bpf_helpers.h等头文件</li>
+<li>定义许可证：通常使用“Dual BSD/GPL”</li>
+<li>定义bpf函数：即要附加到内核probe上执行的代码逻辑</li>
+<li>返回值</li>
 </ul>
 <h2 id="加载器验证架构">加载器&amp;验证架构</h2>
 <p><strong>概述：</strong>
@@ -441,6 +449,24 @@ map传递</p>
 程序拥有一个大小为 512 字节的固定堆栈空间，由特殊寄存器 R10
 指向堆栈的顶部（高地址）。程序通过对 R10 进行负偏移来访问堆栈，例如
 <code>r10 - 8</code> 表示堆栈顶部向下偏移 8 字节的位置。</p>
+<h2 id="btf">BTF</h2>
+<p><strong>概述：</strong>
+BTF，也就是bpf类型格式，是一种元数据格式，用于编码与bpf程序和映射相关的调试信息。它专注于描述数据类型以及定义子例程的函数信息。这些调试信息可用于多种用途，包括映射可视化、bpf程序的函数签名增强，以及辅助生成带注释的源代码、JIT代码和验证器日志</p>
+<p><strong>函数签名增强：</strong></p>
+<ul>
+<li>函数参数类型和返回类型：BTF可以描述函数的输入和输出参数的类型（比如整体、结构体、指针等），使得分析工具能够正确地识别这些类型</li>
+<li>函数的调用约定：btf能够帮助工具理解函数是如何被调用的，包括参数如何传递、返回值如何处理等信息</li>
+</ul>
+<p><strong>btf规范：</strong></p>
+<ul>
+<li>btf内核api：定义了用户空间和内核之间的接口，在使用之前，内核会验证提供的btf信息</li>
+<li>btf
+elf文件格式：这建立了elf文件和用户空间中的libbpf加载器之间的契约</li>
+</ul>
+<blockquote>
+<p>btf时作为DWARF调试信息的替代方案而创建的，btf由于其<a
+target="_blank" rel="noopener" href="https://nakryiko.com/posts/btf-dedup/">重复数据删除算法</a>而更加节省空间，同时又保持了足够的表达能力，能够包含c程序的所有类型信息。</p>
+</blockquote>
 <h1 id="开发工具链">开发工具链</h1>
 <h2 id="bcc">bcc</h2>
 <p><strong>概述：</strong>
