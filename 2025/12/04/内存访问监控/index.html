@@ -1,0 +1,953 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  <link rel="icon" href="/img/%E5%BE%AE%E4%BF%A1%E5%A4%B4%E5%83%8F.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="凌云行者">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="内存访问监控">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存访问监控">
+<meta property="og:url" content="http://example.com/2025/12/04/%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE%E7%9B%91%E6%8E%A7/index.html">
+<meta property="og:site_name" content="凌云行者的博客">
+<meta property="og:description" content="内存访问监控">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE%E7%9B%91%E6%8E%A7.png">
+<meta property="article:published_time" content="2025-12-04T13:13:58.000Z">
+<meta property="article:modified_time" content="2025-12-04T13:18:31.134Z">
+<meta property="article:author" content="凌云行者">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE%E7%9B%91%E6%8E%A7.png">
+  
+  
+  
+  <title>内存访问监控 - 凌云行者的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"wmN2DXdZ64UHbbAUn6oCgldr-gzGzoHsz","app_key":"U09w0L2CpXIR03ygOqzRyd7T","server_url":"https://wmn2dxdz.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>凌云行者</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/%E5%8D%9A%E5%AE%A2%E6%96%87%E7%AB%A0.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="内存访问监控"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-04 21:13" pubdate>
+          2025年12月04日, 9:13 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          1.8k 字
+        
+      </span>
+    
+
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">内存访问监控</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="概述">1. 概述</h1>
+<p>通过对进程内存访问数据采样，计算进程对remote内存访问产生的带宽流量来间接推断跨numa访问的严重程度，从而实现带宽感知调度决策、RTD间调度优化，并向带宽分配功能提供反馈，从而实现对内存带宽的控制</p>
+<h1 id="硬件方案">2. 硬件方案</h1>
+<h2 id="cpu支持">2.1 cpu支持</h2>
+<ul>
+<li>Intel RDT
+<ul>
+<li>https://cloud-atlas.readthedocs.io/zh-cn/latest/kernel/cpu/intel/intel_rdt/intel_rdt_arch.html</li>
+<li>https://www.intel.cn/content/www/cn/zh/content-details/851356/intel-resource-director-technology-intel-rdt-architecture-specification.html</li>
+<li>https://eci.intel.com/docs/3.0/development/intel-pqos.html</li>
+</ul></li>
+<li>AMD PQos（与RDT对等的）</li>
+<li>海光类似AMD，我在机器上看也是有相关cpu feature的</li>
+<li>鲲鹏
+PMU，应该也是支持这个内存访问采样的，他们有提供对应的用户态库。但是对跨numa内存访问的功能似乎不能指定进程进行才采样</li>
+<li>arm MPAM(Memmory Partitioning and Monitoring)</li>
+</ul>
+<h2 id="内核resctrl支持">2.2 内核resctrl支持</h2>
+<h3 id="概述-1">2.2.1 概述</h3>
+<p><strong>概述：</strong>
+resctrl问津啊系统通过sysfs暴露给用户态，能够在用户态使用这些接口文件。此功能需要开启CONFIG_X86_CPU_RESCTRL编译配置</p>
+<p><strong>cpuinfo flag：</strong></p>
+<table>
+
+<thead>
+<tr>
+<th>特性</th>
+<th>flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RDT(Resource Director Technology) Allocation</td>
+<td>rdt_a</td>
+</tr>
+<tr>
+<td>CAT(Cache Allocation Technology)</td>
+<td>cat_l3、cat_l2</td>
+</tr>
+<tr>
+<td>CDP(Code and Data Prioritization)</td>
+<td>cdp_l3、cdp_l2</td>
+</tr>
+<tr>
+<td>CQM(Cache QoS Monitoring)</td>
+<td>cqm_llc、cqm_occup_llc</td>
+</tr>
+<tr>
+<td>MBM(Memory Bandwidth Monitoring)【采样内存访问所需的特性】</td>
+<td>cqm_mbm_total、cqm_mbm_local</td>
+</tr>
+<tr>
+<td>MBA(Memory Bandwidth Allocation)</td>
+<td>Mba</td>
+</tr>
+<tr>
+<td>SMBA(Slow Memory Bandwidth Allocation)</td>
+<td></td>
+</tr>
+<tr>
+<td>BMEC(Bandwidth Monitoring Event Configuration)</td>
+<td></td>
+</tr>
+<tr>
+<td>ABMC(Assignable Bandwidth Monitoring Counters)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>每个接口文件的详细介绍看linux doc：</strong>
+https://docs.kernel.org/filesystems/resctrl.html</p>
+<p><strong>arm MAPM较新，内核支持的较晚，相关链接：</strong></p>
+<ul>
+<li>将x86/resctrl抽象为公共接口以便arm
+MPAM接入：https://lwn.net/Articles/1021264/</li>
+<li>arm mpam引入：https://lwn.net/Articles/1042576/</li>
+<li>arm
+MAPM介绍：https://developer.arm.com/documentation/108032/0100/A-closer-look-at-MPAM-software/Linux-MPAM-overview</li>
+</ul>
+<h3 id="使用">2.2.2 使用</h3>
+<p><strong>1. 使用此功能需要挂载该文件系统：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mount -t resctrl resctrl /sys/fs/resctrl<br></code></pre></td></tr></table></figure>
+<p><strong>2. 在mon_group下创建监控组：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /sys/fs/resctrl/mon_groups<br><span class="hljs-built_in">mkdir</span> test-mon<br></code></pre></td></tr></table></figure>
+<p><strong>3. 设置要监控的cpu和进程：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> 0 &gt; cpus_list<br><span class="hljs-built_in">echo</span> &lt;PID&gt; &gt; tasks<br></code></pre></td></tr></table></figure>
+<p><strong>4. 查看内存访问数据量：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> mon_data/mon_L3_00/mbm_local_bytes <span class="hljs-comment"># 本地</span><br><span class="hljs-built_in">cat</span> mon_data/mon_L3_00/mbm_total_bytes <span class="hljs-comment"># 总共</span><br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>如果cpu不属于这个L3 cache
+domain，读取这两个接口文件会返回Unavailable</p>
+<p>想要知道cpu0跟哪些cpu共享L3 cache，可以执行cat
+/sys/devices/system/cpu/cpu0/cache/index3/shared_cpu_list，看其他cpu类似</p>
+</blockquote>
+<p><strong>5. 删除子group：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">rmdir</span> test-mon<br></code></pre></td></tr></table></figure>
+<h2 id="用户态工具">2.3 用户态工具</h2>
+<h3 id="pqos">2.3.1 pqos</h3>
+<h4 id="编译安装">2.3.1.1 编译安装</h4>
+<blockquote>
+<p><strong>仓库代码：</strong>
+https://eci.intel.com/docs/3.0/development/intel-pqos.html</p>
+</blockquote>
+<p><strong>概述：</strong>
+该工具可以不需要内核支持，直接使用CAT、CMT、MBM、CDP功能，直接访问msr寄存器。支持Intel
+RDT和AMD PQoS，我觉得海光cpu应该也是可以使用这个工具</p>
+<p><strong>1. 添加动态库链接目录：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;/usr/local/lib&quot;</span> &gt;&gt; /etc/ld.so.conf<br>ldconfig<br></code></pre></td></tr></table></figure>
+<p><strong>2. 修改lib/pqos.h的enum
+pqos_vendor，添加PQOS_VENDOR_HYGON</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">pqos_vendor</span> &#123;</span><br>        PQOS_VENDOR_UNKNOWN = <span class="hljs-number">0</span>, <span class="hljs-comment">/**&lt; UNKNOWN */</span><br>        PQOS_VENDOR_INTEL = <span class="hljs-number">1</span>,   <span class="hljs-comment">/**&lt; INTEL */</span><br>        PQOS_VENDOR_AMD = <span class="hljs-number">2</span>,     <span class="hljs-comment">/**&lt; AMD */</span><br>        PQOS_VENDOR_HYGON = <span class="hljs-number">3</span>    <span class="hljs-comment">/**&lt; HYGON */</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p><strong>3.
+修改lib/cpuinfo.c的detect_vendor()，添加PQOS_VENDOR_HYGON的检测：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-keyword">enum</span> pqos_vendor<br><span class="hljs-title function_">detect_vendor</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>        <span class="hljs-class"><span class="hljs-keyword">enum</span> <span class="hljs-title">pqos_vendor</span> <span class="hljs-title">cpu_vendor</span>;</span><br>        <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">cpuid_out</span> <span class="hljs-title">vendor</span>;</span><br><br>        lcpuid(<span class="hljs-number">0x0</span>, <span class="hljs-number">0x0</span>, &amp;vendor);<br>        <span class="hljs-keyword">if</span> (vendor.ebx == <span class="hljs-number">0x756e6547</span> &amp;&amp; vendor.edx == <span class="hljs-number">0x49656e69</span> &amp;&amp;<br>            vendor.ecx == <span class="hljs-number">0x6c65746e</span>) &#123;<br>                cpu_vendor = PQOS_VENDOR_INTEL;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (vendor.ebx == <span class="hljs-number">0x68747541</span> &amp;&amp; vendor.edx == <span class="hljs-number">0x69746E65</span> &amp;&amp;<br>                   vendor.ecx == <span class="hljs-number">0x444D4163</span>) &#123;<br>                cpu_vendor = PQOS_VENDOR_AMD;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (vendor.ebx == <span class="hljs-number">0x6f677948</span> &amp;&amp; vendor.edx == <span class="hljs-number">0x6e65476e</span> &amp;&amp;<br>                   vendor.ecx == <span class="hljs-number">0x656e6975</span>) &#123;<br>                cpu_vendor = PQOS_VENDOR_HYGON;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>                cpu_vendor = PQOS_VENDOR_UNKNOWN;<br>        &#125;<br>        <span class="hljs-keyword">return</span> cpu_vendor;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>4.
+修改lib/cpuinfo.c的init_config()，添加对PQOS_VENDOR_HYGON的处理：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">int</span><br><span class="hljs-title function_">init_config</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> cpuinfo_config *config, <span class="hljs-keyword">enum</span> pqos_vendor vendor)</span><br>&#123;<br>        <span class="hljs-built_in">memset</span>(config, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> cpuinfo_config));<br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * Make sure to initialize all the pointers to avoid</span><br><span class="hljs-comment">         * NULL check while calling</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-keyword">if</span> (vendor == PQOS_VENDOR_INTEL) &#123;<br>                config-&gt;cpuid_cache_leaf = <span class="hljs-number">4</span>;<br>                config-&gt;mba_max = PQOS_MBA_LINEAR_MAX;<br>                config-&gt;mba_msr_reg = PQOS_MSR_MBA_MASK_START;<br>                config-&gt;mba_default_val = <span class="hljs-number">0</span>;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (vendor == PQOS_VENDOR_AMD) &#123;<br>                config-&gt;cpuid_cache_leaf = <span class="hljs-number">0x8000001D</span>;<br>                config-&gt;mba_max = PQOS_MBA_MAX_AMD;<br>                config-&gt;mba_msr_reg = PQOS_MSR_MBA_MASK_START_AMD;<br>                config-&gt;mba_default_val = PQOS_MBA_MAX_AMD;<br>                config-&gt;smba_msr_reg = PQOS_MSR_SMBA_MASK_START_AMD;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (vendor == PQOS_VENDOR_HYGON) &#123;<br>                config-&gt;cpuid_cache_leaf = <span class="hljs-number">0x8000001D</span>;<br>                config-&gt;mba_max = PQOS_MBA_MAX_AMD;<br>                config-&gt;mba_msr_reg = PQOS_MSR_MBA_MASK_START_AMD;<br>                config-&gt;mba_default_val = PQOS_MBA_MAX_AMD;<br>                config-&gt;smba_msr_reg = PQOS_MSR_SMBA_MASK_START_AMD;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>                LOG_ERROR(<span class="hljs-string">&quot;init_config: init failed!&quot;</span>);<br>                <span class="hljs-keyword">return</span> -EFAULT;<br>        &#125;<br><br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>5. 编译安装：</strong></p>
+<blockquote>
+<p>要求gcc 9及以上</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">make<br>make install<br></code></pre></td></tr></table></figure>
+<h4 id="使用-1">2.3.1.2 使用</h4>
+<p><strong>MBM的使用方法：</strong>
+MBL表示本地内存带宽，MBR表示远程内存带宽</p>
+<ol type="1">
+<li><p>监控指定核心的内存带宽使用情况：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pqos -m <span class="hljs-string">&#x27;mbl:cores;mbr:cores</span><br></code></pre></td></tr></table></figure></li>
+<li><p>示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pqos -m <span class="hljs-string">&#x27;mbl:1,3-4;mbr:1,3-4&#x27;</span><br></code></pre></td></tr></table></figure></li>
+<li><p>输出示例如下：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">TIME</span> <span class="hljs-number">2019</span>-<span class="hljs-number">05</span>-<span class="hljs-number">07</span> <span class="hljs-number">08</span>:<span class="hljs-number">01</span>:<span class="hljs-number">16</span>  <br><span class="hljs-attribute">CORE</span> IPC  MISSES  MBL\[MB/s\] MBR\[MB/s\]  <br><span class="hljs-attribute">1</span>    <span class="hljs-number">1</span>.<span class="hljs-number">17</span> <span class="hljs-number">124254</span>k <span class="hljs-number">15161</span>.<span class="hljs-number">8</span> 		<span class="hljs-number">0</span>.<span class="hljs-number">1</span>  <br><span class="hljs-attribute">3</span> 	 <span class="hljs-number">1</span>.<span class="hljs-number">54</span> <span class="hljs-number">38010</span>k  <span class="hljs-number">4595</span>.<span class="hljs-number">0</span> 			<span class="hljs-number">0</span>.<span class="hljs-number">1</span>  <br><span class="hljs-attribute">4</span> 	 <span class="hljs-number">1</span>.<span class="hljs-number">41</span> <span class="hljs-number">135584</span>k <span class="hljs-number">8210</span>.<span class="hljs-number">6</span> 			<span class="hljs-number">0</span>.<span class="hljs-number">2</span><br></code></pre></td></tr></table></figure></li>
+<li><p>监控每个进程/任务的内存带宽使用情况：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pqos -I -p <span class="hljs-string">&#x27;mbl:pids;mbr:pids&#x27;</span><br></code></pre></td></tr></table></figure></li>
+<li><p>示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pqos -I -p <span class="hljs-string">&#x27;mbl:65627;mbr:65627&#x27;</span><br></code></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>在海光cpu上的测试：</strong>
+需要修改intel-cmt-cat源码使其支持海光cpu的vendor</p>
+<ol type="1">
+<li><p>执行测试程序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">taskset -c 4 memtester 1000M<br></code></pre></td></tr></table></figure></li>
+<li><p>监控指定核心：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">pqos -I -p <span class="hljs-string">&#x27;mbl:77614;mbr:77614&#x27;</span><br><br>pqos -I -p <span class="hljs-string">&#x27;mbl:69943;mbr:69943&#x27;</span><br></code></pre></td></tr></table></figure></li>
+<li><p>结果： <img src="/2025/12/04/%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE%E7%9B%91%E6%8E%A7/image-20251105111940862.png" srcset="/img/loading.gif" lazyload class=""></p></li>
+</ol>
+<h4 id="mbm监控结果说明">2.3.1.3 MBM监控结果说明</h4>
+<ul>
+<li><p>通过写入IA32_QM_EVTSEL MSR设置RMID和Event
+ID，硬件就会查看特定数据，并通过IA32_QM_CTR MSR返回结果。</p></li>
+<li><p>MBM监控的是L3 cache到主内存的内存请求带宽</p></li>
+<li><p>MBM计数器记录的值是累积值，cpu代理和非cpu代理发出的每个内存请求都会被应将标记上相应的RMID
+tag，硬件会根据这些RMID收集资源监控要遥测数据</p></li>
+<li><p>pqos工具输出的结果是每秒读msr的值，然后跟上一秒读的值作差值算出带宽（pqos工具如果使用的是resctrl接口，会通过创建子group，如果是核心模式，指定多少个核心就创建多少个子group分别监控指定核心；如果是进程模式，就只创建一个，然后会累积所有L3
+cache domain统计的内存访问带宽）</p></li>
+<li><p>如果不想使用pqos工具，可以直接使用linux提供的resctrl接口。跟cgroup差不多，详见<a
+href="#%202.2%20内核resctrl支持">2.2 内核resctrl支持</a></p></li>
+</ul>
+<h3 id="鲲鹏libkperf库">2.3.2 鲲鹏libkperf库</h3>
+<h4 id="pmu检查">2.3.3.1 PMU检查</h4>
+<p>应该是只要支持鲲鹏的PMU特性就可以使用该库，检查是否支持PMU：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">perf <span class="hljs-built_in">stat</span> -a <span class="hljs-built_in">sleep</span> 10<br></code></pre></td></tr></table></figure>
+<p>输入如下说明支持： <img src="/2025/12/04/%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE%E7%9B%91%E6%8E%A7/image-20251104172350653.png" srcset="/img/loading.gif" lazyload class=""></p>
+<p>如果如下，一些性能指标没有采集到说明不支持： <img src="/2025/12/04/%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE%E7%9B%91%E6%8E%A7/image-20251104172420686.png" srcset="/img/loading.gif" lazyload class=""></p>
+<h4 id="使用-2">2.3.3.2 使用</h4>
+<p><strong>仓库代码：</strong>
+https://gitee.com/openeuler/libkperf.git</p>
+<p><strong>采集每个numa的跨nuam访问HHA的操作比例示例代码：</strong>
+似乎是不能以进程为粒度的，而是以整个numa节点为粒度的</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// c++代码示例</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;symbol.h&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;pmu.h&quot;</span></span><br><br>PmuDeviceAttr devAttr[<span class="hljs-number">2</span>];<br><span class="hljs-comment">// 采集跨numa访问HHA的操作比例</span><br>devAttr[<span class="hljs-number">0</span>].metric = PMU_HHA_CROSS_NUMA;<br><span class="hljs-comment">// 采集跨socket访问HHA的操作比例</span><br>devAttr[<span class="hljs-number">1</span>].metric = PMU_HHA_CROSS_SOCKET;<br><span class="hljs-comment">// 初始化采集任务</span><br><span class="hljs-type">int</span> pd = <span class="hljs-built_in">PmuDeviceOpen</span>(devAttr, <span class="hljs-number">2</span>);<br><span class="hljs-comment">// 开始采集</span><br><span class="hljs-built_in">PmuEnable</span>(pd);<br><span class="hljs-built_in">sleep</span>(<span class="hljs-number">1</span>);<br><span class="hljs-built_in">PmuDisable</span>(pd);<br>PmuData *oriData = <span class="hljs-literal">nullptr</span>;<br><span class="hljs-type">int</span> oriLen = <span class="hljs-built_in">PmuRead</span>(pd, &amp;oriData);<br>PmuDeviceData *devData = <span class="hljs-literal">nullptr</span>;<br><span class="hljs-keyword">auto</span> len = <span class="hljs-built_in">PmuGetDevMetric</span>(oriData, oriLen, devAttr, <span class="hljs-number">2</span>, &amp;devData);<br><span class="hljs-comment">// devData的长度等于设备numa的个数</span><br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; len / <span class="hljs-number">2</span>; ++i) &#123;<br>    std::cout &lt;&lt; <span class="hljs-string">&quot;HHA cross-numa operations ratio (Numa: &quot;</span> &lt;&lt; devData[i].numaId &lt;&lt; <span class="hljs-string">&quot;): &quot;</span> &lt;&lt; devData[i].count&lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>;<br>&#125;<br><span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = len / <span class="hljs-number">2</span>; i &lt; len; ++i) &#123;<br>    std::cout &lt;&lt; <span class="hljs-string">&quot;HHA cross-socket operations ratio (Numa: &quot;</span> &lt;&lt; devData[i].numaId &lt;&lt; <span class="hljs-string">&quot;): &quot;</span> &lt;&lt; devData[i].count&lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>;<br>&#125;<br><span class="hljs-built_in">DevDataFree</span>(devData);<br><span class="hljs-built_in">PmuDataFree</span>(oriData);<br><span class="hljs-built_in">PmuClose</span>(pd);<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>详见：https://gitee.com/openeuler/libkperf/blob/master/docs/Details_Usage.md#%E9%87%87%E9%9B%86%E8%B7%A8numa%E8%B7%A8socket%E8%AE%BF%E9%97%AEhha%E6%AF%94%E4%BE%8B</p>
+<p>标题是《采集跨numa/跨socket访问HHA比例》</p>
+</blockquote>
+<h3 id="perf-mem">2.3.3 perf mem</h3>
+<p><strong>需要硬件支持：</strong></p>
+<ul>
+<li>intel TPEBS</li>
+<li>AMD IBS Op</li>
+<li>Arm64 SPE</li>
+</ul>
+<h1 id="软件方案">3. 软件方案</h1>
+<p>目前没有调研到纯软件来实现内存访问监控比较好的方法。似乎内核只能通过page
+fault来感知到内存访问，所以监控page fault是一个方法</p>
+<ol type="1">
+<li>使用内核提供的tracepoint事件追踪page fault</li>
+<li>编写bpf程序，根据虚拟地址address转换为pfn，从pfn中获取struct
+page，然后获取page所属的nuam
+id，维护计数器统计该访问是本地访问还是远程访问（统计结果通过ebpf
+map传到用户态）</li>
+<li>将page更新到epbf
+map中，然后用户态程序定义一个时间窗口，定时将这些page通过mprotect()
+syscall修改页面保护为PROT_NONE，则后面进程再次访问该page会触发page
+fault</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="category-chain-item">操作系统</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="print-no-link">#操作系统</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>内存访问监控</div>
+      <div>http://example.com/2025/12/04/内存访问监控/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>凌云行者</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月4日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/06/27/bigalloc%E6%9C%BA%E5%88%B6/" title="bigalloc机制">
+                        <span class="hidden-mobile">bigalloc机制</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://github.com/1037827920" target="_blank" rel="nofollow noopener"><span>个人Github</span></a> <i class="iconfont icon-comment"></i> <text>邮箱: 1037827920@qq.com</text> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        本站总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        本站总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
